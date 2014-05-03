@@ -71,6 +71,13 @@ class DataProcessingPanels(horizon.PanelGroup):
               'data_processing.data_plugins',)
 
 
+class GroupPolicyPanels(horizon.PanelGroup):
+    name = _("Group Policy")
+    slug = "group_policy"
+    panels = ('endpoint_groups',
+              'contracts')
+
+
 class Project(horizon.Dashboard):
     name = _("Project")
     slug = "project"
@@ -80,7 +87,8 @@ class Project(horizon.Dashboard):
         ObjectStorePanels,
         OrchestrationPanels,
         DatabasePanels,
-        DataProcessingPanels,)
+        DataProcessingPanels,
+        GroupPolicyPanels)
     default_panel = 'overview'
     supports_tenants = True
 
