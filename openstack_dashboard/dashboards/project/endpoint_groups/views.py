@@ -31,6 +31,7 @@ from openstack_dashboard.dashboards.project.endpoint_groups \
     import workflows as epg_workflows
 
 EPGTabs = epg_tabs.EPGTabs
+EPGDetailsTabs = epg_tabs.EPGDetailsTabs
 
 AddEPG = epg_workflows.AddEPG
 UpdateEPG = epg_forms.UpdateEPG
@@ -46,7 +47,7 @@ class AddEPGView(workflows.WorkflowView):
 
 
 class EPGDetailsView(tabs.TabView):
-    #tab_group_class = (EPGDetailsTabs)
+    tab_group_class = (EPGDetailsTabs)
     template_name = 'project/endpoint_groups/details_tabs.html'
 
 

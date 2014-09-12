@@ -12,6 +12,7 @@
 #
 # @author: Ronak Shah
 
+from django.core.urlresolvers import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 from horizon import exceptions
 from horizon import tabs
@@ -48,3 +49,25 @@ class EPGTabs(tabs.TabGroup):
     slug = "epgtabs"
     tabs = (EPGsTab,)
     sticky = True
+
+
+class EPGDetailsTab(tabs.Tab):
+    name = _("EPG Details")
+    slug = "epgdetails"
+    template_name = "project/endpoint_groups/_epg_details.html"
+    failure_url = reverse_lazy('horizon:project:endpoint_group:index')
+
+    def get_context_data(self, request):
+        epgid = self.tab_group.kwargs['epg_id']
+        try:
+            epg = api.group_policy.epg_get(request, epgid)
+        except Exception:
+            exceptions.handle(request,
+                              _('Unable to retrieve firewall details.'),
+                              redirect=self.failure_url)
+        return {'epg': epg}
+
+
+class EPGDetailsTabs(tabs.TabGroup):
+    slug = "epgtabs"
+    tabs = (EPGDetailsTab,)
