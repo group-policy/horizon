@@ -46,7 +46,7 @@ class IndexView(tabs.TabView):
         obj_type = re.search('.delete([a-z]+)', action).group(1)
         if not obj_ids:
             obj_ids.append(re.search('([0-9a-z-]+)$', action).group(1))
-        if obj_type == 'action':
+        if obj_type == 'policyaction':
             for obj_id in obj_ids:
                 try:
                     api.group_policy.policyaction_delete(request, obj_id)
@@ -54,7 +54,7 @@ class IndexView(tabs.TabView):
                 except Exception as e:
                     exceptions.handle(request,
                                       _('Unable to delete action. %s') % e)
-        if obj_type == 'classifier':
+        if obj_type == 'policyclassifier':
             for obj_id in obj_ids:
                 try:
                     api.group_policy.policyclassifier_delete(request, obj_id)
@@ -62,7 +62,7 @@ class IndexView(tabs.TabView):
                 except Exception as e:
                     exceptions.handle(request,
                                       _('Unable to delete classifier. %s') % e)
-        if obj_type == 'rule':
+        if obj_type == 'policyrule':
             for obj_id in obj_ids:
                 try:
                     api.group_policy.policyrule_delete(request, obj_id)
