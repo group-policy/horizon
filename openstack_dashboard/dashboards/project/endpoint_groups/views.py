@@ -40,6 +40,21 @@ class IndexView(tabs.TabView):
     tab_group_class = (EPGTabs)
     template_name = 'project/endpoint_groups/details_tabs.html'
 
+    def post(self, request, *args, **kwargs):
+        obj_ids = request.POST.getlist('object_ids')
+        action = request.POST['action']
+        if not obj_ids:
+            obj_ids.append(re.search('([0-9a-z-]+)$', action).group(1))
+        for obj_id in obj_ids:
+            try:
+                api.group_policy.epg_delete(request, obj_id)
+                messages.success(request,
+                                 _('Deleted EPG %s') % obj_id)
+            except Exception as e:
+                exceptions.handle(request,
+                                  _('Unable to delete EPG. %s') % e)
+        return self.get(request, *args, **kwargs)
+
 
 class AddEPGView(workflows.WorkflowView):
     workflow_class = AddEPG
