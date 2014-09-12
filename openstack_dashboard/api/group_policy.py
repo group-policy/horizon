@@ -164,12 +164,16 @@ def policyaction_list(request, **kwargs):
     return [PolicyAction(pa) for pa in actions]
 
 
+def policyaction_delete(request, pa_id):
+    neutronclient(request).delete_policy_action(pa_id)
+
+
 def policyrule_get(request, pr_id):
     return {}
 
 
 def policyrule_delete(request, pr_id):
-    pass
+    neutronclient(request).delete_policy_rule(pr_id)
 
 
 def policyrule_update(request, pr_id, **kwargs):
@@ -181,7 +185,7 @@ def policyclassifier_get(request, pc_id):
 
 
 def policyclassifier_delete(request, pc_id):
-    pass
+    neutronclient(request).delete_policy_classifier(pc_id)
 
 
 def policyclassifier_update(request, pc_id, **kwargs):

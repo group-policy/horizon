@@ -12,9 +12,16 @@
 #
 # @author: Ronak Shah
 
+import re
+
+from django.utils.translation import ugettext_lazy as _
+
+from horizon import messages
+from horizon import exceptions
 from horizon import tabs
 from horizon import workflows
 
+from openstack_dashboard import api
 from openstack_dashboard.dashboards.project.contracts \
     import tabs as contract_tabs
 from openstack_dashboard.dashboards.project.contracts \
@@ -33,6 +40,48 @@ class IndexView(tabs.TabView):
     tab_group_class = (ContractTabs)
     template_name = 'project/contracts/details_tabs.html'
 
+    def post(self, request, *args, **kwargs):
+        obj_ids = request.POST.getlist('object_ids')
+        action = request.POST['action']
+        obj_type = re.search('.delete([a-z]+)', action).group(1)
+        if not obj_ids:
+            obj_ids.append(re.search('([0-9a-z-]+)$', action).group(1))
+        if obj_type == 'action':
+            for obj_id in obj_ids:
+                try:
+                    api.group_policy.policyaction_delete(request, obj_id)
+                    messages.success(request, _('Deleted action %s') % obj_id)
+                except Exception as e:
+                    exceptions.handle(request,
+                                      _('Unable to delete action. %s') % e)
+        if obj_type == 'classifier':
+            for obj_id in obj_ids:
+                try:
+                    api.group_policy.policyclassifier_delete(request, obj_id)
+                    messages.success(request, _('Deleted classifer %s') % obj_id)
+                except Exception as e:
+                    exceptions.handle(request,
+                                      _('Unable to delete classifier. %s') % e)
+        if obj_type == 'rule':
+            for obj_id in obj_ids:
+                try:
+                    api.group_policy.policyrule_delete(request, obj_id)
+                    messages.success(request,
+                                     _('Deleted rule %s') % obj_id)
+                except Exception as e:
+                    exceptions.handle(request,
+                                      _('Unable to delete rule. %s') % e)
+	if obj_type == 'contract':
+	    for obj_id in obj_ids:
+		try:
+		    api.group_policy.contract_delete(request, obj_id)
+		    messages.success(request,
+				     _('Deleted rule %s') % obj_id)
+		except Exception as e:
+		    exceptions.handle(request,
+				      _('Unabled to delete contract. %s') % e)
+
+        return self.get(request, *args, **kwargs)
 
 class AddContractView(workflows.WorkflowView):
     workflow_class = AddContract
