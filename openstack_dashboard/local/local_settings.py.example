@@ -195,7 +195,7 @@ OPENSTACK_NEUTRON_NETWORK = {
     # in this list will be available to choose from when creating a network.
     # Network types include local, flat, vlan, gre, and vxlan.
     'supported_provider_types': ['*'],
-    'enable_group_policy': False,
+    'enable_group_policy': True,
 }
 
 # The OPENSTACK_IMAGE_BACKEND settings can be used to customize features
