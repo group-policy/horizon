@@ -63,7 +63,7 @@ class EPGDetailsTab(tabs.Tab):
             epg = api.group_policy.epg_get(request, epgid)
         except Exception:
             exceptions.handle(request,
-                              _('Unable to retrieve firewall details.'),
+                              _('Unable to retrieve epg details.'),
                               redirect=self.failure_url)
         return {'epg': epg}
 

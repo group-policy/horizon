@@ -125,7 +125,8 @@ class DeletePolicyActionLink(tables.DeleteAction):
 
 class ContractsTable(tables.DataTable):
     name = tables.Column("name",
-                         verbose_name=_("Name"))
+                         verbose_name=_("Name"),
+			 link="horizon:project:contracts:contractdetails")
 
     class Meta:
         name = "contractstable"

@@ -21,6 +21,7 @@ from openstack_dashboard.dashboards.project.contracts \
     import workflows as contract_workflows
 
 ContractTabs = contract_tabs.ContractTabs
+ContractDetailsTabs = contract_tabs.ContractDetailsTabs
 
 AddContract = contract_workflows.AddContract
 AddPolicyRule = contract_workflows.AddPolicyRule
@@ -54,7 +55,7 @@ class AddPolicyActionView(workflows.WorkflowView):
 
 
 class ContractDetailsView(tabs.TabView):
-    #tab_group_class = (EPGDetailsTabs)
+    tab_group_class = (ContractDetailsTabs)
     template_name = 'project/contracts/details_tabs.html'
 
 

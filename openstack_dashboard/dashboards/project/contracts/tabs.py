@@ -12,6 +12,7 @@
 #
 # @author: Ronak Shah
 
+from django.core.urlresolvers import reverse_lazy
 from django.utils.translation import ugettext_lazy as _
 from horizon import exceptions
 from horizon import tabs
@@ -123,3 +124,26 @@ class ContractTabs(tabs.TabGroup):
             PolicyClassifiersTab,
             PolicyActionsTab)
     sticky = True
+
+
+class ContractDetailsTab(tabs.Tab):
+    name = _("Contract Details")
+    slug = "contractdetails"
+    template_name = "project/contracts/_contract_details.html"
+    failure_url = reverse_lazy('horizon:project:contract:index')
+
+    def get_context_data(self, request):
+        cid = self.tab_group.kwargs['contract_id']
+        try:
+            contract = api.group_policy.contract_get(request, cid)
+        except Exception:
+            exceptions.handle(request,
+                              _('Unable to retrieve contract details.'),
+                              redirect=self.failure_url)
+        return {'contract': contract}
+
+
+class ContractDetailsTabs(tabs.TabGroup):
+    slug = "contracttabs"
+    tabs = (ContractDetailsTab,)
+

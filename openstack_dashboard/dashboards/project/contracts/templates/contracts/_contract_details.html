@@ -1,0 +1,20 @@
+{% load i18n sizeformat parse_date %}
+{% load url from future %}
+
+<div class="info row detail">
+  <hr class="header_rule">
+  <dl>
+    <dt>{% trans "Name" %}</dt>
+    <dd>{{ contract.name|default:_("-") }}</dd>
+
+    <dt>{% trans "Description" %}</dt>
+    <dd>{{ contract.description|default:_("-") }}</dd>
+
+    <dt>{% trans "ID" %}</dt>
+    <dd>{{ contract.id }} </dd>
+
+    <dt>{% trans "Project ID" %}</dt>
+    <dd>{{ contract.tenant_id }}</dd>
+  </dl>
+</div>
+

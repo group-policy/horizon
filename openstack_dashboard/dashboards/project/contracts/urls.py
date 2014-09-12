@@ -38,4 +38,6 @@ urlpatterns = patterns(
         name='updatepolicyclassifier'),
     url(r'^updatepolicyaction/(?P<policyaction_id>[^/]+)/$',
         views.PolicyActionDetailsView.as_view(),
-        name='updatepolicyaction'),)
+        name='updatepolicyaction'),
+    url(r'^contract/(?P<contract_id>[^/]+)/$',
+        views.ContractDetailsView.as_view(), name='contractdetails'),)
