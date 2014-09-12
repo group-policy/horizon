@@ -22,8 +22,8 @@ from openstack_dashboard import api
 
 
 class SelectProvidedContractAction(workflows.Action):
-    contract = forms.MultipleChoiceField(
-        label=_("Contract"),
+    provided_contract = forms.MultipleChoiceField(
+        label=_("Provided Contract"),
         required=False,
         widget=forms.CheckboxSelectMultiple(),
         help_text=_("Choose a contract for an EPG."))
@@ -32,7 +32,7 @@ class SelectProvidedContractAction(workflows.Action):
         name = _("Provided Contracts")
         help_text = _("Select provided contract for EPG.")
 
-    def populate_contract_choices(self, request, context):
+    def populate_provided_contract_choices(self, request, context):
         try:
             tenant_id = self.request.user.tenant_id
             contracts = api.group_policy.contract_list(request,
@@ -51,8 +51,8 @@ class SelectProvidedContractAction(workflows.Action):
 
 
 class SelectConsumedContractAction(workflows.Action):
-    contract = forms.MultipleChoiceField(
-        label=_("Contract"),
+    consumed_contract = forms.MultipleChoiceField(
+        label=_("Consumed Contract"),
         required=False,
         widget=forms.CheckboxSelectMultiple(),
         help_text=_("Select consumed contract for EPG."))
@@ -61,7 +61,7 @@ class SelectConsumedContractAction(workflows.Action):
         name = _("Consumed Contracts")
         help_text = _("Select consumed contract for EPG.")
 
-    def populate_contract_choices(self, request, context):
+    def populate_consumed_contract_choices(self, request, context):
         try:
             tenant_id = self.request.user.tenant_id
             contracts = api.group_policy.contract_list(request,
@@ -85,9 +85,9 @@ class SelectProvidedContractStep(workflows.Step):
     contributes = ("provided_contracts",)
 
     def contribute(self, data, context):
-        if data:
+	if data:
             contracts = self.workflow.request.POST.getlist(
-                "contract")
+                "provided_contract")
             if contracts:
                 contract_dict = {}
                 for contract in contracts:
@@ -105,13 +105,13 @@ class SelectConsumedContractStep(workflows.Step):
     def contribute(self, data, context):
         if data:
             contracts = self.workflow.request.POST.getlist(
-                "contract")
+                "consumed_contract")
             if contracts:
                 contract_dict = {}
                 for contract in contracts:
                     if contract != '':
                         contract_dict[contract] = None
-                context['provided_contracts'] = contract_dict
+                context['consumed_contracts'] = contract_dict
             return context
 
 
