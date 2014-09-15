@@ -18,6 +18,7 @@ from django.utils.translation import ugettext_lazy as _
 
 from horizon import exceptions
 from horizon import forms
+from horizon import messages
 from horizon import tabs
 from horizon.utils import memoized
 from horizon import workflows
