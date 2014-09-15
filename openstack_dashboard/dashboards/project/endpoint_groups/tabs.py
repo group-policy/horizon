@@ -95,7 +95,7 @@ class InstancesTab(tabs.TableTab):
         return instances
 
 class ConsumedTab(tabs.TableTab):
-    name = _('Consumed')
+    name = _('Consumed Contracts')
     slug = 'consumed_contracts_tab'
     table_classes = (tables.ConsumedContractsTable,)
     template_name = ("horizon/common/_detail_table.html")
@@ -111,7 +111,7 @@ class ConsumedTab(tabs.TableTab):
 
 
 class ProvidedTab(tabs.TableTab):
-    name = _('Provided')
+    name = _('Provided Contracts')
     slug = 'provided_contracts_tab'
     table_classes = (tables.ProvidedContractsTable,)
     template_name = ("horizon/common/_detail_table.html")
@@ -128,5 +128,5 @@ class ProvidedTab(tabs.TableTab):
 
 class EPGMemberTabs(tabs.TabGroup):
     slug = 'member_tabs'
-    tabs = (EPGDetailsTab, InstancesTab,ConsumedTab,ProvidedTab,)
+    tabs = (InstancesTab, ProvidedTab, ConsumedTab, EPGDetailsTab,)
     stiky = True
