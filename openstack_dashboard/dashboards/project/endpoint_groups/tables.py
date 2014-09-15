@@ -97,9 +97,16 @@ class ConsoleLink(tables.LinkAction):
             tabs.InstanceDetailTabs).get_query_string()
         return "?".join([base_url, tab_query_string])
  
+class CreateContractLink(tables.LinkAction):
+     name = "launch_vm"
+     verbose_name = _("Create Contract")
+     classes = ("ajax-modal", "btn-addvm",)
+     
+     def get_link_url(self):
+        return reverse("horizon:project:endpoint_groups:add_contract", kwargs={'epg_id': self.table.kwargs['epg_id']}) 
 
 class InstancesTable(tables.DataTable):
-    name = tables.Column("name", link=("horizon:project:instances:detail"), verbose_name=_("Instance Name"))
+    name = tables.Column("name", link="horizon:project:instances:detail", verbose_name=_("Instance Name"))
     image_name = tables.Column("image_name", verbose_name=_("Image Name"))
     az = tables.Column("availability_zone", verbose_name=_("Availability Zone"))
     ip = tables.Column(get_ips, verbose_name=_("IP Address"), attrs={'data-type': "ip"})
@@ -112,12 +119,13 @@ class InstancesTable(tables.DataTable):
         row_actions = (RemoveVMLink,ConsoleLink,)
 
 class ConsumedContractsTable(tables.DataTable):
-    name = tables.Column("name", verbose_name=_("Contract Name"))
+    name = tables.Column("name",link="horizon:project:contracts:contractdetails",verbose_name=_("Contract Name"))
     description = tables.Column("description",verbose_name=_("Description"))
 
     class Meta:
         name = 'consumed_contracts'
         verbose_name = _("Consumed Contracts")
+        table_actions = (CreateContractLink,)
 
 class ProvidedContractsTable(tables.DataTable):
     name = tables.Column("name", link=("horizon:project:instances:detail"), verbose_name=_("Contract Name"))
@@ -125,3 +133,4 @@ class ProvidedContractsTable(tables.DataTable):
     class Meta:
         name = 'provided_contracts'
         verbose_name = _("Provided Contracts")
+        table_actions = (CreateContractLink,)

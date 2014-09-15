@@ -37,6 +37,8 @@ AddEPG = epg_workflows.AddEPG
 UpdateEPG = epg_forms.UpdateEPG
 LaunchVM = epg_forms.CreateVM
 DeleteVM = epg_forms.DeleteVM
+CreateContractForm = epg_forms.CreateContractForm
+
 
 class IndexView(tabs.TabView):
     tab_group_class = (EPGTabs)
@@ -114,3 +116,14 @@ class UpdateEPGView(forms.ModalFormView):
         epg = self._get_object()
         initial = epg.get_dict()
         return initial
+
+class CreateContractView(forms.ModalFormView):
+    form_class = CreateContractForm
+    template_name = "project/endpoint_groups/add_contract.html"
+    success_url = reverse_lazy("horizon:project:endpoint_groups:epg")
+
+    def get_context_data(self, **kwargs):
+        context = super(CreateContractView, self).get_context_data(**kwargs)
+        context["epg_id"] = self.kwargs['epg_id']
+        self.request.session['epgid'] = self.kwargs['epg_id']
+        return context

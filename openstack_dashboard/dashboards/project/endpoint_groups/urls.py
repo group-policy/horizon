@@ -24,4 +24,6 @@ urlpatterns = patterns( '',
     url(r'^updateepg/(?P<epg_id>[^/]+)/$', views.UpdateEPGView.as_view(), name='updateepg'),
     url(r'^epg/(?P<epg_id>[^/]+)/$', views.EPGDetailsView.as_view(), name='epgdetails'),
     url(r'^addvm/(?P<epg_id>[^/]+)/$', views.LaunchVMView.as_view(), name='addvm'),
-    url(r'^delvm/(?P<vmid>[^/]+)/$', views.DeleteVMView.as_view(), name='delvm'),)
+    url(r'^delvm/(?P<vmid>[^/]+)/$', views.DeleteVMView.as_view(), name='delvm'),
+    url(r'^add_contract/(?P<epg_id>[^/]+)/$', views.CreateContractView.as_view(), name='add_contract'),
+	)

@@ -21,7 +21,7 @@ from openstack_dashboard.dashboards.project import dashboard
 
 
 class EPG(horizon.Panel):
-    name = _("Endpoint Groups")
+    name = _("Groups")
     slug = "endpoint_groups"
 
 

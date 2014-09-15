@@ -103,7 +103,6 @@ class ConsumedTab(tabs.TableTab):
     def get_consumed_contracts_data(self):
         epgid = self.tab_group.kwargs['epg_id']
         items = api.group_policy.contract_list(self.request)
-        print items
         return items
 
 

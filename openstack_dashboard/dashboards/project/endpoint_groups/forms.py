@@ -153,3 +153,17 @@ class DeleteVM(forms.SelfHandlingForm):
     def handle(self,request,context):
         pass
 
+class CreateContractForm(forms.SelfHandlingForm):
+    name = forms.CharField(label=_("Contract Name"), max_length=255)
+
+    def handle(self,request,context):
+        try:
+            api.group_policy.contract_create(request,name=context['name'])
+            msg = _('Contract created successfully!')
+            messages.success(request, msg)
+            LOG.debug(msg)
+        except Exception:
+            msg = _('Failed to create contract!')
+            redirect = reverse("horizon:project:endpoint_groups:epgdetails", kwargs={'epg_id': epg_id})
+            LOG.error(msg)
+
