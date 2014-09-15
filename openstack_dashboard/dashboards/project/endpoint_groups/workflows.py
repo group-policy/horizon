@@ -85,7 +85,7 @@ class SelectProvidedContractStep(workflows.Step):
     contributes = ("provided_contracts",)
 
     def contribute(self, data, context):
-	if data:
+        if data:
             contracts = self.workflow.request.POST.getlist(
                 "provided_contract")
             if contracts:
@@ -127,8 +127,8 @@ class AddEPGAction(workflows.Action):
         super(AddEPGAction, self).__init__(request, *args, **kwargs)
 
     class Meta:
-        name = _("Create EPG")
-        help_text = _("Create a new EPG")
+        name = _("Create Group")
+        help_text = _("Create a new Group")
 
 
 class AddEPGStep(workflows.Step):
@@ -142,10 +142,10 @@ class AddEPGStep(workflows.Step):
 
 class AddEPG(workflows.Workflow):
     slug = "addepg"
-    name = _("Create EPG")
+    name = _("Create Group")
     finalize_button_name = _("Create")
-    success_message = _('Create EPG "%s".')
-    failure_message = _('Unable to create EPG "%s".')
+    success_message = _('Create Group "%s".')
+    failure_message = _('Unable to create Group "%s".')
     success_url = "horizon:project:endpoint_groups:index"
     default_steps = (AddEPGStep,
                      SelectProvidedContractStep,

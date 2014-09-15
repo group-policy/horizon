@@ -35,13 +35,13 @@ class DeleteEPGLink(tables.DeleteAction):
     name = "deleteepg"
     action_present = _("Delete")
     action_past = _("Scheduled deletion of %(data_type)s")
-    data_type_singular = _("EPG")
-    data_type_plural = _("EPGs")
+    data_type_singular = _("Group")
+    data_type_plural = _("Groups")
 
 
 class AddEPGLink(tables.LinkAction):
     name = "addepg"
-    verbose_name = _("Create EPG")
+    verbose_name = _("Create Group")
     url = "horizon:project:endpoint_groups:addepg"
     classes = ("ajax-modal", "btn-addepg",)
 
@@ -53,7 +53,7 @@ class EPGsTable(tables.DataTable):
 
     class Meta:
         name = "epgstable"
-        verbose_name = _("EPGs")
+        verbose_name = _("Groups")
         table_actions = (AddEPGLink, DeleteEPGLink)
         row_actions = (UpdateEPGLink, DeleteEPGLink)
 
@@ -119,7 +119,9 @@ class InstancesTable(tables.DataTable):
         row_actions = (RemoveVMLink,ConsoleLink,)
 
 class ConsumedContractsTable(tables.DataTable):
-    name = tables.Column("name",link="horizon:project:contracts:contractdetails",verbose_name=_("Contract Name"))
+    name = tables.Column("name",
+                         link="horizon:project:contracts:contractdetails",
+                         verbose_name=_("Contract Name"))
     description = tables.Column("description",verbose_name=_("Description"))
 
     class Meta:
@@ -128,7 +130,9 @@ class ConsumedContractsTable(tables.DataTable):
         table_actions = (CreateContractLink,)
 
 class ProvidedContractsTable(tables.DataTable):
-    name = tables.Column("name", link=("horizon:project:instances:detail"), verbose_name=_("Contract Name"))
+    name = tables.Column("name",
+                         link="horizon:project:contracts:contractdetails",
+                         verbose_name=_("Contract Name"))
     
     class Meta:
         name = 'provided_contracts'

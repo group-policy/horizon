@@ -25,7 +25,7 @@ EPGsTable = tables.EPGsTable
 
 class EPGsTab(tabs.TableTab):
     table_classes = (EPGsTable,)
-    name = _("EPGs")
+    name = _("Groups")
     slug = "endpoint_groups"
     template_name = "horizon/common/_detail_table.html"
 
@@ -52,7 +52,7 @@ class EPGTabs(tabs.TabGroup):
 
 
 class EPGDetailsTab(tabs.Tab):
-    name = _("EPG Details")
+    name = _("Group Details")
     slug = "epgdetails"
     template_name = "project/endpoint_groups/_epg_details.html"
     failure_url = reverse_lazy('horizon:project:endpoint_group:index')
@@ -62,7 +62,7 @@ class EPGDetailsTab(tabs.Tab):
         try:
             epg = api.group_policy.epg_get(request, epgid)
         except Exception:
-            exceptions.handle(request, _('Unable to retrieve epg details.'), redirect=self.failure_url)
+            exceptions.handle(request, _('Unable to retrieve group details.'), redirect=self.failure_url)
         return {'epg': epg}
 
 
