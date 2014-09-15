@@ -102,9 +102,12 @@ class ConsumedTab(tabs.TableTab):
 
     def get_consumed_contracts_data(self):
         epgid = self.tab_group.kwargs['epg_id']
-        items = api.group_policy.contract_list(self.request)
-        print items
-        return items
+        epg = api.group_policy.epg_get(self.request, epgid)
+        consumed_contract_ids = epg.get('consumed_contracts')
+        consumed_contracts = []
+        for _id in consumed_contract_ids:
+            consumed_contracts.append(api.group_policy.contract_get(self.request, _id))
+        return consumed_contracts
 
 
 class ProvidedTab(tabs.TableTab):
@@ -115,8 +118,13 @@ class ProvidedTab(tabs.TableTab):
     
     def get_provided_contracts_data(self):
         epgid = self.tab_group.kwargs['epg_id']
-        items = []
-        return []
+        epg = api.group_policy.epg_get(self.request, epgid)
+        provided_contract_ids = epg.get('provided_contracts')
+        provided_contracts = []
+        for _id in provided_contract_ids:
+            provided_contracts.append(api.group_policy.contract_get(self.request, _id))
+        return provided_contracts
+
 
 class EPGMemberTabs(tabs.TabGroup):
     slug = 'member_tabs'
