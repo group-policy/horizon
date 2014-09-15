@@ -12,14 +12,22 @@
 #
 # @author: Ronak Shah
 
+import logging
+
+from django.core.urlresolvers import reverse
+from django.template.defaultfilters import filesizeformat  # noqa
 from django.utils.translation import ugettext_lazy as _
 
 from horizon import exceptions
 from horizon import forms
+from horizon import messages
 from horizon import workflows
 
 from openstack_dashboard import api
+from openstack_dashboard.dashboards.project.instances import utils
+from openstack_dashboard.dashboards.project.images import utils as imageutils
 
+LOG = logging.getLogger(__name__)
 
 class SelectProvidedContractAction(workflows.Action):
     provided_contract = forms.MultipleChoiceField(
@@ -164,6 +172,102 @@ class AddEPG(workflows.Workflow):
             exceptions.handle(request, msg)
             return False
 
-class LaunchVM(workflows.Workflow):
+
+def _image_choice_title(img):
+    gb = filesizeformat(img.size)
+    return '%s (%s)' % (img.name or img.id, gb)
+
+
+class LaunchInstance(workflows.Action):
+    availability_zone = forms.ChoiceField(label=_("Availability Zone"), required=False)
+    name = forms.CharField(label=_("Instance Name"), max_length=255)
+    flavor = forms.ChoiceField(label=_("Flavor"), help_text=_("Size of image to launch."))
+    count = forms.IntegerField(label=_("Instance Count"), min_value=1, initial=1, help_text=_("Number of instances to launch."))
+    image = forms.ChoiceField(label=_("Select Image"),
+            widget=forms.SelectWidget(attrs={'class': 'image-selector'},
+                                       data_attrs=('size', 'display-name'),
+                                       transform=_image_choice_title))
+    
+    def __init__(self, request, *args, **kwargs):
+        super(LaunchInstance, self).__init__(request, *args, **kwargs)
+        tenant_id = request.user.tenant_id
+        images = imageutils.get_available_images(request, request.user.tenant_id)
+        choices = [(image.id, image) for image in images]
+        if choices:
+            choices.insert(0, ("", _("Select Image")))
+        else:
+            choices.insert(0, ("", _("No images available")))
+        self.fields['image'].choices = choices
+        self.fields['availability_zone'].choices = self._availability_zone_choices(request)
+        self.fields['flavor'].choices = self._flavor_choices(request)
+
+
+    def _flavor_choices(self, request):
+        flavors = utils.flavor_list(request)
+        if flavors:
+            return utils.sort_flavor_list(request, flavors)
+        return []
+
+    def _availability_zone_choices(self, request):
+        try:
+            zones = api.nova.availability_zone_list(request)
+        except Exception:
+            zones = []
+            exceptions.handle(request, _('Unable to retrieve availability zones.'))
+        zone_list = [(zone.zoneName, zone.zoneName) for zone in zones if zone.zoneState['available']]
+        zone_list.sort()
+        if not zone_list:
+            zone_list.insert(0, ("", _("No availability zones found")))
+        elif len(zone_list) > 1:
+            zone_list.insert(0, ("", _("Any Availability Zone")))
+        return zone_list
+    
+    def handle(self, request, context):
+        print context
+        epg_id = self.request.path.split("/")[-2]
+        try:
+            print "====== port id =========="
+            msg = _('Member was successfully created.')
+            ep = api.group_policy.ep_create(request,endpoint_group_id=epg_id)
+            """========== create the VM here ============"""
+            api.nova.server_create(request, 
+                    context['name'], 
+                    context['image'],
+                    context['flavor'],
+                    key_name=None,
+                    user_data=None,
+                    security_groups=None,
+                    instance_count=context['count'],
+                    nics=[{'port-id':ep.port_id}])
+            LOG.debug(msg)
+            messages.success(request, msg)
+        except Exception as e:
+            #msg = _('Failed to update EPG %(name)s: %(reason)s' % {'name': name_or_id, 'reason': e})
+            msg = _('Failed to launch VM')
+            LOG.error(msg)
+            redirect = reverse("horizon:project:endpoint_groups:epgdetails", kwargs={'epg_id': epg_id})
+            exceptions.handle(request, msg, redirect=redirect) 
+
+
+class LaunchVMStep(workflows.Step):
+    action_class = LaunchInstance
+    contributes = ("name", "availability_zone", "flavor", "count", "image")
+
+    def contribute(self, data, context):
+        context = super(LaunchVMStep, self).contribute(data, context)
+        return context
+
+
+class CreateVM(workflows.Workflow):
     slug = "launch VM"
     name = _("Create Member")
+    
+    finalize_button_name = _("Launch")
+    success_message = _('Create Member "%s".')
+    failure_message = _('Unable to create Member "%s".')
+    success_url = "horizon:project:endpoint_groups:index"
+    default_steps = (LaunchVMStep,)
+    wizard = True
+
+    def format_status_message(self, message):
+        return message % self.context.get('name')

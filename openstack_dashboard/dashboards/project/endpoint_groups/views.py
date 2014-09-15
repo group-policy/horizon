@@ -35,7 +35,7 @@ EPGDetailsTabs = epg_tabs.EPGDetailsTabs
 
 AddEPG = epg_workflows.AddEPG
 UpdateEPG = epg_forms.UpdateEPG
-LaunchVM = epg_forms.CreateVM
+LaunchVM = epg_workflows.CreateVM
 DeleteVM = epg_forms.DeleteVM
 CreateContractForm = epg_forms.CreateContractForm
 
@@ -69,16 +69,9 @@ class EPGDetailsView(tabs.TabbedTableView):
     tab_group_class = (epg_tabs.EPGMemberTabs)
     template_name = 'project/endpoint_groups/details_tabs.html'
 
-class LaunchVMView(forms.ModalFormView):
-    form_class = LaunchVM
+class LaunchVMView(workflows.WorkflowView):
+    workflow_class = LaunchVM
     template_name = "project/endpoint_groups/add_vm.html"
-    success_url = reverse_lazy("horizon:project:endpoint_groups:epg")
-
-    def get_context_data(self, **kwargs):
-        context = super(LaunchVMView, self).get_context_data(**kwargs)
-        context["epg_id"] = self.kwargs['epg_id']
-        self.request.session['epgid'] = self.kwargs['epg_id']
-        return context 
 
 class DeleteVMView(forms.ModalFormView):
     form_class = DeleteVM
