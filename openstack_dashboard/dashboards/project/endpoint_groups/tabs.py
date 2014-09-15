@@ -62,12 +62,63 @@ class EPGDetailsTab(tabs.Tab):
         try:
             epg = api.group_policy.epg_get(request, epgid)
         except Exception:
-            exceptions.handle(request,
-                              _('Unable to retrieve epg details.'),
-                              redirect=self.failure_url)
+            exceptions.handle(request, _('Unable to retrieve epg details.'), redirect=self.failure_url)
         return {'epg': epg}
+
 
 
 class EPGDetailsTabs(tabs.TabGroup):
     slug = "epgtabs"
     tabs = (EPGDetailsTab,)
+
+class InstancesTab(tabs.TableTab):
+    name = _("Members")
+    slug = "members_tab"
+    table_classes = (tables.InstancesTable,)
+    template_name = ("horizon/common/_detail_table.html")
+    preload = True
+
+    def get_instances_data(self):
+        epgid = self.tab_group.kwargs['epg_id']
+        instances = []
+        try:
+            marker = self.request.GET.get(tables.InstancesTable._meta.pagination_param, None)
+            instances, self._has_more = api.nova.server_list(self.request,search_opts={'marker': marker, 'paginate': True})
+            for item in instances:
+                setattr(item,'epgid',epgid)
+            instances = instances
+        except Exception as e:
+            self._has_more = False
+            error_message = _('Unable to get instances')
+            exceptions.handle(self.request, error_message)
+            instances = []
+        return instances
+
+class ConsumedTab(tabs.TableTab):
+    name = _('Consumed')
+    slug = 'consumed_contracts_tab'
+    table_classes = (tables.ConsumedContractsTable,)
+    template_name = ("horizon/common/_detail_table.html")
+
+    def get_consumed_contracts_data(self):
+        epgid = self.tab_group.kwargs['epg_id']
+        items = api.group_policy.contract_list(self.request)
+        print items
+        return items
+
+
+class ProvidedTab(tabs.TableTab):
+    name = _('Provided')
+    slug = 'provided_contracts_tab'
+    table_classes = (tables.ProvidedContractsTable,)
+    template_name = ("horizon/common/_detail_table.html")
+    
+    def get_provided_contracts_data(self):
+        epgid = self.tab_group.kwargs['epg_id']
+        items = []
+        return []
+
+class EPGMemberTabs(tabs.TabGroup):
+    slug = 'member_tabs'
+    tabs = (EPGDetailsTab, InstancesTab,ConsumedTab,ProvidedTab,)
+    stiky = True

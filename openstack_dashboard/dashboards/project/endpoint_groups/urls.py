@@ -18,11 +18,10 @@ from django.conf.urls import url  # noqa
 
 from openstack_dashboard.dashboards.project.endpoint_groups import views
 
-urlpatterns = patterns(
-    '',
+urlpatterns = patterns( '',
     url(r'^$', views.IndexView.as_view(), name='index'),
     url(r'^addepg$', views.AddEPGView.as_view(), name='addepg'),
-    url(r'^updateepg/(?P<epg_id>[^/]+)/$',
-        views.UpdateEPGView.as_view(), name='updateepg'),
-    url(r'^epg/(?P<epg_id>[^/]+)/$',
-        views.EPGDetailsView.as_view(), name='epgdetails'),)
+    url(r'^updateepg/(?P<epg_id>[^/]+)/$', views.UpdateEPGView.as_view(), name='updateepg'),
+    url(r'^epg/(?P<epg_id>[^/]+)/$', views.EPGDetailsView.as_view(), name='epgdetails'),
+    url(r'^addvm/(?P<epg_id>[^/]+)/$', views.LaunchVMView.as_view(), name='addvm'),
+    url(r'^delvm/(?P<vmid>[^/]+)/$', views.DeleteVMView.as_view(), name='delvm'),)

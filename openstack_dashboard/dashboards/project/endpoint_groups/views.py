@@ -35,6 +35,8 @@ EPGDetailsTabs = epg_tabs.EPGDetailsTabs
 
 AddEPG = epg_workflows.AddEPG
 UpdateEPG = epg_forms.UpdateEPG
+LaunchVM = epg_forms.CreateVM
+DeleteVM = epg_forms.DeleteVM
 
 class IndexView(tabs.TabView):
     tab_group_class = (EPGTabs)
@@ -61,9 +63,25 @@ class AddEPGView(workflows.WorkflowView):
     template_name = "project/endpoint_groups/addepg.html"
 
 
-class EPGDetailsView(tabs.TabView):
-    tab_group_class = (EPGDetailsTabs)
+class EPGDetailsView(tabs.TabbedTableView):
+    tab_group_class = (epg_tabs.EPGMemberTabs)
     template_name = 'project/endpoint_groups/details_tabs.html'
+
+class LaunchVMView(forms.ModalFormView):
+    form_class = LaunchVM
+    template_name = "project/endpoint_groups/add_vm.html"
+    success_url = reverse_lazy("horizon:project:endpoint_groups:epg")
+
+    def get_context_data(self, **kwargs):
+        context = super(LaunchVMView, self).get_context_data(**kwargs)
+        context["epg_id"] = self.kwargs['epg_id']
+        self.request.session['epgid'] = self.kwargs['epg_id']
+        return context 
+
+class DeleteVMView(forms.ModalFormView):
+    form_class = DeleteVM
+    template_name = "project/endpoint_groups/del_vm.html"
+    success_url = reverse_lazy("horizon:project:endpoint_groups:epg")
 
 
 class UpdateEPGView(forms.ModalFormView):
@@ -84,8 +102,7 @@ class UpdateEPGView(forms.ModalFormView):
     def _get_object(self, *args, **kwargs):
         epg_id = self.kwargs['epg_id']
         try:
-            epg = api.group_policy.epg_get(self.request,
-                                           epg_id)
+            epg = api.group_policy.epg_get(self.request, epg_id)
             epg.set_id_as_name_if_empty()
             return epg
         except Exception:

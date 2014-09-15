@@ -47,14 +47,11 @@ class CreateForm(forms.SelfHandlingForm):
     description = forms.CharField(widget=forms.Textarea(
         attrs={'class': 'modal-body-fixed-width'}),
         label=_("Description"), required=False)
-    type = forms.ChoiceField(label=_("Type"),
-                             required=False)
+    type = forms.ChoiceField(label=_("Type"), required=False)
     size = forms.IntegerField(min_value=1, label=_("Size (GB)"))
     volume_source_type = forms.ChoiceField(label=_("Volume Source"),
                                            required=False,
-                                           widget=forms.Select(attrs={
-                                               'class': 'switchable',
-                                               'data-slug': 'source'}))
+                                           widget=forms.Select(attrs={ 'class': 'switchable', 'data-slug': 'source'}))
     snapshot_source = forms.ChoiceField(
         label=_("Use snapshot as a source"),
         widget=forms.SelectWidget(

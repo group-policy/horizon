@@ -72,7 +72,7 @@ class DataProcessingPanels(horizon.PanelGroup):
 
 
 class GroupPolicyPanels(horizon.PanelGroup):
-    name = _("Group Policy")
+    name = _("Policy")
     slug = "group_policy"
     panels = ('endpoint_groups',
               'contracts')

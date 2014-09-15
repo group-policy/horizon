@@ -67,9 +67,13 @@ class PolicyAction(neutron.NeutronAPIDictWrapper):
 
 def epg_create(request, **kwargs):
     body = {'endpoint_group': kwargs}
-    epg = neutronclient(request).create_endpoint_group(
-        body).get('endpoint_group')
+    epg = neutronclient(request).create_endpoint_group( body).get('endpoint_group')
     return EPG(epg)
+
+def ep_create(request,**kwargs):
+    body = {'endpoint': kwargs}
+    ep = neutronclient(request).create_endpoint(body).get('endpoint')
+    return EPG(ep)
 
 
 def epg_list(request, **kwargs):

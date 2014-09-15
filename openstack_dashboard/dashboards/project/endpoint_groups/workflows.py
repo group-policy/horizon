@@ -163,3 +163,7 @@ class AddEPG(workflows.Workflow):
             msg = self.format_status_message(self.failure_message) + str(e)
             exceptions.handle(request, msg)
             return False
+
+class LaunchVM(workflows.Workflow):
+    slug = "launch VM"
+    name = _("Create Member")
