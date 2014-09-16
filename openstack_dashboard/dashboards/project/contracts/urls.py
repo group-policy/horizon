@@ -39,5 +39,12 @@ urlpatterns = patterns(
     url(r'^updatepolicyaction/(?P<policyaction_id>[^/]+)/$',
         views.PolicyActionDetailsView.as_view(),
         name='updatepolicyaction'),
+    url(r'^policyrule/(?P<policyrule_id>[^/]+)/$',
+        views.PolicyRuleDetailsView.as_view(), name='policyruledetails'),
+    url(r'^policyclassifier/(?P<policyclassifier_id>[^/]+)/$',
+        views.PolicyClassifierDetailsView.as_view(), name='policyclassifierdetails'),
+    url(r'^policyaction/(?P<policyaction_id>[^/]+)/$',
+        views.PolicyActionDetailsView.as_view(), name='policyactiondetails'),
     url(r'^contract/(?P<contract_id>[^/]+)/$',
-        views.ContractDetailsView.as_view(), name='contractdetails'),)
+        views.ContractDetailsView.as_view(), name='contractdetails'),
+    )

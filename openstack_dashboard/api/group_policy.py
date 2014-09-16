@@ -172,8 +172,16 @@ def policyaction_delete(request, pa_id):
     neutronclient(request).delete_policy_action(pa_id)
 
 
+def policyaction_get(request, pa_id):
+    policyaction = neutronclient(request).show_policy_action(
+        pa_id).get('policy_action')
+    return PolicyAction(policyaction)
+
+
 def policyrule_get(request, pr_id):
-    return {}
+    policyrule = neutronclient(request).show_policy_rule(
+        pr_id).get('policy_rule')
+    return PolicyRule(policyrule)
 
 
 def policyrule_delete(request, pr_id):
@@ -185,7 +193,9 @@ def policyrule_update(request, pr_id, **kwargs):
 
 
 def policyclassifier_get(request, pc_id):
-    return {}
+    policyclassifier = neutronclient(request).show_policy_classifier(
+        pc_id).get('policy_classifier')
+    return PolicyClassifier(policyclassifier)
 
 
 def policyclassifier_delete(request, pc_id):
