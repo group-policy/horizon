@@ -29,7 +29,9 @@ from openstack_dashboard.dashboards.project.contracts \
 
 ContractTabs = contract_tabs.ContractTabs
 ContractDetailsTabs = contract_tabs.ContractDetailsTabs
-
+PolicyRuleDetailsTabs = contract_tabs.PolicyRuleDetailsTabs
+PolicyClassifierDetailsTabs = contract_tabs.PolicyClassifierDetailsTabs
+PolicyActionDetailsTabs = contract_tabs.PolicyActionDetailsTabs
 AddContract = contract_workflows.AddContract
 AddPolicyRule = contract_workflows.AddPolicyRule
 AddPolicyClassifier = contract_workflows.AddPolicyClassifier
@@ -71,15 +73,15 @@ class IndexView(tabs.TabView):
                 except Exception as e:
                     exceptions.handle(request,
                                       _('Unable to delete rule. %s') % e)
-	if obj_type == 'contract':
-	    for obj_id in obj_ids:
-		try:
-		    api.group_policy.contract_delete(request, obj_id)
-		    messages.success(request,
-				     _('Deleted rule %s') % obj_id)
-		except Exception as e:
-		    exceptions.handle(request,
-				      _('Unabled to delete contract. %s') % e)
+        if obj_type == 'contract':
+            for obj_id in obj_ids:
+                try:
+                    api.group_policy.contract_delete(request, obj_id)
+                    messages.success(request,
+                                     _('Deleted rule %s') % obj_id)
+                except Exception as e:
+                    exceptions.handle(request,
+                                      _('Unabled to delete contract. %s') % e)
 
         return self.get(request, *args, **kwargs)
 
@@ -109,15 +111,15 @@ class ContractDetailsView(tabs.TabView):
 
 
 class PolicyRuleDetailsView(tabs.TabView):
-    #tab_group_class = (EPGDetailsTabs)
+    tab_group_class = (PolicyRuleDetailsTabs)
     template_name = 'project/contracts/details_tabs.html'
 
 
 class PolicyClassifierDetailsView(tabs.TabView):
-    #tab_group_class = (EPGDetailsTabs)
+    tab_group_class = (PolicyClassifierDetailsTabs)
     template_name = 'project/contracts/details_tabs.html'
 
 
 class PolicyActionDetailsView(tabs.TabView):
-    #tab_group_class = (EPGDetailsTabs)
+    tab_group_class = (PolicyActionDetailsTabs)
     template_name = 'project/contracts/details_tabs.html'

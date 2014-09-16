@@ -137,7 +137,8 @@ class ContractsTable(tables.DataTable):
 
 class PolicyRulesTable(tables.DataTable):
     name = tables.Column("name",
-                         verbose_name=_("Name"))
+                         verbose_name=_("Name"),
+            link="horizon:project:contracts:policyruledetails")
 
     class Meta:
         name = "policyrulestable"
@@ -148,7 +149,8 @@ class PolicyRulesTable(tables.DataTable):
 
 class PolicyClassifiersTable(tables.DataTable):
     name = tables.Column("name",
-                         verbose_name=_("Name"))
+                         verbose_name=_("Name"),
+                         link="horizon:project:contracts:policyclassifierdetails")
 
     class Meta:
         name = "policyclassifierstable"
@@ -159,7 +161,8 @@ class PolicyClassifiersTable(tables.DataTable):
 
 class PolicyActionsTable(tables.DataTable):
     name = tables.Column("name",
-                         verbose_name=_("Name"))
+                         verbose_name=_("Name"),
+                         link="horizon:project:contracts:policyactiondetails")
 
     class Meta:
         name = "policyactionstable"

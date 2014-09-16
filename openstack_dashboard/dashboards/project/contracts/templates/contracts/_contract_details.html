@@ -15,6 +15,17 @@
 
     <dt>{% trans "Project ID" %}</dt>
     <dd>{{ contract.tenant_id }}</dd>
+    <dt>{% trans "Policy Rules" %}</dt>
+    <dd>
+      {% if contract.policy_rules %}
+      {% for policy_rule in contract.policy_rules %}
+      {% url 'horizon:project:contracts:policyruledetails' policy_rule as rule_url %}
+      {{ rule.position }} : <a href="{{ rule_url }}">{{ policy_rule }}</a><br>
+      {% endfor %}
+      {% else %}
+      {% trans "-" %}
+      {% endif %}
+    </dd>
   </dl>
 </div>
 
