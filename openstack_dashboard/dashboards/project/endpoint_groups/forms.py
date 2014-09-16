@@ -31,64 +31,16 @@ class UpdateEPG(forms.SelfHandlingForm):
     name = forms.CharField(max_length=80, label=_("Name"), required=False)
     description = forms.CharField(max_length=80, label=_("Description"), required=False)
     #l2_policy_id = forms.ChoiceField(label=_("L2 Policy"), required=False)
-    provided_contracts = forms.MultipleChoiceField(
-        label=_("Provided Contracts"),
-        required=False,
-        widget=forms.CheckboxSelectMultiple(),
-        help_text=_("Create a Group with provides the selected Contracts."))
-    consumed_contracts = forms.MultipleChoiceField(
-        label=_("Consumed Contracts"),
-        required=False,
-        widget=forms.CheckboxSelectMultiple(),
-        help_text=_("Create a Group with consumes the selected Contracts."))
     failure_url = 'horizon:project:endpoint_groups:index'
 
     def __init__(self, request, *args, **kwargs):
         super(UpdateEPG, self).__init__(request, *args, **kwargs)
-
-        try:
-            tenant_id = self.request.user.tenant_id
-            #l2_pol_id = api.group_policy.l2policy_list(request, tenant_id=tenant_id)
-            provided_contracts = api.group_policy.contract_list(request, tenant_id=tenant_id)
-            consumed_contracts = api.group_policy.contract_list(request, tenant_id=tenant_id)
-            provided_contracts_choices = []
-            consumed_contracts_choices = []
-            for p in provided_contracts:
-                p.set_id_as_name_if_empty()
-                provided_contracts_choices.append((p.id, p.name))
-            self.fields['provided_contracts'].choices = provided_contracts_choices
-            for c in consumed_contracts:
-                c.set_id_as_name_if_empty()
-                consumed_contracts_choices.append((c.id, c.name))
-            self.fields['consumed_contracts'].choices = consumed_contracts_choices
-        except Exception:
-            exceptions.handle(request, _('Unable to retrieve EPG info.'))
-            provided_contracts = []
-            consumed_contracts = []
-
-        #TODO - (Ronak)
+        #l2_pol_id = api.group_policy.l2policy_list(request, tenant_id=tenant_id)
 
     def handle(self, request, context):
         epg_id = self.initial['epg_id']
         name_or_id = context.get('name') or epg_id
         try:
-            if not context.get("provided_contracts"):
-                context['provided_contracts'] = {}
-            else:
-                contract_dict = {}
-                for contract in context.get("provided_contracts"):
-                    if contract != '':
-                        contract_dict[contract] = "provided_contracts"
-                context['provided_contracts'] = contract_dict
-
-            if not context.get("consumed_contracts"):
-                context['consumed_contracts'] = {}
-            else:
-                contract_dict = {}
-                for contract in context.get("consumed_contracts"):
-                    if contract != '':
-                        contract_dict[contract] = "consumed_contracts"
-                context['consumed_contracts'] = contract_dict
             epg = api.group_policy.epg_update(request, epg_id, **context)
             msg = _('EPG %s was successfully updated.') % name_or_id
             LOG.debug(msg)
