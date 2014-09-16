@@ -14,6 +14,7 @@
 
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
+from django import http
 
 from horizon import tables
 from horizon.utils import filters
@@ -65,12 +66,22 @@ class LaunchVMLink(tables.LinkAction):
     def get_link_url(self):
         return reverse("horizon:project:endpoint_groups:addvm", kwargs={'epg_id': self.table.kwargs['epg_id']})
 
-class RemoveVMLink(tables.LinkAction):
-    name = "delete_vm"
-    verbose_name = _("Delete Instance")
-
-    def get_link_url(self,vm):
-        return reverse("horizon:project:endpoint_groups:delvm", kwargs={'vmid': vm.id})
+class RemoveVMLink(tables.DeleteAction):
+    data_type_singular = _("Instance")
+    data_type_plural = _("Instances")
+ 
+    
+    def delete(self, request, instance_id):
+        url = reverse("horizon:project:endpoint_groups:epgdetails", kwargs={'epg_id': self.table.kwargs['epg_id']}) 
+        try:
+            api.nova.server_delete(request, instance_id)
+            LOG.debug('Deleted instance %s successfully' % instance_id)
+            return http.HttpResponseRedirect(url)
+        except Exception:
+            msg = _('Failed to delete instance %s') % instance_id
+            LOG.info(msg)
+            exceptions.handle(request, msg, redirect=redirect) 
+        redirect = url
 
 class ConsoleLink(tables.LinkAction):
     name = "console"
@@ -97,13 +108,7 @@ class ConsoleLink(tables.LinkAction):
             tabs.InstanceDetailTabs).get_query_string()
         return "?".join([base_url, tab_query_string])
  
-class CreateContractLink(tables.LinkAction):
-     name = "launch_vm"
-     verbose_name = _("Create Contract")
-     classes = ("ajax-modal", "btn-addvm",)
-     
-     def get_link_url(self):
-        return reverse("horizon:project:endpoint_groups:add_contract", kwargs={'epg_id': self.table.kwargs['epg_id']}) 
+
 
 class InstancesTable(tables.DataTable):
     name = tables.Column("name", link="horizon:project:instances:detail", verbose_name=_("Instance Name"))
@@ -116,25 +121,57 @@ class InstancesTable(tables.DataTable):
         name = "instances"
         verbose_name = _("Members")
         table_actions = (LaunchVMLink,)
-        row_actions = (RemoveVMLink,ConsoleLink,)
+        row_actions = (ConsoleLink,RemoveVMLink,)
+
+"======= actions for provided contracts ================"
+class AddContractLink(tables.LinkAction):
+     name = "add_contract"
+     verbose_name = _("Add Contract")
+     classes = ("ajax-modal", "btn-addvm",)
+     
+     def get_link_url(self):
+        return reverse("horizon:project:endpoint_groups:add_contract", kwargs={'epg_id': self.table.kwargs['epg_id']}) 
+
+class RemoveContractLink(tables.LinkAction):
+     name = "remove_contract"
+     verbose_name = _("Remove Contract")
+     classes = ("ajax-modal", "btn-addvm",)
+     
+     def get_link_url(self):
+        return reverse("horizon:project:endpoint_groups:remove_contract", kwargs={'epg_id': self.table.kwargs['epg_id']}) 
+ 
+class ProvidedContractsTable(tables.DataTable):
+    name = tables.Column("name", link="horizon:project:contracts:contractdetails", verbose_name=_("Contract Name"))
+    
+    class Meta:
+        name = 'provided_contracts'
+        verbose_name = _("Provided Contracts")
+        table_actions = (AddContractLink,RemoveContractLink,) 
+
+
+class AddConsumedLink(tables.LinkAction):
+     name = "add_consumed"
+     verbose_name = _("Add Contract")
+     classes = ("ajax-modal", "btn-addvm",)
+     
+     def get_link_url(self):
+        return reverse("horizon:project:endpoint_groups:add_consumed", kwargs={'epg_id': self.table.kwargs['epg_id']})
+
+class RemoveConsumedLink(tables.LinkAction):
+     name = "remove_consumed"
+     verbose_name = _("Remove Contract")
+     classes = ("ajax-modal", "btn-addvm",)
+     
+     def get_link_url(self):
+        return reverse("horizon:project:endpoint_groups:remove_consumed", kwargs={'epg_id': self.table.kwargs['epg_id']})
 
 class ConsumedContractsTable(tables.DataTable):
-    name = tables.Column("name",
-                         link="horizon:project:contracts:contractdetails",
-                         verbose_name=_("Contract Name"))
+    name = tables.Column("name", 
+            link="horizon:project:contracts:contractdetails", verbose_name=_("Contract Name"))
     description = tables.Column("description",verbose_name=_("Description"))
 
     class Meta:
         name = 'consumed_contracts'
         verbose_name = _("Consumed Contracts")
-        table_actions = (CreateContractLink,)
-
-class ProvidedContractsTable(tables.DataTable):
-    name = tables.Column("name",
-                         link="horizon:project:contracts:contractdetails",
-                         verbose_name=_("Contract Name"))
-    
-    class Meta:
-        name = 'provided_contracts'
-        verbose_name = _("Provided Contracts")
-        table_actions = (CreateContractLink,)
+        table_actions = (AddConsumedLink,RemoveConsumedLink,)
+ 

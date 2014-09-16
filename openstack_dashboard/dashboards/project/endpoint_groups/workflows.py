@@ -223,13 +223,10 @@ class LaunchInstance(workflows.Action):
         return zone_list
     
     def handle(self, request, context):
-        print context
         epg_id = self.request.path.split("/")[-2]
         try:
-            print "====== port id =========="
             msg = _('Member was successfully created.')
             ep = api.group_policy.ep_create(request,endpoint_group_id=epg_id)
-            """========== create the VM here ============"""
             api.nova.server_create(request, 
                     context['name'], 
                     context['image'],
@@ -265,9 +262,13 @@ class CreateVM(workflows.Workflow):
     finalize_button_name = _("Launch")
     success_message = _('Create Member "%s".')
     failure_message = _('Unable to create Member "%s".')
-    success_url = "horizon:project:endpoint_groups:index"
     default_steps = (LaunchVMStep,)
     wizard = True
 
     def format_status_message(self, message):
         return message % self.context.get('name')
+    
+    def get_success_url(self):
+        epgid = self.request.path.split("/")[-2] #TODO need to find a better way of doing this.
+        success_url = reverse("horizon:project:endpoint_groups:epgdetails",kwargs={'epg_id':epgid})
+        return success_url

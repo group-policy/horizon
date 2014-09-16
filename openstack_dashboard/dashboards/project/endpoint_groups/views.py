@@ -36,7 +36,6 @@ EPGDetailsTabs = epg_tabs.EPGDetailsTabs
 AddEPG = epg_workflows.AddEPG
 UpdateEPG = epg_forms.UpdateEPG
 LaunchVM = epg_workflows.CreateVM
-DeleteVM = epg_forms.DeleteVM
 CreateContractForm = epg_forms.CreateContractForm
 
 
@@ -72,11 +71,9 @@ class EPGDetailsView(tabs.TabbedTableView):
 class LaunchVMView(workflows.WorkflowView):
     workflow_class = LaunchVM
     template_name = "project/endpoint_groups/add_vm.html"
-
-class DeleteVMView(forms.ModalFormView):
-    form_class = DeleteVM
-    template_name = "project/endpoint_groups/del_vm.html"
-    success_url = reverse_lazy("horizon:project:endpoint_groups:epg")
+    
+    def get_initial(self):
+        return self.kwargs
 
 
 class UpdateEPGView(forms.ModalFormView):
@@ -113,10 +110,47 @@ class UpdateEPGView(forms.ModalFormView):
 class CreateContractView(forms.ModalFormView):
     form_class = CreateContractForm
     template_name = "project/endpoint_groups/add_contract.html"
-    success_url = reverse_lazy("horizon:project:endpoint_groups:epg")
 
     def get_context_data(self, **kwargs):
         context = super(CreateContractView, self).get_context_data(**kwargs)
         context["epg_id"] = self.kwargs['epg_id']
-        self.request.session['epgid'] = self.kwargs['epg_id']
         return context
+    
+    def get_initial(self):
+        return self.kwargs
+
+class RemoveContractView(forms.ModalFormView):
+    form_class = epg_forms.RemoveContractForm
+    template_name = "project/endpoint_groups/remove_contract.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(RemoveContractView, self).get_context_data(**kwargs)
+        context["epg_id"] = self.kwargs['epg_id']
+        return context
+    
+    def get_initial(self):
+        return self.kwargs 
+
+class AddConsumedView(forms.ModalFormView):
+    form_class = epg_forms.AddConsumedForm
+    template_name = "project/endpoint_groups/add_consumed.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(AddConsumedView, self).get_context_data(**kwargs)
+        context["epg_id"] = self.kwargs['epg_id']
+        return context
+    
+    def get_initial(self):
+        return self.kwargs
+ 
+class RemoveConsumedView(forms.ModalFormView):
+    form_class = epg_forms.RemoveConsumedForm
+    template_name = "project/endpoint_groups/remove_consumed.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(RemoveConsumedView, self).get_context_data(**kwargs)
+        context["epg_id"] = self.kwargs['epg_id']
+        return context
+    
+    def get_initial(self):
+        return self.kwargs 
