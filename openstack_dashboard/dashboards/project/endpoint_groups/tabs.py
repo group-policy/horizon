@@ -80,19 +80,21 @@ class InstancesTab(tabs.TableTab):
 
     def get_instances_data(self):
         epgid = self.tab_group.kwargs['epg_id']
-        instances = []
+        filtered_instances = []
         try:
+            epg_name = api.group_policy.epg_get(self.request, epgid).name
             marker = self.request.GET.get(tables.InstancesTable._meta.pagination_param, None)
             instances, self._has_more = api.nova.server_list(self.request,search_opts={'marker': marker, 'paginate': True})
             for item in instances:
-                setattr(item,'epgid',epgid)
-            instances = instances
+                if [x for x in item.addresses if epg_name in x]:
+                    setattr(item,'epgid',epgid)
+                    filtered_instances.append(item)
         except Exception as e:
             self._has_more = False
             error_message = _('Unable to get instances')
             exceptions.handle(self.request, error_message)
-            instances = []
-        return instances
+            filtered_instances = []
+        return filtered_instances
 
 class ConsumedTab(tabs.TableTab):
     name = _('Consumed Contracts')
