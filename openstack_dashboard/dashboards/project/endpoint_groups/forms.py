@@ -103,6 +103,7 @@ class UpdateEPG(forms.SelfHandlingForm):
 
 
 class CreateContractForm(forms.SelfHandlingForm):
+    #This function does Add Provided contracts to EPG
     contract = forms.MultipleChoiceField(label=_("Provided Contracts"),)
     
     def __init__(self, request, *args, **kwargs):
@@ -110,16 +111,22 @@ class CreateContractForm(forms.SelfHandlingForm):
         contracts = []
         try:
             tenant_id = self.request.user.tenant_id
+            epg_id = kwargs['initial']['epg_id']
+            epg = api.group_policy.epg_get(request, epg_id)
+            providedcontracts = epg.get("provided_contracts") 
             items = api.group_policy.contract_list(request, tenant_id=tenant_id)
-            contracts = [(p.id,p.name) for p in items]
+            contracts = [(p.id,p.name) for p in items if p.id not in providedcontracts]
         except Exception as e:
             pass
         self.fields['contract'].choices = contracts
     
     def handle(self,request,context):
         epg_id = self.initial['epg_id']
+        epg = api.group_policy.epg_get(request, epg_id)
         url = reverse("horizon:project:endpoint_groups:epgdetails", kwargs={'epg_id': epg_id})
         try:
+            for contract in epg.get("provided_contracts"):
+                context['contract'].append(contract)
             contracts = dict([(item,'string') for item in context['contract']])
             api.group_policy.epg_update(request,epg_id,provided_contracts=contracts)
             msg = _('Contract added successfully!')
@@ -140,8 +147,11 @@ class RemoveContractForm(forms.SelfHandlingForm):
         contracts = []
         try:
             tenant_id = self.request.user.tenant_id
+            epg_id = kwargs['initial']['epg_id']
+            epg = api.group_policy.epg_get(request, epg_id)
+            providedcontracts = epg.get("provided_contracts") 
             items = api.group_policy.contract_list(request, tenant_id=tenant_id)
-            contracts = [(p.id,p.name) for p in items] 
+            contracts = [(p.id,p.name) for p in items if p.id in providedcontracts] 
         except Exception as e:
             pass
         self.fields['contract'].choices = contracts
@@ -150,7 +160,11 @@ class RemoveContractForm(forms.SelfHandlingForm):
         epg_id = self.initial['epg_id']
         url = reverse("horizon:project:endpoint_groups:epgdetails", kwargs={'epg_id': epg_id})
         try:
-            contracts = dict([(item,'string') for item in context['contract']])
+            epg = api.group_policy.epg_get(request, epg_id)
+            old_contracts = epg.get("provided_contracts")
+            for contract in context['contract']:
+                old_contracts.remove(contract)
+            contracts = dict([(item,'string') for item in old_contracts])
             api.group_policy.epg_update(request,epg_id,provided_contracts=contracts)
             msg = _('Contract removed successfully!')
             messages.success(request, msg)
@@ -170,8 +184,11 @@ class AddConsumedForm(forms.SelfHandlingForm):
         contracts = []
         try:
             tenant_id = self.request.user.tenant_id
+            epg_id = kwargs['initial']['epg_id']
+            epg = api.group_policy.epg_get(request, epg_id)
+            consumedcontracts = epg.get("consumed_contracts")             
             items = api.group_policy.contract_list(request, tenant_id=tenant_id)
-            contracts = [(p.id,p.name) for p in items]
+            contracts = [(p.id,p.name) for p in items if p.id not in consumedcontracts]
         except Exception as e:
             pass
         self.fields['contract'].choices = contracts
@@ -180,6 +197,9 @@ class AddConsumedForm(forms.SelfHandlingForm):
         epg_id = self.initial['epg_id']
         url = reverse("horizon:project:endpoint_groups:epgdetails", kwargs={'epg_id': epg_id})
         try:
+            epg = api.group_policy.epg_get(request, epg_id)
+            for contract in epg.get("consumed_contracts"):
+                context['contract'].append(contract)
             consumed = dict([(item,'string') for item in context['contract']])
             api.group_policy.epg_update(request,epg_id,consumed_contracts=consumed)
             msg = _('Contract Added successfully!')
@@ -200,8 +220,11 @@ class RemoveConsumedForm(forms.SelfHandlingForm):
         contracts = []
         try:
             tenant_id = self.request.user.tenant_id
+            epg_id = kwargs['initial']['epg_id']
+            epg = api.group_policy.epg_get(request, epg_id)
+            consumedcontracts = epg.get("consumed_contracts") 
             items = api.group_policy.contract_list(request, tenant_id=tenant_id)
-            contracts = [(p.id,p.name) for p in items]
+            contracts = [(p.id,p.name) for p in items if p.id in consumedcontracts]
         except Exception as e:
             pass
         self.fields['contract'].choices = contracts
@@ -210,8 +233,12 @@ class RemoveConsumedForm(forms.SelfHandlingForm):
         epg_id = self.initial['epg_id']
         url = reverse("horizon:project:endpoint_groups:epgdetails", kwargs={'epg_id': epg_id})
         try:
-            consumed = dict([(item,'string') for item in context['contract']])
-            api.group_policy.epg_update(reuqest,epg_id,consumed_contracts=consumed)
+            epg = api.group_policy.epg_get(request, epg_id)
+            old_contracts = epg.get("consumed_contracts")
+            for contract in context['contract']:
+                old_contracts.remove(contract)
+            consumed = dict([(item,'string') for item in old_contracts])
+            api.group_policy.epg_update(request,epg_id,consumed_contracts=consumed)
             msg = _('Contract removed successfully!')
             messages.success(request, msg)
             LOG.debug(msg)
