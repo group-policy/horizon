@@ -2,30 +2,63 @@
 {% load url from future %}
 
 <div class="info row detail">
-  <hr class="header_rule">
-  <dl>
-    <dt>{% trans "Name" %}</dt>
-    <dd>{{ contract.name|default:_("-") }}</dd>
+	<hr class="header_rule">
+	<dl>
+		<dt>{% trans "Name" %}</dt>
+		<dd>{{ contract.name|default:_("-") }}</dd>
 
-    <dt>{% trans "Description" %}</dt>
-    <dd>{{ contract.description|default:_("-") }}</dd>
+		<dt>{% trans "Description" %}</dt>
+		<dd>{{ contract.description|default:_("-") }}</dd>
 
-    <dt>{% trans "ID" %}</dt>
-    <dd>{{ contract.id }} </dd>
+		<dt>{% trans "ID" %}</dt>
+		<dd>{{ contract.id }} </dd>
 
-    <dt>{% trans "Project ID" %}</dt>
-    <dd>{{ contract.tenant_id }}</dd>
-    <dt>{% trans "Policy Rules" %}</dt>
-    <dd>
-      {% if contract.policy_rules %}
-      {% for policy_rule in contract.policy_rules %}
-      {% url 'horizon:project:contracts:policyruledetails' policy_rule as rule_url %}
-      {{ rule.position }} : <a href="{{ rule_url }}">{{ policy_rule }}</a><br>
-      {% endfor %}
-      {% else %}
-      {% trans "-" %}
-      {% endif %}
-    </dd>
-  </dl>
+		<dt>{% trans "Project ID" %}</dt>
+		<dd>{{ contract.tenant_id }}</dd>
+		<dt>{% trans "Policy Rules" %}</dt>
+		<dd>
+		{% if contract.policy_rules %}
+		<table class="table table-condensed">
+			<thead>
+				<th>Name</th>
+				<th>ID</th>
+				<th>Description</th>
+				<th>Enabled</th>
+    			<th>Policy Actions</th>
+    			<th>Policy Classifiers</th>
+			</thead>
+			<tbody>
+			{% for rule in rules %}
+			<tr>
+				<td>{{rule.name|default:_("-") }}</td>
+				<td>{{rule.id}}</td>
+				<td>{{rule.description|default:_("-") }}</td>
+				<td>{{rule.enabled|default:_("-") }}</td>
+				<td>
+				{% if rule.policy_actions %}
+				{% for action in rule.policy_actions %}
+				{% url 'horizon:project:contracts:policyactiondetails' action as action_url %}
+				{{ action.position }} <a href="{{ action_url }}">{{ action }}</a><br>
+				{% endfor %}
+				{% else %}
+				{% trans "-" %}
+				{% endif %}
+				</td>
+				<td>
+				  {% if rule.policy_classifier_id %}
+				  {% url 'horizon:project:contracts:policyclassifierdetails' rule.policy_classifier_id as classifier_url %}
+				  <a href="{{ classifier_url }}">{{ rule.policy_classifier_id }}</a><br>
+				  {% trans "-" %}
+				  {% endif %}
+				</td> 
+			</tr>
+			{% endfor %}
+			</tbody>
+		</table>
+		{% else %}
+		{% trans "-" %}
+		{% endif %}
+		</dd>
+	</dl>
 </div>
 
