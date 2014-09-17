@@ -19,6 +19,7 @@ from horizon import tabs
 
 from openstack_dashboard import api
 from openstack_dashboard.dashboards.project.endpoint_groups import tables
+from openstack_dashboard.dashboards.project.instances.tables import is_deleting
 
 EPGsTable = tables.EPGsTable
 
@@ -44,12 +45,10 @@ class EPGsTab(tabs.TableTab):
 
         return epgs
 
-
 class EPGTabs(tabs.TabGroup):
     slug = "epgtabs"
     tabs = (EPGsTab,)
     sticky = True
-
 
 class EPGDetailsTab(tabs.Tab):
     name = _("Group Details")
@@ -64,8 +63,6 @@ class EPGDetailsTab(tabs.Tab):
         except Exception:
             exceptions.handle(request, _('Unable to retrieve group details.'), redirect=self.failure_url)
         return {'epg': epg}
-
-
 
 class EPGDetailsTabs(tabs.TabGroup):
     slug = "epgtabs"
@@ -85,6 +82,7 @@ class InstancesTab(tabs.TableTab):
             epg_name = api.group_policy.epg_get(self.request, epgid).name
             marker = self.request.GET.get(tables.InstancesTable._meta.pagination_param, None)
             instances, self._has_more = api.nova.server_list(self.request,search_opts={'marker': marker, 'paginate': True})
+            instances = [item for item in instances if not is_deleting(item)]
             for item in instances:
                 if [x for x in item.addresses if epg_name in x]:
                     setattr(item,'epgid',epgid)
@@ -111,7 +109,6 @@ class ConsumedTab(tabs.TableTab):
             consumed_contracts.append(api.group_policy.contract_get(self.request, _id))
         return consumed_contracts
 
-
 class ProvidedTab(tabs.TableTab):
     name = _('Provided Contracts')
     slug = 'provided_contracts_tab'
@@ -126,7 +123,6 @@ class ProvidedTab(tabs.TableTab):
         for _id in provided_contract_ids:
             provided_contracts.append(api.group_policy.contract_get(self.request, _id))
         return provided_contracts
-
 
 class EPGMemberTabs(tabs.TabGroup):
     slug = 'member_tabs'

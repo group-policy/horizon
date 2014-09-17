@@ -99,8 +99,8 @@ class ConsoleLink(tables.LinkAction):
     def allowed(self, request, instance=None):
         # We check if ConsoleLink is allowed only if settings.CONSOLE_TYPE is
         # not set at all, or if it's set to any value other than None or False.
-        return bool(getattr(settings, 'CONSOLE_TYPE', True)) and \
-            instance.status in ACTIVE_STATES and not is_deleting(instance)
+        #return bool(getattr(settings, 'CONSOLE_TYPE', True)) and instance.status in ACTIVE_STATES and not is_deleting(instance)
+        return True
 
     def get_link_url(self, datum):
         base_url = super(ConsoleLink, self).get_link_url(datum)
@@ -113,7 +113,7 @@ class ConsoleLink(tables.LinkAction):
 class InstancesTable(tables.DataTable):
     name = tables.Column("name", link="horizon:project:instances:detail", verbose_name=_("Instance Name"))
     image_name = tables.Column("image_name", verbose_name=_("Image Name"))
-    az = tables.Column("availability_zone", verbose_name=_("Availability Zone"))
+    status = tables.Column("status", verbose_name=_("Status"))
     ip = tables.Column(get_ips, verbose_name=_("IP Address"), attrs={'data-type': "ip"})
 
 
@@ -123,7 +123,6 @@ class InstancesTable(tables.DataTable):
         table_actions = (LaunchVMLink,)
         row_actions = (ConsoleLink,RemoveVMLink,)
 
-"======= actions for provided contracts ================"
 class AddContractLink(tables.LinkAction):
      name = "add_contract"
      verbose_name = _("Add Contract")
@@ -166,7 +165,7 @@ class RemoveConsumedLink(tables.LinkAction):
         return reverse("horizon:project:endpoint_groups:remove_consumed", kwargs={'epg_id': self.table.kwargs['epg_id']})
 
 class ConsumedContractsTable(tables.DataTable):
-    name = tables.Column("name", 
+    name = tables.Column("name",
             link="horizon:project:contracts:contractdetails", verbose_name=_("Contract Name"))
     description = tables.Column("description",verbose_name=_("Description"))
 
