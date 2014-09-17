@@ -28,11 +28,10 @@ class AddContractLink(tables.LinkAction):
 class UpdateContractLink(tables.LinkAction):
     name = "updatecontract"
     verbose_name = _("Edit Contract")
-    classes = ("ajax-modal", "btn-update",)
+    classes = ("ajax-modal",'edit_contract')
 
     def get_link_url(self, contract):
-        base_url = reverse("horizon:project:contracts:updatecontract",
-                           kwargs={'contract_id': contract.id})
+        base_url = reverse("horizon:project:contracts:updatecontract", kwargs={'contract_id': contract.id})
         return base_url
 
 
@@ -124,9 +123,8 @@ class DeletePolicyActionLink(tables.DeleteAction):
 
 
 class ContractsTable(tables.DataTable):
-    name = tables.Column("name",
-                         verbose_name=_("Name"),
-			 link="horizon:project:contracts:contractdetails")
+    name = tables.Column("name", verbose_name=_("Name"),
+            link="horizon:project:contracts:contractdetails")
 
     class Meta:
         name = "contractstable"
