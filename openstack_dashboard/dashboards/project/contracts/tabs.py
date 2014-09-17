@@ -136,11 +136,13 @@ class ContractDetailsTab(tabs.Tab):
         cid = self.tab_group.kwargs['contract_id']
         try:
             contract = api.group_policy.contract_get(request, cid)
+            rules = api.group_policy.policyrule_list(request, contract_id=contract.id)
+            print rules[0].items
         except Exception:
             exceptions.handle(request,
                               _('Unable to retrieve contract details.'),
                               redirect=self.failure_url)
-        return {'contract': contract}
+        return {'contract': contract,'rules':rules}
 
 
 class ContractDetailsTabs(tabs.TabGroup):
@@ -156,13 +158,17 @@ class PolicyRulesDetailsTab(tabs.Tab):
 
     def get_context_data(self, request):
         ruleid = self.tab_group.kwargs['policyrule_id']
+        actions = []
+        classifiers = []
         try:
             policyrule = api.group_policy.policyrule_get(request, ruleid)
+            actions = api.group_policy.policyaction_list(request, policyrule_id=ruleid)
+            classifiers = api.group_policy.policyclassifier_list(request, policyrule_id=ruleid)
         except Exception:
             exceptions.handle(request,
                               _('Unable to retrieve policyrule details.'),
                               redirect=self.failure_url)
-        return {'policyrule': policyrule}
+        return {'policyrule': policyrule, 'classifiers':classifiers,'actions':actions}
 
 
 class PolicyRuleDetailsTabs(tabs.TabGroup):
