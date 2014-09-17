@@ -15,17 +15,20 @@
 import re
 
 from django.utils.translation import ugettext_lazy as _
+from django.core.urlresolvers import reverse
 
 from horizon import messages
 from horizon import exceptions
 from horizon import tabs
 from horizon import workflows
+from horizon import forms
 
 from openstack_dashboard import api
 from openstack_dashboard.dashboards.project.contracts \
     import tabs as contract_tabs
 from openstack_dashboard.dashboards.project.contracts \
     import workflows as contract_workflows
+from openstack_dashboard.dashboards.project.contracts import forms as contract_forms
 
 ContractTabs = contract_tabs.ContractTabs
 ContractDetailsTabs = contract_tabs.ContractDetailsTabs
@@ -88,6 +91,19 @@ class IndexView(tabs.TabView):
 class AddContractView(workflows.WorkflowView):
     workflow_class = AddContract
     template_name = "project/contracts/addcontract.html"
+
+class UpdateContractView(forms.ModalFormView):
+    form_class = contract_forms.UpdateContractForm
+    template_name = 'project/contracts/update_contract.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(UpdateContractView, self).get_context_data(**kwargs)
+        context['contract_id'] = self.kwargs['contract_id']
+        return context
+
+    def get_initial(self):
+        return {'contract_id': self.kwargs['contract_id']}
+ 
 
 
 class AddPolicyRuleView(workflows.WorkflowView):
