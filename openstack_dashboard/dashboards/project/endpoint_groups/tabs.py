@@ -79,14 +79,20 @@ class InstancesTab(tabs.TableTab):
         epgid = self.tab_group.kwargs['epg_id']
         filtered_instances = []
         try:
-            epg_name = api.group_policy.epg_get(self.request, epgid).name
-            marker = self.request.GET.get(tables.InstancesTable._meta.pagination_param, None)
-            instances, self._has_more = api.nova.server_list(self.request,search_opts={'marker': marker, 'paginate': True})
+            eps = api.group_policy.ep_list(self.request,
+                                           endpoint_group_id=epgid)
+            epg_ports = [x.port_id for x in eps]
+            marker = self.request.GET.get(
+                tables.InstancesTable._meta.pagination_param, None)
+            instances, self._has_more = api.nova.server_list(
+                self.request, search_opts={'marker': marker, 'paginate': True})
             instances = [item for item in instances if not is_deleting(item)]
             for item in instances:
-                if [x for x in item.addresses if epg_name in x]:
-                    setattr(item,'epgid',epgid)
-                    filtered_instances.append(item)
+                for port in api.neutron.port_list(self.request,
+                                                  device_id=item.id):
+                    if port.id in epg_ports:
+                        filtered_instances.append(item)
+                        break
         except Exception as e:
             self._has_more = False
             error_message = _('Unable to get instances')

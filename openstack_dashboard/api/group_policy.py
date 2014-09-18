@@ -20,6 +20,15 @@ from openstack_dashboard.api import neutron
 neutronclient = neutron.neutronclient
 
 
+class EP(neutron.NeutronAPIDictWrapper):
+    """Wrapper for neutron endpoint group."""
+
+    def get_dict(self):
+        ep_dict = self._apidict
+        ep_dict['ep_id'] = ep_dict['id']
+        return ep_dict
+
+
 class EPG(neutron.NeutronAPIDictWrapper):
     """Wrapper for neutron endpoint group."""
 
@@ -70,10 +79,16 @@ def epg_create(request, **kwargs):
     epg = neutronclient(request).create_endpoint_group( body).get('endpoint_group')
     return EPG(epg)
 
+
 def ep_create(request,**kwargs):
     body = {'endpoint': kwargs}
     ep = neutronclient(request).create_endpoint(body).get('endpoint')
     return EPG(ep)
+
+
+def ep_list(request, **kwargs):
+    eps = neutronclient(request).list_endpoints(**kwargs).get('endpoints')
+    return [EP(ep) for ep in eps]
 
 
 def epg_list(request, **kwargs):
