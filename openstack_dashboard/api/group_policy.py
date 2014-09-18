@@ -219,3 +219,16 @@ def policyclassifier_delete(request, pc_id):
 
 def policyclassifier_update(request, pc_id, **kwargs):
     return {}
+
+def l3policy_list(request,**kwargs):
+    return neutronclient(request).list_l3_policies(**kwargs).get('l3_policies')
+
+def l2policy_list(request,**kwargs):
+    return neutronclient(request).list_l2_policies(**kwargs).get('l2_policies')
+
+def l3policy_get(request,pc_id,**kwargs):
+    return neutronclient(request).show_l3_policy(pc_id).get('l3_policy')
+
+def l2policy_get(request,pc_id,**kwargs):
+    return neutronclient(request).show_l2_policy(pc_id).get('l2_policy')
+

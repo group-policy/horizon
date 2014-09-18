@@ -47,3 +47,31 @@ class UpdateContractForm(forms.SelfHandlingForm):
         except Exception as e:
             redirect = reverse('horizon:project:contracts:index')
             exceptions.handle(request, _("Unable to update contract."), redirect=redirect)
+
+class UpdatePolicyActionForm(forms.SelfHandlingForm):
+    name = forms.CharField(label=_("Name"))
+    description = forms.CharField(label=_("Description"),required=False)
+    action_type = forms.ChoiceField(label=_("Action"))
+    action_value = forms.CharField(label=_("Action Value"),required=False)
+
+    def __init__(self, request, *args, **kwargs):
+        super(UpdatePolicyActionForm, self).__init__(request, *args, **kwargs)
+
+        try:
+            policyaction_id = self.initial['policyaction_id']
+            pa = api.group_policy.policyaction_get(request, policyaction_id)
+            self.fields['name'].initial = pa.name
+            self.fields['action_value'].initial = pa.action_value
+            self.fields['action_type'].initial = pa.action_type
+        except Exception as e:
+            pass
+        self.fields['action_type'].choices = [('allow', _('ALLOW')), ('redirect', _('REDIRECT'))]
+    
+    def handle(self,request,context):
+        url = reverse('horizon:project:contracts:index')
+        try:
+            policyaction_id = self.initial['policyaction_id']
+            messages.success(request, _('Policy Action successfully updated.'))
+            return http.HttpResponseRedirect(url)
+        except Exception as e:
+            exceptions.handle(request, _("Unable to update policy action."), redirect=url)

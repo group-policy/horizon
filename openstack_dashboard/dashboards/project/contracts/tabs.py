@@ -104,12 +104,10 @@ class ContractsTab(tabs.TableTab):
     def get_contractstable_data(self):
         try:
             tenant_id = self.request.user.tenant_id
-            contracts = api.group_policy.contract_list(self.tab_group.request,
-                                                       tenant_id=tenant_id)
+            contracts = api.group_policy.contract_list(self.tab_group.request, tenant_id=tenant_id)
         except Exception:
             contracts = []
-            exceptions.handle(self.tab_group.request,
-                              _('Unable to retrieve contract list.'))
+            exceptions.handle(self.tab_group.request, _('Unable to retrieve contract list.'))
 
         for contract in contracts:
             contract.set_id_as_name_if_empty()
@@ -137,12 +135,24 @@ class ContractDetailsTab(tabs.Tab):
         try:
             contract = api.group_policy.contract_get(request, cid)
             rules = api.group_policy.policyrule_list(request, contract_id=contract.id)
-            print rules[0].items
+            rules = [item for item in rules if item.id in contract.policy_rules]
+            rules_with_details = []
+            for rule in rules:
+                r = {}
+                r['name'] = rule.name
+                r['id'] = rule.id
+                action_list = []
+                for aid in rule.policy_actions:
+                    action = api.group_policy.policyaction_get(request,aid)
+                    action_list.append(action.name+":"+str(action.id)+":"+str(action.action_type))
+                r['actions'] = action_list
+                r['classifier'] = api.group_policy.policyclassifier_get(request,rule.policy_classifier_id)
+                rules_with_details.append(r)
         except Exception:
             exceptions.handle(request,
                               _('Unable to retrieve contract details.'),
                               redirect=self.failure_url)
-        return {'contract': contract,'rules':rules}
+        return {'contract': contract,'rules_with_details':rules_with_details}
 
 
 class ContractDetailsTabs(tabs.TabGroup):

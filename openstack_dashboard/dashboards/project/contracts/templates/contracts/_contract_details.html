@@ -15,50 +15,41 @@
 
 		<dt>{% trans "Project ID" %}</dt>
 		<dd>{{ contract.tenant_id }}</dd>
-		<dt>{% trans "Policy Rules" %}</dt>
-		<dd>
-		{% if contract.policy_rules %}
-		<table class="table table-condensed">
+	</dl>
+</div>
+{% if contract.policy_rules %}
+<div class="panel panel-default">
+	<div class="panel panel-heading"> {% trans "Policy Rules" %} </div>
+	<div class="panel panel-body">
+		<table class="table">
 			<thead>
 				<th>Name</th>
 				<th>ID</th>
-				<th>Description</th>
-				<th>Enabled</th>
-    			<th>Policy Actions</th>
-    			<th>Policy Classifiers</th>
+				<th>Policy Classifier Protocol</th>
+				<th>Policy Classifier Port</th>
+				<th>Policy Classifier Direction</th>
+				<th>Policy Actions</th>
 			</thead>
 			<tbody>
-			{% for rule in rules %}
+			{% for rule in rules_with_details %}
 			<tr>
 				<td>{{rule.name|default:_("-") }}</td>
 				<td>{{rule.id}}</td>
-				<td>{{rule.description|default:_("-") }}</td>
-				<td>{{rule.enabled|default:_("-") }}</td>
-				<td>
-				{% if rule.policy_actions %}
-				{% for action in rule.policy_actions %}
-				{% url 'horizon:project:contracts:policyactiondetails' action as action_url %}
-				{{ action.position }} <a href="{{ action_url }}">{{ action }}</a><br>
-				{% endfor %}
-				{% else %}
-				{% trans "-" %}
-				{% endif %}
+				<td>{{rule.classifier.protocol}}</td>
+				<td>{{rule.classifier.port_range}}</td>
+				<td>{{rule.classifier.direction}}</td>
+				<td>&nbsp;
+					{% for a in rule.actions %}
+					{{a}}</br>
+					{% endfor %}
 				</td>
-				<td>
-				  {% if rule.policy_classifier_id %}
-				  {% url 'horizon:project:contracts:policyclassifierdetails' rule.policy_classifier_id as classifier_url %}
-				  <a href="{{ classifier_url }}">{{ rule.policy_classifier_id }}</a><br>
-				  {% trans "-" %}
-				  {% endif %}
-				</td> 
 			</tr>
 			{% endfor %}
 			</tbody>
 		</table>
-		{% else %}
-		{% trans "-" %}
-		{% endif %}
-		</dd>
-	</dl>
+	</div>
 </div>
+{% else %}
+{% trans "-" %}
+{% endif %} 
 

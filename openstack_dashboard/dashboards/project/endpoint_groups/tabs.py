@@ -60,9 +60,11 @@ class EPGDetailsTab(tabs.Tab):
         epgid = self.tab_group.kwargs['epg_id']
         try:
             epg = api.group_policy.epg_get(request, epgid)
+            l3list = api.group_policy.l3policy_list(request)
+            l2list = api.group_policy.l2policy_list(request)
         except Exception:
             exceptions.handle(request, _('Unable to retrieve group details.'), redirect=self.failure_url)
-        return {'epg': epg}
+        return {'epg': epg, 'l3list':l3list,'l2list':l2list}
 
 class EPGDetailsTabs(tabs.TabGroup):
     slug = "epgtabs"

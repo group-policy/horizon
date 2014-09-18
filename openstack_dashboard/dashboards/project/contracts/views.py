@@ -120,6 +120,18 @@ class AddPolicyActionView(workflows.WorkflowView):
     workflow_class = AddPolicyAction
     template_name = "project/contracts/addpolicyaction.html"
 
+class UpdatePolicyActionView(forms.ModalFormView):
+    form_class = contract_forms.UpdatePolicyActionForm
+    template_name = "project/contracts/update_policy_action.html"
+
+    def get_context_data(self, **kwargs):
+        context = super(UpdatePolicyActionView, self).get_context_data(**kwargs)
+        context['policyaction_id'] = self.kwargs['policyaction_id']
+        return context
+
+    def get_initial(self):
+        return {'policyaction_id': self.kwargs['policyaction_id']} 
+
 
 class ContractDetailsView(tabs.TabView):
     tab_group_class = (ContractDetailsTabs)

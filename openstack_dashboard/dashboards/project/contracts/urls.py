@@ -37,7 +37,7 @@ urlpatterns = patterns(
         views.PolicyClassifierDetailsView.as_view(),
         name='updatepolicyclassifier'),
     url(r'^updatepolicyaction/(?P<policyaction_id>[^/]+)/$',
-        views.PolicyActionDetailsView.as_view(),
+        views.UpdatePolicyActionView.as_view(),
         name='updatepolicyaction'),
     url(r'^policyrule/(?P<policyrule_id>[^/]+)/$',
         views.PolicyRuleDetailsView.as_view(), name='policyruledetails'),
