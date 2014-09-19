@@ -265,9 +265,7 @@ class AddPolicyRule(workflows.Workflow):
 
 
 class AddClassifierAction(workflows.Action):
-    name = forms.CharField(max_length=80,
-                           label=_("Name"),
-                           required=False)
+    name = forms.CharField(max_length=80, label=_("Name"), required=False)
     protocol = forms.ChoiceField(
         label=_("Protocol"),
         choices=[('tcp', _('TCP')),
@@ -335,8 +333,7 @@ class AddPolicyActionAction(workflows.Action):
                            required=False)
     action_type = forms.ChoiceField(
         label=_("Action"),
-        choices=[('allow', _('ALLOW')),
-                 ('redirect', _('REDIRECT'))],)
+        choices=[('allow', _('ALLOW')), ('redirect', _('REDIRECT'))],)
     action_value = forms.CharField(max_length=36,
                            label=_("Action value"),
                            required=False)

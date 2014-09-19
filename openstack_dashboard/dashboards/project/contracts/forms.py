@@ -11,6 +11,9 @@ from horizon.utils import validators
 
 from openstack_dashboard import api
 
+PROTOCOLS = [('tcp', _('TCP')), ('udp', _('UDP')), ('icmp', _('ICMP')), ('any', _('ANY'))]
+DIRECTIONS = [('in', _('IN')), ('out', _('OUT')), ('bi', _('BI'))]
+
 class UpdateContractForm(forms.SelfHandlingForm):
     name = forms.CharField(label=_("Name"))
     description = forms.CharField(label=_("Description"),required=False)
@@ -75,3 +78,64 @@ class UpdatePolicyActionForm(forms.SelfHandlingForm):
             return http.HttpResponseRedirect(url)
         except Exception as e:
             exceptions.handle(request, _("Unable to update policy action."), redirect=url)
+
+class UpdatePolicyClassifierForm(forms.SelfHandlingForm):
+    name = forms.CharField(max_length=80, label=_("Name"), required=False)
+    description = forms.CharField(label=_("Description"), required=False)
+    protocol = forms.ChoiceField(label=_("Protocol"),choices=PROTOCOLS)
+    port_range = forms.CharField(max_length=80, label=_("Port/Range(min:max)"), required=False)
+    direction = forms.ChoiceField(label=_("Direction"), choices=DIRECTIONS)
+
+    def __init__(self, request, *args, **kwargs):
+        super(UpdatePolicyClassifierForm, self).__init__(request, *args, **kwargs)
+        try:
+            policyclassifier_id = self.initial['policyclassifier_id']
+            classifier = api.group_policy.policyclassifier_get(request, policyclassifier_id)
+            for item in ['name','description','protocol','port_range','direction']:
+                self.fields[item].initial = getattr(classifier,item)
+        except Exception as e:
+           exceptions.handle(request, _("Unable to retrive policy classifier details."))
+    
+    def handle(self,request,context):
+       url = reverse('horizon:project:contracts:index')
+       try:
+           policyclassifier_id = self.initial['policyclassifier_id']
+           #TODO call the API method
+           messages.success(request, _('Policy classifier successfully updated.'))
+           return http.HttpResponseRedirect(url)
+       except Exception as e:
+           exceptions.handle(request, _("Unable to update policy classifier."), redirect=url)
+
+class UpdatePolicyRuleForm(forms.SelfHandlingForm):
+    name = forms.CharField(max_length=80, label=_("Name"), required=False)
+    description = forms.CharField(label=_("Description"), required=False)
+    policy_classifier_id = forms.ChoiceField(label=_("Policy Classifier"))
+    policy_actions = forms.MultipleChoiceField(label=_("Policy Actions"))
+
+    def __init__(self, request, *args, **kwargs):
+        super(UpdatePolicyRuleForm, self).__init__(request, *args, **kwargs)
+        try:
+            tenant_id = request.user.tenant_id
+            policyrule_id = self.initial['policyrule_id']
+            rule = api.group_policy.policyrule_get(request, policyrule_id)
+            for item in ['name','description','policy_classifier_id','policy_actions']:
+               self.fields[item].initial = getattr(rule,item)
+            actions = api.group_policy.policyaction_list(request, tenant_id=tenant_id)
+            action_list = [a.id for a in actions]
+            for action in actions:
+                action.set_id_as_name_if_empty()
+            actions = sorted(actions, key=lambda action: action.name)
+            action_list = [(a.id, a.name) for a in actions]
+            self.fields['policy_actions'].choices = action_list
+        except Exception as e:
+           exceptions.handle(request, _("Unable to retrive policy rule details."))
+    
+    def handle(self,request,context):
+       url = reverse('horizon:project:contracts:index')
+       try:
+           policyrule_id = self.initial['policyrule_id']
+           #TODO call the API method
+           messages.success(request, _('Policy rule successfully updated.'))
+           return http.HttpResponseRedirect(url)
+       except Exception as e:
+           exceptions.handle(request, _("Unable to update policy rule."), redirect=url) 

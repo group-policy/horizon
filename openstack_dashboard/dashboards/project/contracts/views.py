@@ -142,10 +142,33 @@ class PolicyRuleDetailsView(tabs.TabView):
     tab_group_class = (PolicyRuleDetailsTabs)
     template_name = 'project/contracts/details_tabs.html'
 
+class UpdatePolicyRuleView(forms.ModalFormView):
+    form_class = contract_forms.UpdatePolicyRuleForm
+    template_name = "project/contracts/update_policy_rule.html"
+
+    def get_context_data(self,**kwargs):
+        context = super(UpdatePolicyRuleView,self).get_context_data(**kwargs)
+        context['policyrule_id'] = self.kwargs['policyrule_id']
+        return context
+
+    def get_initial(self):
+        return {'policyrule_id':self.kwargs['policyrule_id']} 
 
 class PolicyClassifierDetailsView(tabs.TabView):
     tab_group_class = (PolicyClassifierDetailsTabs)
     template_name = 'project/contracts/details_tabs.html'
+
+class UpdatePolicyClassifierView(forms.ModalFormView):
+    form_class = contract_forms.UpdatePolicyClassifierForm
+    template_name = "project/contracts/update_policy_classifier.html"
+
+    def get_context_data(self,**kwargs):
+        context = super(UpdatePolicyClassifierView,self).get_context_data(**kwargs)
+        context['policyclassifier_id'] = self.kwargs['policyclassifier_id']
+        return context
+
+    def get_initial(self):
+        return {'policyclassifier_id':self.kwargs['policyclassifier_id']}
 
 
 class PolicyActionDetailsView(tabs.TabView):

@@ -27,32 +27,53 @@ from openstack_dashboard import api
 LOG = logging.getLogger(__name__)
 
 
-class UpdateEPG(forms.SelfHandlingForm):
+class UpdateEPGForm(forms.SelfHandlingForm):
     name = forms.CharField(max_length=80, label=_("Name"), required=False)
     description = forms.CharField(max_length=80, label=_("Description"), required=False)
-    #l2_policy_id = forms.ChoiceField(label=_("L2 Policy"), required=False)
+    provided_contracts = forms.MultipleChoiceField(label=_("Provided Contracts"),required=False)
+    consumed_contracts = forms.MultipleChoiceField(label=_("Consumed Contracts"),required=False)
     failure_url = 'horizon:project:endpoint_groups:index'
 
     def __init__(self, request, *args, **kwargs):
-        super(UpdateEPG, self).__init__(request, *args, **kwargs)
-        #l2_pol_id = api.group_policy.l2policy_list(request, tenant_id=tenant_id)
+        super(UpdateEPGForm, self).__init__(request, *args, **kwargs)
+        try:
+            epg_id = self.initial['epg_id']
+            epg = api.group_policy.epg_get(request, epg_id)
+            self.fields['name'].initial = epg.name
+            self.fields['description'].initial = epg.description
+            provided = [api.group_policy.contract_get(request,item) for item in epg.provided_contracts]
+            consumed = [api.group_policy.contract_get(request,item) for item in epg.consumed_contracts]
+            self.fields['provided_contracts'].initial = provided
+            self.fields['consumed_contracts'].initial = consumed
+            tenant_id = self.request.user.tenant_id
+            contracts = api.group_policy.contract_list(request, tenant_id=tenant_id)
+            for c in contracts:
+                c.set_id_as_name_if_empty()
+            contracts = sorted(contracts, key=lambda rule: rule.name)
+            contract_list = [(c.id, c.name) for c in contracts] 
+            self.fields['provided_contracts'].choices = contract_list
+            self.fields['consumed_contracts'].choices = contract_list
+        except Exception as e:
+            exceptions.handle(request, _('Unable to retrieve contract details.'))
+            pass
 
     def handle(self, request, context):
         epg_id = self.initial['epg_id']
         name_or_id = context.get('name') or epg_id
         try:
+            context['provided_contracts'] = dict([(i,'string') for i in context['provided_contracts']])
+            context['consumed_contracts'] = dict([(i,'string') for i in context['consumed_contracts']])
+            print context
             epg = api.group_policy.epg_update(request, epg_id, **context)
             msg = _('EPG %s was successfully updated.') % name_or_id
             LOG.debug(msg)
             messages.success(request, msg)
             return epg
         except Exception as e:
-            msg = _('Failed to update EPG %(name)s: %(reason)s' %
-                    {'name': name_or_id, 'reason': e})
+            msg = _('Failed to update EPG %(name)s: %(reason)s' % {'name': name_or_id, 'reason': e})
             LOG.error(msg)
             redirect = reverse(self.failure_url)
             exceptions.handle(request, msg, redirect=redirect)
-
 
 class CreateContractForm(forms.SelfHandlingForm):
     #This function does Add Provided contracts to EPG

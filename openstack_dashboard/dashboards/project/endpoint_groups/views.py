@@ -36,7 +36,6 @@ EPGTabs = epg_tabs.EPGTabs
 EPGDetailsTabs = epg_tabs.EPGDetailsTabs
 
 AddEPG = epg_workflows.AddEPG
-UpdateEPG = epg_forms.UpdateEPG
 LaunchVM = epg_workflows.CreateVM
 CreateContractForm = epg_forms.CreateContractForm
 
@@ -79,7 +78,7 @@ class LaunchVMView(workflows.WorkflowView):
 
 
 class UpdateEPGView(forms.ModalFormView):
-    form_class = UpdateEPG
+    form_class = epg_forms.UpdateEPGForm
     template_name = "project/endpoint_groups/updateepg.html"
     context_object_name = 'epg'
     success_url = reverse_lazy("horizon:project:endpoint_groups:index")
