@@ -20,6 +20,15 @@ from openstack_dashboard.api import neutron
 neutronclient = neutron.neutronclient
 
 
+class EP(neutron.NeutronAPIDictWrapper):
+    """Wrapper for neutron endpoint group."""
+
+    def get_dict(self):
+        ep_dict = self._apidict
+        ep_dict['ep_id'] = ep_dict['id']
+        return ep_dict
+
+
 class EPG(neutron.NeutronAPIDictWrapper):
     """Wrapper for neutron endpoint group."""
 
@@ -64,12 +73,30 @@ class PolicyAction(neutron.NeutronAPIDictWrapper):
         action_dict['action_id'] = action_dict['id']
         return action_dict
 
+class L2Policy(neutron.NeutronAPIDictWrapper):
+	"""Wrapper for neutron action."""
+
+	def get_dict(self):
+		policy_dict = self._apidict
+		policy_dict['policy_id'] = policy_dict['id']
+		return policy_dict
+
 
 def epg_create(request, **kwargs):
     body = {'endpoint_group': kwargs}
-    epg = neutronclient(request).create_endpoint_group(
-        body).get('endpoint_group')
+    epg = neutronclient(request).create_endpoint_group( body).get('endpoint_group')
     return EPG(epg)
+
+
+def ep_create(request,**kwargs):
+    body = {'endpoint': kwargs}
+    ep = neutronclient(request).create_endpoint(body).get('endpoint')
+    return EPG(ep)
+
+
+def ep_list(request, **kwargs):
+    eps = neutronclient(request).list_endpoints(**kwargs).get('endpoints')
+    return [EP(ep) for ep in eps]
 
 
 def epg_list(request, **kwargs):
@@ -168,8 +195,16 @@ def policyaction_delete(request, pa_id):
     neutronclient(request).delete_policy_action(pa_id)
 
 
+def policyaction_get(request, pa_id):
+    policyaction = neutronclient(request).show_policy_action(
+        pa_id).get('policy_action')
+    return PolicyAction(policyaction)
+
+
 def policyrule_get(request, pr_id):
-    return {}
+    policyrule = neutronclient(request).show_policy_rule(
+        pr_id).get('policy_rule')
+    return PolicyRule(policyrule)
 
 
 def policyrule_delete(request, pr_id):
@@ -181,7 +216,9 @@ def policyrule_update(request, pr_id, **kwargs):
 
 
 def policyclassifier_get(request, pc_id):
-    return {}
+    policyclassifier = neutronclient(request).show_policy_classifier(
+        pc_id).get('policy_classifier')
+    return PolicyClassifier(policyclassifier)
 
 
 def policyclassifier_delete(request, pc_id):
@@ -190,3 +227,26 @@ def policyclassifier_delete(request, pc_id):
 
 def policyclassifier_update(request, pc_id, **kwargs):
     return {}
+
+def l3policy_list(request,**kwargs):
+    policies = neutronclient(request).list_l3_policies(**kwargs).get('l3_policies')
+    return [L2Policy(item) for item in policies]
+
+def l2policy_list(request,**kwargs):
+    policies =  neutronclient(request).list_l2_policies(**kwargs).get('l2_policies')
+    return [L2Policy(item) for item in policies]
+
+def l3policy_get(request,pc_id,**kwargs):
+    return neutronclient(request).show_l3_policy(pc_id).get('l3_policy')
+
+def l2policy_get(request,pc_id,**kwargs):
+    return neutronclient(request).show_l2_policy(pc_id).get('l2_policy')
+
+def l2policy_create(request,**kwargs):
+    body = {'l2_policy': kwargs}
+    return neutronclient(request).create_l2_policy(body).get('l2_policy')
+
+def l3policy_create(request,**kwargs):
+    body = {'l3_policy':kwargs}
+    return neutronclient(request).create_l3_policy(body).get('l3_policy')
+
