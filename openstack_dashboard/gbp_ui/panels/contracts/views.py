@@ -23,7 +23,8 @@ from horizon import tabs
 from horizon import workflows
 from horizon import forms
 
-from openstack_dashboard import api
+from gbp_ui import client
+
 import tabs as contract_tabs
 import workflows as contract_workflows
 import forms as contract_forms
@@ -52,7 +53,7 @@ class IndexView(tabs.TabView):
         if obj_type == 'policyaction':
             for obj_id in obj_ids:
                 try:
-                    api.group_policy.policyaction_delete(request, obj_id)
+                    client.policyaction_delete(request, obj_id)
                     messages.success(request, _('Deleted action %s') % obj_id)
                 except Exception as e:
                     exceptions.handle(request,
@@ -60,7 +61,7 @@ class IndexView(tabs.TabView):
         if obj_type == 'policyclassifier':
             for obj_id in obj_ids:
                 try:
-                    api.group_policy.policyclassifier_delete(request, obj_id)
+                    client.policyclassifier_delete(request, obj_id)
                     messages.success(request, _('Deleted classifer %s') % obj_id)
                 except Exception as e:
                     exceptions.handle(request,
@@ -68,7 +69,7 @@ class IndexView(tabs.TabView):
         if obj_type == 'policyrule':
             for obj_id in obj_ids:
                 try:
-                    api.group_policy.policyrule_delete(request, obj_id)
+                    client.policyrule_delete(request, obj_id)
                     messages.success(request,
                                      _('Deleted rule %s') % obj_id)
                 except Exception as e:
@@ -77,7 +78,7 @@ class IndexView(tabs.TabView):
         if obj_type == 'contract':
             for obj_id in obj_ids:
                 try:
-                    api.group_policy.contract_delete(request, obj_id)
+                    client.contract_delete(request, obj_id)
                     messages.success(request,
                                      _('Deleted rule %s') % obj_id)
                 except Exception as e:

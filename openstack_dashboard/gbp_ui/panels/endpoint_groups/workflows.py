@@ -24,6 +24,7 @@ from horizon import messages
 from horizon import workflows
 
 from openstack_dashboard import api
+from gbp_ui import client
 from openstack_dashboard.dashboards.project.instances import utils
 from openstack_dashboard.dashboards.project.images import utils as imageutils
 
@@ -43,7 +44,7 @@ class SelectProvidedContractAction(workflows.Action):
     def populate_provided_contract_choices(self, request, context):
         try:
             tenant_id = self.request.user.tenant_id
-            contracts = api.group_policy.contract_list(request,
+            contracts = client.contract_list(request,
                 tenant_id=tenant_id)
             for c in contracts:
                 c.set_id_as_name_if_empty()
@@ -72,7 +73,7 @@ class SelectConsumedContractAction(workflows.Action):
     def populate_consumed_contract_choices(self, request, context):
         try:
             tenant_id = self.request.user.tenant_id
-            contracts = api.group_policy.contract_list(request,
+            contracts = client.contract_list(request,
                 tenant_id=tenant_id)
             for c in contracts:
                 c.set_id_as_name_if_empty()
@@ -85,6 +86,39 @@ class SelectConsumedContractAction(workflows.Action):
                               _('Unable to retrieve contracts (%(error)s).')
                               % {'error': str(e)})
         return contract_list
+
+class SelectL2policyAction(workflows.Action):
+	l2policy = forms.ChoiceField(
+			label=_("L2 Policy"),
+			required=False,
+			help_text=_("Select l2 policy for EPG."),)
+
+	class Meta:
+		name = _("L2 Policy")
+		help_text = _("Select l2 policy for EPG.")
+
+	def populate_l2policy_choices(self,request,context):
+		policies = []
+		try:
+			policies = client.l2policy_list(request)
+			for p in policies:
+				p.set_id_as_name_if_empty()
+			policies = sorted(policies, key=lambda rule: rule.name)
+			policies = [(p.id, p.name+":"+p.id) for p in policies] 
+		except Exception as e:
+			exceptions.handle(request,
+					_("Unable to retrieve policies (%(error)s).")
+					% {'error': str(e)})
+		return policies
+
+class SelectL2policyStep(workflows.Step):
+	action_class = SelectL2policyAction
+	name = _("L2 Policy")
+	contributes = ("l2policy_id",)
+
+	def contribute(self,data,context):
+		return context
+
 
 
 class SelectProvidedContractStep(workflows.Step):
@@ -157,20 +191,22 @@ class AddEPG(workflows.Workflow):
     success_url = "horizon:project:endpoint_groups:index"
     default_steps = (AddEPGStep,
                      SelectProvidedContractStep,
-                     SelectConsumedContractStep)
+                     SelectConsumedContractStep,
+					 SelectL2policyStep,)
     wizard = True
 
     def format_status_message(self, message):
         return message % self.context.get('name')
 
     def handle(self, request, context):
-        try:
-            api.group_policy.epg_create(request, **context)
-            return True
-        except Exception as e:
-            msg = self.format_status_message(self.failure_message) + str(e)
-            exceptions.handle(request, msg)
-            return False
+		try:
+			print context
+			client.epg_create(request, **context)
+			return True
+		except Exception as e:
+			msg = self.format_status_message(self.failure_message) + str(e)
+			exceptions.handle(request, msg)
+			return False
 
 
 def _image_choice_title(img):
@@ -226,7 +262,7 @@ class LaunchInstance(workflows.Action):
         epg_id = self.request.path.split("/")[-2]
         try:
             msg = _('Member was successfully created.')
-            ep = api.group_policy.ep_create(request,endpoint_group_id=epg_id)
+            ep = client.ep_create(request,endpoint_group_id=epg_id)
             api.nova.server_create(request, 
                     context['name'], 
                     context['image'],

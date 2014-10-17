@@ -20,7 +20,7 @@ from horizon import exceptions
 from horizon import forms
 from horizon import workflows
 
-from openstack_dashboard import api
+from gbp_ui import client
 
 
 class SelectPolicyRuleAction(workflows.Action):
@@ -37,7 +37,7 @@ class SelectPolicyRuleAction(workflows.Action):
     def populate_policy_rules_choices(self, request, context):
         try:
             tenant_id = self.request.user.tenant_id
-            rules = api.group_policy.policyrule_list(request,
+            rules = client.policyrule_list(request,
                                                      tenant_id=tenant_id)
             for r in rules:
                 r.set_id_as_name_if_empty()
@@ -108,7 +108,7 @@ class AddContract(workflows.Workflow):
 
     def _create_contract(self, request, context):
         try:
-            api.group_policy.contract_create(request, **context)
+            client.contract_create(request, **context)
             return True
         except Exception as e:
             msg = self.format_status_message(self.failure_message) + str(e)
@@ -135,7 +135,7 @@ class SelectPolicyClassifierAction(workflows.Action):
     def populate_classifier_choices(self, request, context):
         try:
             tenant_id = self.request.user.tenant_id
-            classifiers = api.group_policy.policyclassifier_list(request,
+            classifiers = client.policyclassifier_list(request,
                 tenant_id=tenant_id)
             for classifier in classifiers:
                 classifier.set_id_as_name_if_empty()
@@ -164,7 +164,7 @@ class SelectPolicyActionAction(workflows.Action):
     def populate_actions_choices(self, request, context):
         try:
             tenant_id = self.request.user.tenant_id
-            actions = api.group_policy.policyaction_list(request,
+            actions = client.policyaction_list(request,
                 tenant_id=tenant_id)
             action_list = [a.id for a in actions]
             for action in actions:
@@ -250,7 +250,7 @@ class AddPolicyRule(workflows.Workflow):
 
     def _create_policyrule(self, request, context):
         try:
-            api.group_policy.policyrule_create(request, **context)
+            client.policyrule_create(request, **context)
             return True
         except Exception as e:
             msg = self.format_status_message(self.failure_message) + str(e)
@@ -313,7 +313,7 @@ class AddPolicyClassifier(workflows.Workflow):
 
     def _create_classifer(self, request, context):
         try:
-            api.group_policy.policyclassifier_create(request, **context)
+            client.policyclassifier_create(request, **context)
             return True
         except Exception as e:
             msg = self.format_status_message(self.failure_message) + str(e)
@@ -372,7 +372,7 @@ class AddPolicyAction(workflows.Workflow):
 
     def _create_action(self, request, context):
         try:
-            api.group_policy.policyaction_create(request, **context)
+            client.policyaction_create(request, **context)
             return True
         except Exception as e:
             msg = self.format_status_message(self.failure_message) + str(e)

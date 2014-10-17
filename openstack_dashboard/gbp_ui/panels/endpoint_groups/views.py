@@ -24,7 +24,8 @@ from horizon import tabs
 from horizon.utils import memoized
 from horizon import workflows
 
-from openstack_dashboard import api
+from gbp_ui import client
+
 import forms as epg_forms
 import tabs as epg_tabs
 import workflows as epg_workflows
@@ -48,7 +49,7 @@ class IndexView(tabs.TabView):
             obj_ids.append(re.search('([0-9a-z-]+)$', action).group(1))
         for obj_id in obj_ids:
             try:
-                api.group_policy.epg_delete(request, obj_id)
+                client.epg_delete(request, obj_id)
                 messages.success(request,
                                  _('Deleted EPG %s') % obj_id)
             except Exception as e:
@@ -63,8 +64,9 @@ class AddEPGView(workflows.WorkflowView):
 
 
 class EPGDetailsView(tabs.TabbedTableView):
-    tab_group_class = (epg_tabs.EPGMemberTabs)
-    template_name = 'project/endpoint_groups/details_tabs.html'
+	tab_group_class = (epg_tabs.EPGMemberTabs)
+	template_name = 'project/endpoint_groups/details_tabs.html'
+
 
 class LaunchVMView(workflows.WorkflowView):
     workflow_class = LaunchVM
@@ -92,7 +94,7 @@ class UpdateEPGView(forms.ModalFormView):
     def _get_object(self, *args, **kwargs):
         epg_id = self.kwargs['epg_id']
         try:
-            epg = api.group_policy.epg_get(self.request, epg_id)
+            epg = client.epg_get(self.request, epg_id)
             epg.set_id_as_name_if_empty()
             return epg
         except Exception:
@@ -164,6 +166,19 @@ class AddL2policyView(forms.ModalFormView):
 	def get_initial(self):
 		return self.kwargs
 
+class L2PolicyUpdateView(forms.ModalFormView):
+ 	form_class = epg_forms.UpdateL2PolicyForm
+	template_name = "project/endpoint_groups/update_l2policy.html"
+
+	def get_context_data(self, **kwargs):
+		context = super(L2PolicyUpdateView,self).get_context_data(**kwargs)
+		context['l2policy_id'] = self.kwargs['l2policy_id']
+		return context
+
+	def get_initial(self):
+		return self.kwargs
+ 
+
 class AddL3policyView(forms.ModalFormView):
 	form_class = epg_forms.AddL3PolicyForm
 	template_name = "project/endpoint_groups/add_l3policy.html"
@@ -179,6 +194,19 @@ class L2PolicyDetailsView(tabs.TabView):
     tab_group_class = (epg_tabs.L2PolicyDetailsTabs)
     template_name = 'project/endpoint_groups/details_tabs.html' 
 
+class L3PolicyUpdateView(forms.ModalFormView):
+ 	form_class = epg_forms.UpdateL3PolicyForm
+	template_name = "project/endpoint_groups/update_l3policy.html"
+
+	def get_context_data(self, **kwargs):
+		context = super(L3PolicyUpdateView,self).get_context_data(**kwargs)
+		context['l3policy_id'] = self.kwargs['l3policy_id']
+		return context
+
+	def get_initial(self):
+		return self.kwargs
+ 
 class L3PolicyDetailsView(tabs.TabView):
     tab_group_class = (epg_tabs.L3PolicyDetailsTabs)
     template_name = 'project/endpoint_groups/details_tabs.html'  
+

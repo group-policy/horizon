@@ -509,6 +509,7 @@ def network_create(request, **kwargs):
     :param name: (optional) name of the network created
     :returns: Subnet object
     """
+
     LOG.debug("network_create(): kwargs = %s" % kwargs)
     # In the case network profiles are being used, profile id is needed.
     if 'net_profile_id' in kwargs:

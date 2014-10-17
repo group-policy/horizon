@@ -240,13 +240,16 @@ def l3policy_get(request,pc_id,**kwargs):
     return neutronclient(request).show_l3_policy(pc_id).get('l3_policy')
 
 def l2policy_get(request,pc_id,**kwargs):
-    return neutronclient(request).show_l2_policy(pc_id).get('l2_policy')
+    return L2Policy(neutronclient(request).show_l2_policy(pc_id).get('l2_policy'))
 
 def l2policy_create(request,**kwargs):
     body = {'l2_policy': kwargs}
     return neutronclient(request).create_l2_policy(body).get('l2_policy')
 
+def l2policy_update(request,pc_id,**kwargs):
+    body = {'l2_policy':kwargs}
+    return neutronclient(request).update_l2_policy(pc_id,body).get('l2_policy')
+
 def l3policy_create(request,**kwargs):
     body = {'l3_policy':kwargs}
     return neutronclient(request).create_l3_policy(body).get('l3_policy')
-

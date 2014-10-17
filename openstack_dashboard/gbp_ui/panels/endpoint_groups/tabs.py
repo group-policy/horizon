@@ -17,9 +17,11 @@ from django.utils.translation import ugettext_lazy as _
 from horizon import exceptions
 from horizon import tabs
 
-from openstack_dashboard import api
-import tables
 from openstack_dashboard.dashboards.project.instances.tables import is_deleting
+from openstack_dashboard import api
+
+from gbp_ui import client
+import tables
 
 EPGsTable = tables.EPGsTable
 L2PolicyTable = tables.L2PolicyTable
@@ -35,7 +37,7 @@ class EPGsTab(tabs.TableTab):
     def get_epgstable_data(self):
         try:
             tenant_id = self.request.user.tenant_id
-            epgs = api.group_policy.epg_list(self.tab_group.request,
+            epgs = client.epg_list(self.tab_group.request,
                                             tenant_id=tenant_id)
         except Exception:
             epgs = []
@@ -57,7 +59,7 @@ class L2PolicyTab(tabs.TableTab):
 		policies = []
 		try:
 			tenant_id = self.request.user.tenant_id
-			policies = api.group_policy.l2policy_list(self.request,tenant_id=tenant_id)
+			policies = client.l2policy_list(self.request,tenant_id=tenant_id)
 		except Exception:
 			policies = []
 			exceptions.handle(self.tab_group.request,
@@ -74,7 +76,7 @@ class L3PolicyTab(tabs.TableTab):
 		policies = []
  		try:
 			tenant_id = self.request.user.tenant_id
-			policies = api.group_policy.l3policy_list(self.request,tenant_id=tenant_id)
+			policies = client.l3policy_list(self.request,tenant_id=tenant_id)
 		except Exception:
 			policies = []
 			exceptions.handle(self.tab_group.request,
@@ -96,9 +98,9 @@ class EPGDetailsTab(tabs.Tab):
     def get_context_data(self, request):
         epgid = self.tab_group.kwargs['epg_id']
         try:
-            epg = api.group_policy.epg_get(request, epgid)
-            l3list = api.group_policy.l3policy_list(request)
-            l2list = api.group_policy.l2policy_list(request)
+            epg = client.epg_get(request, epgid)
+            l3list = client.l3policy_list(request)
+            l2list = client.l2policy_list(request)
         except Exception:
             exceptions.handle(request, _('Unable to retrieve group details.'), redirect=self.failure_url)
         return {'epg': epg, 'l3list':l3list,'l2list':l2list}
@@ -112,7 +114,7 @@ class L2PolicyDetailsTab(tabs.Tab):
 	def get_context_data(self,request):
 		l2policy_id = self.tab_group.kwargs['l2policy_id']
 		try:
-			l2policy = api.group_policy.l2policy_get(request,l2policy_id)
+			l2policy = client.l2policy_get(request,l2policy_id)
 		except Exception:
 			exceptions.handle(request, _('Unable to retrieve l2 policy details.'), redirect=self.failure_url)
 		return {'l2policy':l2policy}
@@ -126,7 +128,7 @@ class L3PolicyDetailsTab(tabs.Tab):
 	def get_context_data(self,request):
 		l3policy_id = self.tab_group.kwargs['l3policy_id']
 		try:
-			l3policy = api.group_policy.l3policy_get(request,l3policy_id)
+			l3policy = client.l3policy_get(request,l3policy_id)
 		except Exception:
 			exceptions.handle(request, _('Unable to retrieve l3 policy details.'), redirect=self.failure_url)
 		return {'l3policy':l3policy}
@@ -155,7 +157,7 @@ class InstancesTab(tabs.TableTab):
         epgid = self.tab_group.kwargs['epg_id']
         filtered_instances = []
         try:
-            eps = api.group_policy.ep_list(self.request,
+            eps = client.ep_list(self.request,
                                            endpoint_group_id=epgid)
             epg_ports = [x.port_id for x in eps]
             marker = self.request.GET.get(
@@ -185,11 +187,11 @@ class ConsumedTab(tabs.TableTab):
 
     def get_consumed_contracts_data(self):
         epgid = self.tab_group.kwargs['epg_id']
-        epg = api.group_policy.epg_get(self.request, epgid)
+        epg = client.epg_get(self.request, epgid)
         consumed_contract_ids = epg.get('consumed_contracts')
         consumed_contracts = []
         for _id in consumed_contract_ids:
-            consumed_contracts.append(api.group_policy.contract_get(self.request, _id))
+            consumed_contracts.append(client.contract_get(self.request, _id))
         return consumed_contracts
 
 class ProvidedTab(tabs.TableTab):
@@ -200,11 +202,11 @@ class ProvidedTab(tabs.TableTab):
     
     def get_provided_contracts_data(self):
         epgid = self.tab_group.kwargs['epg_id']
-        epg = api.group_policy.epg_get(self.request, epgid)
+        epg = client.epg_get(self.request, epgid)
         provided_contract_ids = epg.get('provided_contracts')
         provided_contracts = []
         for _id in provided_contract_ids:
-            provided_contracts.append(api.group_policy.contract_get(self.request, _id))
+            provided_contracts.append(client.contract_get(self.request, _id))
         return provided_contracts
 
 class EPGMemberTabs(tabs.TabGroup):

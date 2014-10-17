@@ -123,47 +123,66 @@ class DeletePolicyActionLink(tables.DeleteAction):
 
 
 class ContractsTable(tables.DataTable):
-    name = tables.Column("name", verbose_name=_("Name"),
-            link="horizon:project:contracts:contractdetails")
+	name = tables.Column("name", verbose_name=_("Name"),
+			link="horizon:project:contracts:contractdetails")
+	description = tables.Column("description",
+			verbose_name=_("Description"))
 
-    class Meta:
-        name = "contractstable"
-        verbose_name = _("Contracts")
-        table_actions = (AddContractLink, DeleteContractLink)
-        row_actions = (UpdateContractLink, DeleteContractLink)
+	class Meta:
+		name = "contractstable"
+		verbose_name = _("Contracts")
+		table_actions = (AddContractLink, DeleteContractLink)
+		row_actions = (UpdateContractLink, DeleteContractLink)
 
 
 class PolicyRulesTable(tables.DataTable):
-    name = tables.Column("name",
-                         verbose_name=_("Name"),
-            link="horizon:project:contracts:policyruledetails")
+	name = tables.Column("name",
+			verbose_name=_("Name"),
+			link="horizon:project:contracts:policyruledetails")
+	description = tables.Column("description",
+			verbose_name=_("Description"))
+	enabled = tables.Column("enabled",
+			verbose_name=_("Enabled"))
 
-    class Meta:
-        name = "policyrulestable"
-        verbose_name = _("Policy Rules")
-        table_actions = (AddPolicyRuleLink, DeletePolicyRuleLink)
-        row_actions = (UpdatePolicyRuleLink, DeletePolicyRuleLink)
+
+	class Meta:
+		name = "policyrulestable"
+		verbose_name = _("Policy Rules")
+		table_actions = (AddPolicyRuleLink, DeletePolicyRuleLink)
+		row_actions = (UpdatePolicyRuleLink, DeletePolicyRuleLink)
 
 
 class PolicyClassifiersTable(tables.DataTable):
-    name = tables.Column("name",
-                         verbose_name=_("Name"),
-                         link="horizon:project:contracts:policyclassifierdetails")
+	name = tables.Column("name",
+			verbose_name=_("Name"),
+			link="horizon:project:contracts:policyclassifierdetails")
+	description = tables.Column("description",
+			verbose_name=_("Description"))
+	direction = tables.Column("direction",
+			verbose_name=_("Direction"))
+	protocol = tables.Column("protocol",
+			verbose_name=_("Protocol"))
 
-    class Meta:
-        name = "policyclassifierstable"
-        verbose_name = _("Policy Classifiers")
-        table_actions = (AddPolicyClassifierLink, DeletePolicyClassifierLink)
-        row_actions = (UpdatePolicyClassifierLink, DeletePolicyClassifierLink)
+	class Meta:
+		name = "policyclassifierstable"
+		verbose_name = _("Policy Classifiers")
+		table_actions = (AddPolicyClassifierLink, DeletePolicyClassifierLink)
+		row_actions = (UpdatePolicyClassifierLink, DeletePolicyClassifierLink)
 
 
 class PolicyActionsTable(tables.DataTable):
-    name = tables.Column("name",
-                         verbose_name=_("Name"),
-                         link="horizon:project:contracts:policyactiondetails")
+	name = tables.Column("name", verbose_name=_("Name"),
+			link="horizon:project:contracts:policyactiondetails")
+	description = tables.Column("description",
+			verbose_name=_("Description"))
+	action_value = tables.Column("action_value",
+			verbose_name=_("Action Value"))
+	action_type = tables.Column("action_type",
+			verbose_name=_("Action Type"))
 
-    class Meta:
-        name = "policyactionstable"
-        verbose_name = _("Policy Actions")
-        table_actions = (AddPolicyActionLink, DeletePolicyActionLink)
-        row_actions = (UpdatePolicyActionLink, DeletePolicyActionLink)
+
+	class Meta:
+		name = "policyactionstable"
+		verbose_name = _("Policy Actions")
+		table_actions = (AddPolicyActionLink, DeletePolicyActionLink)
+		row_actions = (UpdatePolicyActionLink, DeletePolicyActionLink)

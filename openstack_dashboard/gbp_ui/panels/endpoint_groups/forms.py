@@ -23,7 +23,6 @@ from horizon import exceptions
 from horizon import forms
 from horizon import messages
 
-from openstack_dashboard import api
 
 LOG = logging.getLogger(__name__)
 
@@ -39,15 +38,15 @@ class UpdateEPGForm(forms.SelfHandlingForm):
         super(UpdateEPGForm, self).__init__(request, *args, **kwargs)
         try:
             epg_id = self.initial['epg_id']
-            epg = api.group_policy.epg_get(request, epg_id)
+            epg = client.epg_get(request, epg_id)
             self.fields['name'].initial = epg.name
             self.fields['description'].initial = epg.description
-            provided = [api.group_policy.contract_get(request,item) for item in epg.provided_contracts]
-            consumed = [api.group_policy.contract_get(request,item) for item in epg.consumed_contracts]
+            provided = [client.contract_get(request,item) for item in epg.provided_contracts]
+            consumed = [client.contract_get(request,item) for item in epg.consumed_contracts]
             self.fields['provided_contracts'].initial = provided
             self.fields['consumed_contracts'].initial = consumed
             tenant_id = self.request.user.tenant_id
-            contracts = api.group_policy.contract_list(request, tenant_id=tenant_id)
+            contracts = client.contract_list(request, tenant_id=tenant_id)
             for c in contracts:
                 c.set_id_as_name_if_empty()
             contracts = sorted(contracts, key=lambda rule: rule.name)
@@ -64,7 +63,7 @@ class UpdateEPGForm(forms.SelfHandlingForm):
         try:
             context['provided_contracts'] = dict([(i,'string') for i in context['provided_contracts']])
             context['consumed_contracts'] = dict([(i,'string') for i in context['consumed_contracts']])
-            epg = api.group_policy.epg_update(request, epg_id, **context)
+            epg = client.epg_update(request, epg_id, **context)
             msg = _('EPG %s was successfully updated.') % name_or_id
             LOG.debug(msg)
             messages.success(request, msg)
@@ -85,9 +84,9 @@ class CreateContractForm(forms.SelfHandlingForm):
         try:
             tenant_id = self.request.user.tenant_id
             epg_id = kwargs['initial']['epg_id']
-            epg = api.group_policy.epg_get(request, epg_id)
+            epg = client.epg_get(request, epg_id)
             providedcontracts = epg.get("provided_contracts") 
-            items = api.group_policy.contract_list(request, tenant_id=tenant_id)
+            items = client.contract_list(request, tenant_id=tenant_id)
             contracts = [(p.id,p.name) for p in items if p.id not in providedcontracts]
         except Exception as e:
             pass
@@ -95,13 +94,13 @@ class CreateContractForm(forms.SelfHandlingForm):
     
     def handle(self,request,context):
         epg_id = self.initial['epg_id']
-        epg = api.group_policy.epg_get(request, epg_id)
+        epg = client.epg_get(request, epg_id)
         url = reverse("horizon:project:endpoint_groups:epgdetails", kwargs={'epg_id': epg_id})
         try:
             for contract in epg.get("provided_contracts"):
                 context['contract'].append(contract)
             contracts = dict([(item,'string') for item in context['contract']])
-            api.group_policy.epg_update(request,epg_id,provided_contracts=contracts)
+            client.epg_update(request,epg_id,provided_contracts=contracts)
             msg = _('Contract added successfully!')
             messages.success(request, msg)
             LOG.debug(msg)
@@ -121,9 +120,9 @@ class RemoveContractForm(forms.SelfHandlingForm):
         try:
             tenant_id = self.request.user.tenant_id
             epg_id = kwargs['initial']['epg_id']
-            epg = api.group_policy.epg_get(request, epg_id)
+            epg = client.epg_get(request, epg_id)
             providedcontracts = epg.get("provided_contracts") 
-            items = api.group_policy.contract_list(request, tenant_id=tenant_id)
+            items = client.contract_list(request, tenant_id=tenant_id)
             contracts = [(p.id,p.name) for p in items if p.id in providedcontracts] 
         except Exception as e:
             pass
@@ -133,12 +132,12 @@ class RemoveContractForm(forms.SelfHandlingForm):
         epg_id = self.initial['epg_id']
         url = reverse("horizon:project:endpoint_groups:epgdetails", kwargs={'epg_id': epg_id})
         try:
-            epg = api.group_policy.epg_get(request, epg_id)
+            epg = client.epg_get(request, epg_id)
             old_contracts = epg.get("provided_contracts")
             for contract in context['contract']:
                 old_contracts.remove(contract)
             contracts = dict([(item,'string') for item in old_contracts])
-            api.group_policy.epg_update(request,epg_id,provided_contracts=contracts)
+            client.epg_update(request,epg_id,provided_contracts=contracts)
             msg = _('Contract removed successfully!')
             messages.success(request, msg)
             LOG.debug(msg)
@@ -158,9 +157,9 @@ class AddConsumedForm(forms.SelfHandlingForm):
         try:
             tenant_id = self.request.user.tenant_id
             epg_id = kwargs['initial']['epg_id']
-            epg = api.group_policy.epg_get(request, epg_id)
+            epg = client.epg_get(request, epg_id)
             consumedcontracts = epg.get("consumed_contracts")             
-            items = api.group_policy.contract_list(request, tenant_id=tenant_id)
+            items = client.contract_list(request, tenant_id=tenant_id)
             contracts = [(p.id,p.name) for p in items if p.id not in consumedcontracts]
         except Exception as e:
             pass
@@ -170,11 +169,11 @@ class AddConsumedForm(forms.SelfHandlingForm):
         epg_id = self.initial['epg_id']
         url = reverse("horizon:project:endpoint_groups:epgdetails", kwargs={'epg_id': epg_id})
         try:
-            epg = api.group_policy.epg_get(request, epg_id)
+            epg = client.epg_get(request, epg_id)
             for contract in epg.get("consumed_contracts"):
                 context['contract'].append(contract)
             consumed = dict([(item,'string') for item in context['contract']])
-            api.group_policy.epg_update(request,epg_id,consumed_contracts=consumed)
+            client.epg_update(request,epg_id,consumed_contracts=consumed)
             msg = _('Contract Added successfully!')
             messages.success(request, msg)
             LOG.debug(msg)
@@ -194,9 +193,9 @@ class RemoveConsumedForm(forms.SelfHandlingForm):
         try:
             tenant_id = self.request.user.tenant_id
             epg_id = kwargs['initial']['epg_id']
-            epg = api.group_policy.epg_get(request, epg_id)
+            epg = client.epg_get(request, epg_id)
             consumedcontracts = epg.get("consumed_contracts") 
-            items = api.group_policy.contract_list(request, tenant_id=tenant_id)
+            items = client.contract_list(request, tenant_id=tenant_id)
             contracts = [(p.id,p.name) for p in items if p.id in consumedcontracts]
         except Exception as e:
             pass
@@ -206,12 +205,12 @@ class RemoveConsumedForm(forms.SelfHandlingForm):
         epg_id = self.initial['epg_id']
         url = reverse("horizon:project:endpoint_groups:epgdetails", kwargs={'epg_id': epg_id})
         try:
-            epg = api.group_policy.epg_get(request, epg_id)
+            epg = client.epg_get(request, epg_id)
             old_contracts = epg.get("consumed_contracts")
             for contract in context['contract']:
                 old_contracts.remove(contract)
             consumed = dict([(item,'string') for item in old_contracts])
-            api.group_policy.epg_update(request,epg_id,consumed_contracts=consumed)
+            client.epg_update(request,epg_id,consumed_contracts=consumed)
             msg = _('Contract removed successfully!')
             messages.success(request, msg)
             LOG.debug(msg)
@@ -230,7 +229,7 @@ class AddL2PolicyForm(forms.SelfHandlingForm):
 	def __init__(self,request,*args,**kwargs):
 		super(AddL2PolicyForm,self).__init__(request, *args, **kwargs)
 		try:
-			policies = api.group_policy.l3policy_list(request)
+			policies = client.l3policy_list(request)
 			policies = [(item['id'],item['name']+":"+item['id']) for item in policies]
 			self.fields['l3_policy_id'].choices = policies
 		except Exception as e:
@@ -242,7 +241,7 @@ class AddL2PolicyForm(forms.SelfHandlingForm):
 	def handle(self, request, context):
 		url = reverse("horizon:project:endpoint_groups:index")
 		try:
-			l2_policy = api.group_policy.l2policy_create(request,**context)
+			l2_policy = client.l2policy_create(request,**context)
 			msg = _("L2 Policy Created Successfully!")
 			LOG.debug(msg)
 			return http.HttpResponseRedirect(url)
@@ -251,6 +250,42 @@ class AddL2PolicyForm(forms.SelfHandlingForm):
 			msg = _("Failed to create L2 policy")
 			LOG.error(msg)
 			exceptions.handle(request, msg, redirect=redirect)
+
+class UpdateL2PolicyForm(forms.SelfHandlingForm):
+	name = forms.CharField(max_length=80, label=_("Name"), required=False)
+	description = forms.CharField(max_length=80, label=_("Description"), required=False)
+	l3_policy_id = forms.ChoiceField(label=_("L3 Policy"),required=False)
+
+	def __init__(self,request,*args,**kwargs):
+		super(UpdateL2PolicyForm,self).__init__(request, *args, **kwargs)
+		try:
+			l2policy_id = self.initial['l2policy_id']
+			l2 = client.l2policy_get(request,l2policy_id)
+			print l2
+			policies = client.l3policy_list(request)
+			policies = [(item['id'],item['name']+":"+item['id']) for item in policies]
+			self.fields['l3_policy_id'].choices = policies
+			for item in ['name','description','l3_policy_id']:
+				self.fields[item].initial = getattr(l2,item)
+		except Exception as e:
+			msg = _("Failed to get L3 policy list")
+			LOG.error(msg)
+			exceptions.handle(request, msg, redirect=redirect)
+
+
+	def handle(self, request, context):
+		url = reverse("horizon:project:endpoint_groups:index")
+		l2policy_id = self.initial['l2policy_id']
+		try:
+			l2_policy = client.l2policy_update(request,l2policy_id,**context)
+			msg = _("L2 Policy Updated Successfully!")
+			LOG.debug(msg)
+			return http.HttpResponseRedirect(url)
+		except Exception:
+			msg = _("Failed to update L2 policy")
+			LOG.error(msg)
+			exceptions.handle(request, msg, redirect=redirect)
+
 
 class AddL3PolicyForm(forms.SelfHandlingForm):
  	name = forms.CharField(max_length=80, label=_("Name"))
@@ -287,12 +322,61 @@ class AddL3PolicyForm(forms.SelfHandlingForm):
 	def handle(self,request,context):
 		url = reverse("horizon:project:endpoint_groups:index")
  		try:
-			l3_policy = api.group_policy.l3policy_create(request,**context)
+			l3_policy = client.l3policy_create(request,**context)
 			msg = _("L3 Policy Created Successfully!")
 			LOG.debug(msg)
 			return http.HttpResponseRedirect(url)
 		except Exception:
 			msg = _("Failed to create L3 policy")
+			LOG.error(msg)
+			exceptions.handle(request, msg, redirect=redirect)
+ 
+class UpdateL3PolicyForm(forms.SelfHandlingForm):
+ 	name = forms.CharField(max_length=80, label=_("Name"))
+	description = forms.CharField(max_length=80, label=_("Description"), required=False)
+	ip_version = forms.ChoiceField(choices=[(4, 'IPv4'), (6, 'IPv6')],
+								widget=forms.Select(attrs={
+                                  'class': 'switchable',
+                                  'data-slug': 'ipversion',
+                                }), label=_("IP Version")) 
+	ip_pool = forms.IPField(label=_("IP Pool"),
+									initial="",
+									help_text=_("IP Pool"),
+									version=forms.IPv4 | forms.IPv6,
+									mask=True) 
+	subnet_prefix_length = forms.CharField(max_length=80,
+									label=_("Subnet Prefix Length"),
+									help_text=_("Between 2-30 for IP4 and 2-127 for IP6."),)
+
+	def __init__(self,request,*args,**kwargs):
+		super(UpdateL3PolicyForm,self).__init__(request,*args,**kwargs)
+		try:
+			l3policy_id = self.kwargs['l3policy_id']
+			l3policy_id = self.initial['l2policy_id']
+		except Exception:
+			pass
+	
+	def clean(self):
+		cleaned_data = super(UpdateL3PolicyForm, self).clean()
+		if self.is_valid():
+			ipversion = int(cleaned_data['ip_version'])
+			subnet_prefix_length = int(cleaned_data['subnet_prefix_length'])
+			msg = _("Subnet prefix out of range.")
+			if ipversion == 4 and subnet_prefix_length not in range(2,31):
+				raise forms.ValidationError(msg)
+			if ipversion == 6 and subnet_prefix_length not in range(2,128):
+				raise forms.ValidationError(msg)
+		return cleaned_data
+
+	def handle(self,request,context):
+		url = reverse("horizon:project:endpoint_groups:index")
+ 		try:
+			l3_policy = client.l3policy_create(request,**context)
+			msg = _("L3 Policy Updated Successfully!")
+			LOG.debug(msg)
+			return http.HttpResponseRedirect(url)
+		except Exception:
+			msg = _("Failed to update L3 policy")
 			LOG.error(msg)
 			exceptions.handle(request, msg, redirect=redirect)
  

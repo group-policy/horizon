@@ -58,12 +58,31 @@ class EPGsTable(tables.DataTable):
         table_actions = (AddEPGLink, DeleteEPGLink)
         row_actions = (UpdateEPGLink, DeleteEPGLink)
 
+	pass
+
 class CreateL2PolicyLink(tables.LinkAction):
 	name = "add_l2policy"
 	verbose_name = _("Create L2 Policy")
 	url = "horizon:project:endpoint_groups:addl2policy"
 	classes = ("ajax-modal","btn-addl2policy")
 
+
+class EditL2PolicyLink(tables.LinkAction):
+    name = "update_l2policy"
+    verbose_name = _("Edit L2Policy")
+    classes = ("ajax-modal", "btn-update",)
+
+    def get_link_url(self, l2policy):
+        base_url = reverse("horizon:project:endpoint_groups:update_l2policy", kwargs={'l2policy_id': l2policy.id})
+        return base_url
+
+class DeleteL2PolicyLink(tables.DeleteAction):
+    name = "delete_l2policy"
+    action_present = _("Delete")
+    action_past = _("Scheduled deletion of %(data_type)s")
+    data_type_singular = _("L2Policy")
+    data_type_plural = _("L2Policies")
+ 
 
 class L2PolicyTable(tables.DataTable):
 	name = tables.Column("name",
@@ -76,7 +95,8 @@ class L2PolicyTable(tables.DataTable):
 	class Meta:
 		name = "l2policy_table"
 		verbose_name = _("L2 Policy")
-		table_actions = (CreateL2PolicyLink,)
+		table_actions = (CreateL2PolicyLink,DeleteL2PolicyLink)
+		row_actions = (EditL2PolicyLink,DeleteL2PolicyLink)
 
 class CreateL3PolicyLink(tables.LinkAction):
 	name = "create_l3policy"
@@ -84,7 +104,22 @@ class CreateL3PolicyLink(tables.LinkAction):
 	url = "horizon:project:endpoint_groups:addl3policy"
 	classes = ("ajax-modal","btn-addl3policy")
 
+class EditL3PolicyLink(tables.LinkAction):
+    name = "update_l3policy"
+    verbose_name = _("Edit L3Policy")
+    classes = ("ajax-modal", "btn-update",)
 
+    def get_link_url(self, l3policy):
+        base_url = reverse("horizon:project:endpoint_groups:update_l3policy", kwargs={'l3policy_id': l3policy.id})
+        return base_url
+
+class DeleteL3PolicyLink(tables.DeleteAction):
+    name = "delete_l3policy"
+    action_present = _("Delete")
+    action_past = _("Scheduled deletion of %(data_type)s")
+    data_type_singular = _("L3Policy")
+    data_type_plural = _("L3Policies")
+ 
 class L3PolicyTable(tables.DataTable):
 	name = tables.Column("name",
 						verbose_name=_("Name"),
@@ -98,7 +133,8 @@ class L3PolicyTable(tables.DataTable):
 	class Meta:
 		name = "l3policy_table"
 		verbose_name = _("L3 Policy")
-		table_actions = (CreateL3PolicyLink,)
+		table_actions = (CreateL3PolicyLink,DeleteL3PolicyLink,)
+		row_actions = (EditL3PolicyLink,DeleteL3PolicyLink,)
                                                                
 class LaunchVMLink(tables.LinkAction):
     name = "launch_vm"

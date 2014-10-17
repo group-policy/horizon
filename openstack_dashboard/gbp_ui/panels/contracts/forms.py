@@ -9,7 +9,7 @@ from horizon import forms
 from horizon import messages
 from horizon.utils import validators
 
-from openstack_dashboard import api
+from gbp_ui import client
 
 PROTOCOLS = [('tcp', _('TCP')), ('udp', _('UDP')), ('icmp', _('ICMP')), ('any', _('ANY'))]
 DIRECTIONS = [('in', _('IN')), ('out', _('OUT')), ('bi', _('BI'))]
@@ -23,9 +23,9 @@ class UpdateContractForm(forms.SelfHandlingForm):
         super(UpdateContractForm, self).__init__(request, *args, **kwargs)
         rules = []
         try:
-            items = api.group_policy.policyrule_list(request)
+            items = client.policyrule_list(request)
             rules = [(p.id,p.name) for p in items]
-            contract = api.group_policy.contract_get(request, self.initial['contract_id'])
+            contract = client.contract_get(request, self.initial['contract_id'])
             if contract:
                 self.fields['name'].initial = contract.name
                 self.fields['description'].initial = contract.description
@@ -38,7 +38,7 @@ class UpdateContractForm(forms.SelfHandlingForm):
     def handle(self,request,context):
         try:
             contract_id = self.initial['contract_id']
-            con = api.group_policy.contract_update(request, 
+            con = client.contract_update(request, 
                                                   contract_id,
                                                   name=context['name'],
                                                   description=context['description'],
@@ -62,7 +62,7 @@ class UpdatePolicyActionForm(forms.SelfHandlingForm):
 
         try:
             policyaction_id = self.initial['policyaction_id']
-            pa = api.group_policy.policyaction_get(request, policyaction_id)
+            pa = client.policyaction_get(request, policyaction_id)
             self.fields['name'].initial = pa.name
             self.fields['action_value'].initial = pa.action_value
             self.fields['action_type'].initial = pa.action_type
@@ -90,7 +90,7 @@ class UpdatePolicyClassifierForm(forms.SelfHandlingForm):
         super(UpdatePolicyClassifierForm, self).__init__(request, *args, **kwargs)
         try:
             policyclassifier_id = self.initial['policyclassifier_id']
-            classifier = api.group_policy.policyclassifier_get(request, policyclassifier_id)
+            classifier = client.policyclassifier_get(request, policyclassifier_id)
             for item in ['name','description','protocol','port_range','direction']:
                 self.fields[item].initial = getattr(classifier,item)
         except Exception as e:
@@ -117,10 +117,10 @@ class UpdatePolicyRuleForm(forms.SelfHandlingForm):
         try:
             tenant_id = request.user.tenant_id
             policyrule_id = self.initial['policyrule_id']
-            rule = api.group_policy.policyrule_get(request, policyrule_id)
+            rule = client.policyrule_get(request, policyrule_id)
             for item in ['name','description','policy_classifier_id','policy_actions']:
                self.fields[item].initial = getattr(rule,item)
-            actions = api.group_policy.policyaction_list(request, tenant_id=tenant_id)
+            actions = client.policyaction_list(request, tenant_id=tenant_id)
             action_list = [a.id for a in actions]
             for action in actions:
                 action.set_id_as_name_if_empty()

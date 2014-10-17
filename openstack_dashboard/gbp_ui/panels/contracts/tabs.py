@@ -17,7 +17,7 @@ from django.utils.translation import ugettext_lazy as _
 from horizon import exceptions
 from horizon import tabs
 
-from openstack_dashboard import api
+from gbp_ui import client
 import tables
 
 ContractsTable = tables.ContractsTable
@@ -35,7 +35,7 @@ class PolicyActionsTab(tabs.TableTab):
     def get_policyactionstable_data(self):
         try:
             tenant_id = self.request.user.tenant_id
-            actions = api.group_policy.policyaction_list(
+            actions = client.policyaction_list(
                 self.tab_group.request,
                 tenant_id=tenant_id)
         except Exception:
@@ -58,7 +58,7 @@ class PolicyClassifiersTab(tabs.TableTab):
     def get_policyclassifierstable_data(self):
         try:
             tenant_id = self.request.user.tenant_id
-            classifiers = api.group_policy.policyclassifier_list(
+            classifiers = client.policyclassifier_list(
                 self.tab_group.request,
                 tenant_id=tenant_id)
         except Exception:
@@ -81,7 +81,7 @@ class PolicyRulesTab(tabs.TableTab):
     def get_policyrulestable_data(self):
         try:
             tenant_id = self.request.user.tenant_id
-            policy_rules = api.group_policy.policyrule_list(
+            policy_rules = client.policyrule_list(
                 self.tab_group.request,
                 tenant_id=tenant_id)
         except Exception:
@@ -104,7 +104,7 @@ class ContractsTab(tabs.TableTab):
     def get_contractstable_data(self):
         try:
             tenant_id = self.request.user.tenant_id
-            contracts = api.group_policy.contract_list(self.tab_group.request, tenant_id=tenant_id)
+            contracts = client.contract_list(self.tab_group.request, tenant_id=tenant_id)
         except Exception:
             contracts = []
             exceptions.handle(self.tab_group.request, _('Unable to retrieve contract list.'))
@@ -133,8 +133,8 @@ class ContractDetailsTab(tabs.Tab):
     def get_context_data(self, request):
         cid = self.tab_group.kwargs['contract_id']
         try:
-            contract = api.group_policy.contract_get(request, cid)
-            rules = api.group_policy.policyrule_list(request, contract_id=contract.id)
+            contract = client.contract_get(request, cid)
+            rules = client.policyrule_list(request, contract_id=contract.id)
             rules = [item for item in rules if item.id in contract.policy_rules]
             rules_with_details = []
             for rule in rules:
@@ -143,10 +143,10 @@ class ContractDetailsTab(tabs.Tab):
                 r['id'] = rule.id
                 action_list = []
                 for aid in rule.policy_actions:
-                    action = api.group_policy.policyaction_get(request,aid)
+                    action = client.policyaction_get(request,aid)
                     action_list.append(action.name+":"+str(action.id)+":"+str(action.action_type))
                 r['actions'] = action_list
-                r['classifier'] = api.group_policy.policyclassifier_get(request,rule.policy_classifier_id)
+                r['classifier'] = client.policyclassifier_get(request,rule.policy_classifier_id)
                 rules_with_details.append(r)
         except Exception:
             exceptions.handle(request,
@@ -171,9 +171,9 @@ class PolicyRulesDetailsTab(tabs.Tab):
         actions = []
         classifiers = []
         try:
-            policyrule = api.group_policy.policyrule_get(request, ruleid)
-            actions = api.group_policy.policyaction_list(request, policyrule_id=ruleid)
-            classifiers = api.group_policy.policyclassifier_list(request, policyrule_id=ruleid)
+            policyrule = client.policyrule_get(request, ruleid)
+            actions = client.policyaction_list(request, policyrule_id=ruleid)
+            classifiers = client.policyclassifier_list(request, policyrule_id=ruleid)
         except Exception:
             exceptions.handle(request,
                               _('Unable to retrieve policyrule details.'),
@@ -195,7 +195,7 @@ class PolicyClassifierDetailsTab(tabs.Tab):
     def get_context_data(self, request):
         pcid = self.tab_group.kwargs['policyclassifier_id']
         try:
-            policyclassifier = api.group_policy.policyclassifier_get(request, pcid)
+            policyclassifier = client.policyclassifier_get(request, pcid)
         except Exception:
             exceptions.handle(request,
                               _('Unable to retrieve contract details.'),
@@ -217,7 +217,7 @@ class PolicyActionDetailsTab(tabs.Tab):
     def get_context_data(self, request):
         paid = self.tab_group.kwargs['policyaction_id']
         try:
-            policyaction = api.group_policy.policyaction_get(request, paid)
+            policyaction = client.policyaction_get(request, paid)
         except Exception:
             exceptions.handle(request,
                               _('Unable to retrieve policyaction details.'),
