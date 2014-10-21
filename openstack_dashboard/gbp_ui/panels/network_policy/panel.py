@@ -18,6 +18,6 @@ from django.utils.translation import ugettext_lazy as _
 import horizon
 
 
-class Contract(horizon.Panel):
-    name = _("Contracts")
-    slug = "contracts"
+class NetworkPolicy(horizon.Panel):
+    name = _("Network Policy")
+    slug = "network_policy"  

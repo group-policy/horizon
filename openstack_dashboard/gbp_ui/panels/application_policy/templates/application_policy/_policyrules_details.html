@@ -23,7 +23,7 @@
     <dd>
       {% for action in actions%}
 	  {{action.name}}
-      {% url 'horizon:project:contracts:policyactiondetails' action as action_url %}
+      {% url 'horizon:project:application_policy:policyactiondetails' action as action_url %}
       {{ action.position }} : <a href="{{ action_url }}">{{ action.id }}</a><br>
       {% endfor %}
     </dd>
@@ -31,9 +31,8 @@
     <dd>
       {% for classifier in classifiers %}
       {{classifier.name}}:
-      {% url 'horizon:project:contracts:policyclassifierdetails' classifier.id as classifier_url %}
+      {% url 'horizon:project:application_policy:policyclassifierdetails' classifier.id as classifier_url %}
       <a href="{{ classifier_url }}">{{ classifier.id }}</a><br>
-      {% trans "-" %}
       {% endfor %}
     </dd>
   </dl>

@@ -3,7 +3,7 @@
 {% load url from future %}
 
 {% block form_id %}update_policy_classifier_form{% endblock %}
-{% block form_action %}{% url "horizon:project:contracts:updatepolicyclassifier" policyclassifier_id %}{% endblock %}
+{% block form_action %}{% url "horizon:project:application_policy:updatepolicyclassifier" policyclassifier_id %}{% endblock %}
 
 {% block modal_id %}update_policy_classifier_modal{% endblock %}
 {% block modal-header %}{% trans "Edit Policy Classifier" %}{% endblock %}
@@ -21,5 +21,5 @@
 
 {% block modal-footer %}
   <input class="btn btn-primary pull-right" type="submit" value="{% trans "Update Policy Classifier" %}" />
-  <a href="{% url "horizon:project:contracts:index" %}" class="btn btn-default secondary cancel close">{% trans "Cancel" %}</a>
+  <a href="{% url "horizon:project:application_policy:index" %}" class="btn btn-default secondary cancel close">{% trans "Cancel" %}</a>
 {% endblock %} 

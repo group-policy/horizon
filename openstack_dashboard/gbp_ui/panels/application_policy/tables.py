@@ -18,35 +18,35 @@ from django.utils.translation import ugettext_lazy as _
 from horizon import tables
 
 
-class AddContractLink(tables.LinkAction):
+class AddAppPolicyLink(tables.LinkAction):
     name = "addcontract"
-    verbose_name = _("Create Contract")
-    url = "horizon:project:contracts:addcontract"
+    verbose_name = _("Create Policy Rule Set")
+    url = "horizon:project:application_policy:addcontract"
     classes = ("ajax-modal", "btn-addcontract",)
 
 
-class UpdateContractLink(tables.LinkAction):
+class UpdateAppPolicyLink(tables.LinkAction):
     name = "updatecontract"
-    verbose_name = _("Edit Contract")
+    verbose_name = _("Edit Policy Rule Set")
     classes = ("ajax-modal",'edit_contract')
 
     def get_link_url(self, contract):
-        base_url = reverse("horizon:project:contracts:updatecontract", kwargs={'contract_id': contract.id})
+        base_url = reverse("horizon:project:application_policy:updatecontract", kwargs={'contract_id': contract.id})
         return base_url
 
 
-class DeleteContractLink(tables.DeleteAction):
+class DeleteAppPolicyLink(tables.DeleteAction):
     name = "deletecontract"
     action_present = _("Delete")
     action_past = _("Scheduled deletion of %(data_type)s")
-    data_type_singular = _("Contract")
-    data_type_plural = _("Contracts")
+    data_type_singular = _("Policy Rule Set")
+    data_type_plural = _("Policy Rule Set")
 
 
 class AddPolicyRuleLink(tables.LinkAction):
     name = "addpolicyrules"
     verbose_name = _("Create Policy-Rule")
-    url = "horizon:project:contracts:addpolicyrule"
+    url = "horizon:project:application_policy:addpolicyrule"
     classes = ("ajax-modal", "btn-addpolicyrule",)
 
 
@@ -56,7 +56,7 @@ class UpdatePolicyRuleLink(tables.LinkAction):
     classes = ("ajax-modal", "btn-update",)
 
     def get_link_url(self, policy_rule):
-        base_url = reverse("horizon:project:contracts:updatepolicyrule",
+        base_url = reverse("horizon:project:application_policy:updatepolicyrule",
                            kwargs={'policyrule_id': policy_rule.id})
         return base_url
 
@@ -72,7 +72,7 @@ class DeletePolicyRuleLink(tables.DeleteAction):
 class AddPolicyClassifierLink(tables.LinkAction):
     name = "addpolicyclassifiers"
     verbose_name = _("Create Policy-Classifier")
-    url = "horizon:project:contracts:addpolicyclassifier"
+    url = "horizon:project:application_policy:addpolicyclassifier"
     classes = ("ajax-modal", "btn-addpolicyclassifier",)
 
 
@@ -83,7 +83,7 @@ class UpdatePolicyClassifierLink(tables.LinkAction):
 
     def get_link_url(self, policy_classifier):
         base_url = reverse(
-            "horizon:project:contracts:updatepolicyclassifier",
+            "horizon:project:application_policy:updatepolicyclassifier",
             kwargs={'policyclassifier_id': policy_classifier.id})
         return base_url
 
@@ -99,7 +99,7 @@ class DeletePolicyClassifierLink(tables.DeleteAction):
 class AddPolicyActionLink(tables.LinkAction):
     name = "addpolicyactions"
     verbose_name = _("Create Policy-Action")
-    url = "horizon:project:contracts:addpolicyaction"
+    url = "horizon:project:application_policy:addpolicyaction"
     classes = ("ajax-modal", "btn-addpolicyaction",)
 
 
@@ -109,7 +109,7 @@ class UpdatePolicyActionLink(tables.LinkAction):
     classes = ("ajax-modal", "btn-update",)
 
     def get_link_url(self, policy_action):
-        base_url = reverse("horizon:project:contracts:updatepolicyaction",
+        base_url = reverse("horizon:project:application_policy:updatepolicyaction",
                            kwargs={'policyaction_id': policy_action.id})
         return base_url
 
@@ -122,23 +122,23 @@ class DeletePolicyActionLink(tables.DeleteAction):
     data_type_plural = _("PolicyActions")
 
 
-class ContractsTable(tables.DataTable):
+class ApplicationPoliciesTable(tables.DataTable):
 	name = tables.Column("name", verbose_name=_("Name"),
-			link="horizon:project:contracts:contractdetails")
+			link="horizon:project:application_policy:application_policy_details")
 	description = tables.Column("description",
 			verbose_name=_("Description"))
 
 	class Meta:
-		name = "contractstable"
-		verbose_name = _("Contracts")
-		table_actions = (AddContractLink, DeleteContractLink)
-		row_actions = (UpdateContractLink, DeleteContractLink)
+		name = "application_policies_table"
+		verbose_name = _("Policy Rule Set")
+		table_actions = (AddAppPolicyLink, DeleteAppPolicyLink)
+		row_actions = (UpdateAppPolicyLink, DeleteAppPolicyLink)
 
 
 class PolicyRulesTable(tables.DataTable):
 	name = tables.Column("name",
 			verbose_name=_("Name"),
-			link="horizon:project:contracts:policyruledetails")
+			link="horizon:project:application_policy:policyruledetails")
 	description = tables.Column("description",
 			verbose_name=_("Description"))
 	enabled = tables.Column("enabled",
@@ -155,7 +155,7 @@ class PolicyRulesTable(tables.DataTable):
 class PolicyClassifiersTable(tables.DataTable):
 	name = tables.Column("name",
 			verbose_name=_("Name"),
-			link="horizon:project:contracts:policyclassifierdetails")
+			link="horizon:project:application_policy:policyclassifierdetails")
 	description = tables.Column("description",
 			verbose_name=_("Description"))
 	direction = tables.Column("direction",
@@ -172,7 +172,7 @@ class PolicyClassifiersTable(tables.DataTable):
 
 class PolicyActionsTable(tables.DataTable):
 	name = tables.Column("name", verbose_name=_("Name"),
-			link="horizon:project:contracts:policyactiondetails")
+			link="horizon:project:application_policy:policyactiondetails")
 	description = tables.Column("description",
 			verbose_name=_("Description"))
 	action_value = tables.Column("action_value",

@@ -4,4 +4,5 @@ class GroupPolicyPanels(horizon.PanelGroup):
     name = _("Policy")
     slug = "group_policy"
     panels = ('endpoint_groups',
-              'contracts')
+              'network_policy',
+			  'application_policy',)

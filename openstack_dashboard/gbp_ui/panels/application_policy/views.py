@@ -29,7 +29,7 @@ import tabs as contract_tabs
 import workflows as contract_workflows
 import forms as contract_forms
 
-ContractTabs = contract_tabs.ContractTabs
+ContractTabs = contract_tabs.ApplicationPoliciesTabs
 ContractDetailsTabs = contract_tabs.ContractDetailsTabs
 PolicyRuleDetailsTabs = contract_tabs.PolicyRuleDetailsTabs
 PolicyClassifierDetailsTabs = contract_tabs.PolicyClassifierDetailsTabs
@@ -42,7 +42,7 @@ AddPolicyAction = contract_workflows.AddPolicyAction
 
 class IndexView(tabs.TabView):
     tab_group_class = (ContractTabs)
-    template_name = 'project/contracts/details_tabs.html'
+    template_name = 'project/application_policy/details_tabs.html'
 
     def post(self, request, *args, **kwargs):
         obj_ids = request.POST.getlist('object_ids')
@@ -89,11 +89,11 @@ class IndexView(tabs.TabView):
 
 class AddContractView(workflows.WorkflowView):
     workflow_class = AddContract
-    template_name = "project/contracts/addcontract.html"
+    template_name = "project/application_policy/addcontract.html"
 
 class UpdateContractView(forms.ModalFormView):
     form_class = contract_forms.UpdateContractForm
-    template_name = 'project/contracts/update_contract.html'
+    template_name = 'project/application_policy/update_contract.html'
 
     def get_context_data(self, **kwargs):
         context = super(UpdateContractView, self).get_context_data(**kwargs)
@@ -107,21 +107,21 @@ class UpdateContractView(forms.ModalFormView):
 
 class AddPolicyRuleView(workflows.WorkflowView):
     workflow_class = AddPolicyRule
-    template_name = "project/contracts/addpolicyrule.html"
+    template_name = "project/application_policy/addpolicyrule.html"
 
 
 class AddPolicyClassifierView(workflows.WorkflowView):
     workflow_class = AddPolicyClassifier
-    template_name = "project/contracts/addpolicyclassifier.html"
+    template_name = "project/application_policy/addpolicyclassifier.html"
 
 
 class AddPolicyActionView(workflows.WorkflowView):
     workflow_class = AddPolicyAction
-    template_name = "project/contracts/addpolicyaction.html"
+    template_name = "project/application_policy/addpolicyaction.html"
 
 class UpdatePolicyActionView(forms.ModalFormView):
     form_class = contract_forms.UpdatePolicyActionForm
-    template_name = "project/contracts/update_policy_action.html"
+    template_name = "project/application_policy/update_policy_action.html"
 
     def get_context_data(self, **kwargs):
         context = super(UpdatePolicyActionView, self).get_context_data(**kwargs)
@@ -134,16 +134,16 @@ class UpdatePolicyActionView(forms.ModalFormView):
 
 class ContractDetailsView(tabs.TabView):
     tab_group_class = (ContractDetailsTabs)
-    template_name = 'project/contracts/details_tabs.html'
+    template_name = 'project/application_policy/details_tabs.html'
 
 
 class PolicyRuleDetailsView(tabs.TabView):
     tab_group_class = (PolicyRuleDetailsTabs)
-    template_name = 'project/contracts/details_tabs.html'
+    template_name = 'project/application_policy/details_tabs.html'
 
 class UpdatePolicyRuleView(forms.ModalFormView):
     form_class = contract_forms.UpdatePolicyRuleForm
-    template_name = "project/contracts/update_policy_rule.html"
+    template_name = "project/application_policy/update_policy_rule.html"
 
     def get_context_data(self,**kwargs):
         context = super(UpdatePolicyRuleView,self).get_context_data(**kwargs)
@@ -155,11 +155,11 @@ class UpdatePolicyRuleView(forms.ModalFormView):
 
 class PolicyClassifierDetailsView(tabs.TabView):
     tab_group_class = (PolicyClassifierDetailsTabs)
-    template_name = 'project/contracts/details_tabs.html'
+    template_name = 'project/application_policy/details_tabs.html'
 
 class UpdatePolicyClassifierView(forms.ModalFormView):
     form_class = contract_forms.UpdatePolicyClassifierForm
-    template_name = "project/contracts/update_policy_classifier.html"
+    template_name = "project/application_policy/update_policy_classifier.html"
 
     def get_context_data(self,**kwargs):
         context = super(UpdatePolicyClassifierView,self).get_context_data(**kwargs)
@@ -172,4 +172,4 @@ class UpdatePolicyClassifierView(forms.ModalFormView):
 
 class PolicyActionDetailsView(tabs.TabView):
     tab_group_class = (PolicyActionDetailsTabs)
-    template_name = 'project/contracts/details_tabs.html'
+    template_name = 'project/application_policy/details_tabs.html'

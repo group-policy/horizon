@@ -20,7 +20,6 @@ from horizon import tabs
 from gbp_ui import client
 import tables
 
-ContractsTable = tables.ContractsTable
 PolicyRulesTable = tables.PolicyRulesTable
 PolicyClassifiersTable = tables.PolicyClassifiersTable
 PolicyActionsTable = tables.PolicyActionsTable
@@ -95,19 +94,19 @@ class PolicyRulesTab(tabs.TableTab):
         return policy_rules
 
 
-class ContractsTab(tabs.TableTab):
-    table_classes = (ContractsTable,)
-    name = _("Contracts")
-    slug = "contracts"
+class ApplicationPoliciesTab(tabs.TableTab):
+    table_classes = (tables.ApplicationPoliciesTable,)
+    name = _("Policy Rule Set")
+    slug = "application_policies"
     template_name = "horizon/common/_detail_table.html"
 
-    def get_contractstable_data(self):
+    def get_application_policies_table_data(self):
         try:
             tenant_id = self.request.user.tenant_id
             contracts = client.contract_list(self.tab_group.request, tenant_id=tenant_id)
         except Exception:
             contracts = []
-            exceptions.handle(self.tab_group.request, _('Unable to retrieve contract list.'))
+            exceptions.handle(self.tab_group.request, _('Unable to retrieve policy rule set list.'))
 
         for contract in contracts:
             contract.set_id_as_name_if_empty()
@@ -115,9 +114,9 @@ class ContractsTab(tabs.TableTab):
         return contracts
 
 
-class ContractTabs(tabs.TabGroup):
-    slug = "contracttabs"
-    tabs = (ContractsTab,
+class ApplicationPoliciesTabs(tabs.TabGroup):
+    slug = "application_policies_tabs"
+    tabs = (ApplicationPoliciesTab,
             PolicyRulesTab,
             PolicyClassifiersTab,
             PolicyActionsTab)
@@ -127,7 +126,7 @@ class ContractTabs(tabs.TabGroup):
 class ContractDetailsTab(tabs.Tab):
     name = _("Contract Details")
     slug = "contractdetails"
-    template_name = "project/contracts/_contract_details.html"
+    template_name = "project/application_policy/_contract_details.html"
     failure_url = reverse_lazy('horizon:project:contract:index')
 
     def get_context_data(self, request):
@@ -163,7 +162,7 @@ class ContractDetailsTabs(tabs.TabGroup):
 class PolicyRulesDetailsTab(tabs.Tab):
     name = _("PolicyRule Details")
     slug = "policyruledetails"
-    template_name = "project/contracts/_policyrules_details.html"
+    template_name = "project/application_policy/_policyrules_details.html"
     failure_url = reverse_lazy('horizon:project:policyrule:index')
 
     def get_context_data(self, request):
@@ -174,6 +173,7 @@ class PolicyRulesDetailsTab(tabs.Tab):
             policyrule = client.policyrule_get(request, ruleid)
             actions = client.policyaction_list(request, policyrule_id=ruleid)
             classifiers = client.policyclassifier_list(request, policyrule_id=ruleid)
+            classifiers = [item for item in classifiers if item.id == policyrule.policy_classifier_id]
         except Exception:
             exceptions.handle(request,
                               _('Unable to retrieve policyrule details.'),
@@ -189,7 +189,7 @@ class PolicyRuleDetailsTabs(tabs.TabGroup):
 class PolicyClassifierDetailsTab(tabs.Tab):
     name = _("Policyclassifier Details")
     slug = "policyclassifierdetails"
-    template_name = "project/contracts/_policyclassifier_details.html"
+    template_name = "project/application_policy/_policyclassifier_details.html"
     failure_url = reverse_lazy('horizon:project:contract:index')
 
     def get_context_data(self, request):
@@ -211,7 +211,7 @@ class PolicyClassifierDetailsTabs(tabs.TabGroup):
 class PolicyActionDetailsTab(tabs.Tab):
     name = _("PolicyAction Details")
     slug = "policyactiondetails"
-    template_name = "project/contracts/_policyaction_details.html"
+    template_name = "project/application_policy/_policyaction_details.html"
     failure_url = reverse_lazy('horizon:project:contract:index')
 
     def get_context_data(self, request):
