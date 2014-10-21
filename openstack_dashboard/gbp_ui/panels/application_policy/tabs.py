@@ -124,7 +124,7 @@ class ApplicationPoliciesTabs(tabs.TabGroup):
 
 
 class ContractDetailsTab(tabs.Tab):
-    name = _("Contract Details")
+    name = _("Policy Rule Set Details")
     slug = "contractdetails"
     template_name = "project/application_policy/_contract_details.html"
     failure_url = reverse_lazy('horizon:project:contract:index')
