@@ -231,6 +231,9 @@ def policyclassifier_delete(request, pc_id):
 
 
 def policyclassifier_update(request, pc_id, **kwargs):
+ 	body = {'policy_action': kwargs}
+	action = gbpclient(request).update_policy_action(pc_id,
+	 body).get('policy_action')
 	return {}
 
 def l3policy_list(request,**kwargs):

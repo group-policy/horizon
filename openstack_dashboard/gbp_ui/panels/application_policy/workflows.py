@@ -151,11 +151,12 @@ class SelectPolicyClassifierAction(workflows.Action):
 
 
 class SelectPolicyActionAction(workflows.Action):
-    actions = forms.MultipleChoiceField(
+    actions = forms.DynamicChoiceField(
         label=_("Policy Action"),
         required=False,
-        widget=forms.CheckboxSelectMultiple(),
-        help_text=_("Create a policy-rule with selected action."))
+        widget=forms.Select(),
+        help_text=_("Create a policy-rule with selected action."),
+        add_item_link="horizon:project:application_policy:addpolicyaction")
 
     class Meta:
         name = _("actions")

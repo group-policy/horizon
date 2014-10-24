@@ -113,13 +113,14 @@ class SelectL2policyAction(workflows.Action):
 		return policies
 
 class SelectL2policyStep(workflows.Step):
-	action_class = SelectL2policyAction
-	name = _("L2 Policy")
-	contributes = ("l2policy_id",)
+    action_class = SelectL2policyAction
+    name = _("L2 Policy")
+    contributes = ("l2policy_id",)
 
-	def contribute(self,data,context):
-		context['l2_policy_id'] = data['l2policy_id']
-		return context
+    def contribute(self,data,context):
+        if data['l2policy_id'] != 'default':
+            context['l2_policy_id'] = data['l2policy_id']
+        return context
 
 
 

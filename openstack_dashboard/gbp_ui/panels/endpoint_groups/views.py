@@ -64,8 +64,17 @@ class AddEPGView(workflows.WorkflowView):
 
 
 class EPGDetailsView(tabs.TabbedTableView):
-	tab_group_class = (epg_tabs.EPGMemberTabs)
-	template_name = 'project/endpoint_groups/details_tabs.html'
+    tab_group_class = (epg_tabs.EPGMemberTabs)
+    template_name = 'project/endpoint_groups/group_details.html'
+
+    def get_context_data(self,**kwargs):
+        context = super(EPGDetailsView, self).get_context_data(**kwargs)
+        try:
+            epg = client.epg_get(self.request,context['epg_id'])
+            context['epg'] = epg
+        except Exception as e:
+            pass
+        return context
 
 
 class LaunchVMView(workflows.WorkflowView):

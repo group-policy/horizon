@@ -51,7 +51,7 @@ class IndexView(tabs.TabView):
                 exceptions.handle(request,
                                   _('Unable to delete EPG. %s') % e)
         return self.get(request, *args, **kwargs)
- 
+
 class AddL3policyView(forms.ModalFormView):
 	form_class = np_forms.AddL3PolicyForm
 	template_name = "project/network_policy/add_l3policy.html"
@@ -61,10 +61,10 @@ class AddL3policyView(forms.ModalFormView):
 		return context
 
 	def get_initial(self):
-		return self.kwargs 
+		return self.kwargs
 
 class L3PolicyUpdateView(forms.ModalFormView):
- 	form_class = np_forms.UpdateL3PolicyForm
+	form_class = np_forms.UpdateL3PolicyForm
 	template_name = "project/network_policy/update_l3policy.html"
 
 	def get_context_data(self, **kwargs):
@@ -74,10 +74,10 @@ class L3PolicyUpdateView(forms.ModalFormView):
 
 	def get_initial(self):
 		return self.kwargs
- 
+
 class L3PolicyDetailsView(tables.MultiTableView):
 	table_classes = (np_tables.L2PolicyTable,)
-	template_name = 'project/network_policy/l3policy_details.html'  
+	template_name = 'project/network_policy/l3policy_details.html'
 
 	def get_l2policy_table_data(self):
 		policies = []
@@ -93,7 +93,6 @@ class L3PolicyDetailsView(tables.MultiTableView):
 	def get_context_data(self,**kwargs):
 		context = super(L3PolicyDetailsView,self).get_context_data(**kwargs)
 		p = client.l3policy_get(self.request,self.kwargs['l3policy_id'])
-		print p
 		context['l3policy'] = p
 		return context
 
@@ -119,8 +118,8 @@ class L2PolicyUpdateView(forms.ModalFormView):
 
 	def get_initial(self):
 		return self.kwargs
- 
+
 
 class L2PolicyDetailsView(tabs.TabView):
     tab_group_class = (np_tabs.L2PolicyDetailsTabs)
-    template_name = 'project/endpoint_groups/details_tabs.html'  
+    template_name = 'project/endpoint_groups/details_tabs.html'

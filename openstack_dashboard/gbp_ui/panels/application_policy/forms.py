@@ -100,7 +100,7 @@ class UpdatePolicyClassifierForm(forms.SelfHandlingForm):
        url = reverse('horizon:project:application_policy:index')
        try:
            policyclassifier_id = self.initial['policyclassifier_id']
-           #TODO call the API method
+           pc = client.policyclassifier_update(self.request,context)
            messages.success(request, _('Policy classifier successfully updated.'))
            return http.HttpResponseRedirect(url)
        except Exception as e:
