@@ -111,7 +111,7 @@ class InstancesTab(tabs.TableTab):
 
 
 class ConsumedTab(tabs.TableTab):
-    name = _('Consumed Contracts')
+    name = _('Consumed Policy Rule Set')
     slug = 'consumed_contracts_tab'
     table_classes = (tables.ConsumedContractsTable,)
     template_name = ("horizon/common/_detail_table.html")
@@ -126,7 +126,7 @@ class ConsumedTab(tabs.TableTab):
         return consumed_contracts
 
 class ProvidedTab(tabs.TableTab):
-    name = _('Provided Contracts')
+    name = _('Provided Policy Rule Set')
     slug = 'provided_contracts_tab'
     table_classes = (tables.ProvidedContractsTable,)
     template_name = ("horizon/common/_detail_table.html")

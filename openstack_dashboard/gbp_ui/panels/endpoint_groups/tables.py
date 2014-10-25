@@ -24,7 +24,7 @@ import pdb
 
 class UpdateEPGLink(tables.LinkAction):
     name = "updateepg"
-    verbose_name = _("Edit EPG")
+    verbose_name = _("Edit")
     classes = ("ajax-modal", "btn-update",)
 
     def get_link_url(self, epg):
@@ -144,7 +144,7 @@ class ProvidedContractsTable(tables.DataTable):
     
     class Meta:
         name = 'provided_contracts'
-        verbose_name = _("Provided Contracts")
+        verbose_name = _("Provided Policy Rule Set")
         table_actions = (AddContractLink,RemoveContractLink,) 
 
 
@@ -171,5 +171,5 @@ class ConsumedContractsTable(tables.DataTable):
 
     class Meta:
         name = 'consumed_contracts'
-        verbose_name = _("Consumed Contracts")
+        verbose_name = _("Consumed Policy Rule Set")
         table_actions = (AddConsumedLink,RemoveConsumedLink,)
