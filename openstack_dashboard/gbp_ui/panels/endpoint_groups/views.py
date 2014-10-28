@@ -51,10 +51,10 @@ class IndexView(tabs.TabView):
             try:
                 client.epg_delete(request, obj_id)
                 messages.success(request,
-                                 _('Deleted EPG %s') % obj_id)
+                                 _('Deleted Group %s') % obj_id)
             except Exception as e:
                 exceptions.handle(request,
-                                  _('Unable to delete EPG. %s') % e)
+                                  _('Unable to delete Group. %s') % e)
         return self.get(request, *args, **kwargs)
 
 

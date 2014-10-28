@@ -12,7 +12,14 @@ from horizon.utils import validators
 from gbp_ui import client
 
 PROTOCOLS = [('tcp', _('TCP')), ('udp', _('UDP')), ('icmp', _('ICMP')), ('any', _('ANY'))]
-DIRECTIONS = [('in', _('IN')), ('out', _('OUT')), ('bi', _('BI'))]
+DIRECTIONS = [('in', _('IN')), 
+              ('out', _('OUT')), 
+              ('bi', _('BI'))]
+POLICY_ACTION_TYPES = [('allow', _('ALLOW')),
+                       ('redirect', _('REDIRECT')),
+                       ('copy', _('COPY')),
+                       ('log', _('LOG')),
+                       ('qos', _('QoS'))]
 
 class UpdateContractForm(forms.SelfHandlingForm):
     name = forms.CharField(label=_("Name"))
@@ -51,6 +58,38 @@ class UpdateContractForm(forms.SelfHandlingForm):
             redirect = reverse('horizon:project:contracts:index')
             exceptions.handle(request, _("Unable to update contract."), redirect=redirect)
 
+class AddPolicyActionForm(forms.SelfHandlingForm):
+    name = forms.CharField(label=_("Name"))
+    description = forms.CharField(label=_("Description"),
+                                  required=False)
+    action_type = forms.ChoiceField(label=_("Action"),
+                                    choices=POLICY_ACTION_TYPES,
+                                   widget=forms.Select(attrs={
+                                       'class':'switchable',
+                                       'data-slug':'source'
+                                   }))
+    action_value = forms.ChoiceField(label=_("Action Value"),
+                                           required=False,
+                                        widget=forms.Select(attrs={
+                                       'class':'switched',
+                                       'data-switch-on':'source',
+                                       'data-source-redirect':_('Action Value')
+                                   }))
+
+    def __init__(self, request, *args, **kwargs):
+        super(AddPolicyActionForm, self).__init__(request, *args, **kwargs)
+    
+    def handle(self,request,context):
+        url = reverse('horizon:project:application_policy:index')
+        try:
+            if not context['action_value']:
+                del context['action_value']
+            action = client.policyaction_create(request, **context)
+            messages.success(request, _('Policy Action successfully created.'))
+            return action
+        except Exception as e:
+            exceptions.handle(request, _("Unable to create policy action."), redirect=url)
+ 
 class UpdatePolicyActionForm(forms.SelfHandlingForm):
     name = forms.CharField(label=_("Name"))
     description = forms.CharField(label=_("Description"),required=False)
@@ -68,7 +107,7 @@ class UpdatePolicyActionForm(forms.SelfHandlingForm):
             self.fields['action_type'].initial = pa.action_type
         except Exception as e:
             pass
-        self.fields['action_type'].choices = [('allow', _('ALLOW')), ('redirect', _('REDIRECT'))]
+        self.fields['action_type'].choices = POLICY_ACTION_TYPES
     
     def handle(self,request,context):
         url = reverse('horizon:project:application_policy:index')
@@ -78,6 +117,36 @@ class UpdatePolicyActionForm(forms.SelfHandlingForm):
             return http.HttpResponseRedirect(url)
         except Exception as e:
             exceptions.handle(request, _("Unable to update policy action."), redirect=url)
+
+class AddPolicyClassifierForm(forms.SelfHandlingForm):
+    name = forms.CharField(max_length=80, label=_("Name"), required=False)
+    protocol = forms.ChoiceField(
+        label=_("Protocol"),
+        choices=[('tcp', _('TCP')),
+                 ('udp', _('UDP')),
+                 ('icmp', _('ICMP')),
+                 ('any', _('ANY'))],)
+    port_range = forms.CharField(
+        max_length=80,
+        label=_("Port/Range(min:max)"),
+        required=False)
+    direction = forms.ChoiceField(
+        label=_("Direction"),
+        choices=[('in', _('IN')),
+                 ('out', _('OUT')),
+                 ('bi', _('BI'))])
+
+    def __init__(self, request, *args, **kwargs):
+        super(AddPolicyClassifierForm, self).__init__(request, *args, **kwargs)
+
+    def handle(self,request,context):
+        url = reverse('horizon:project:application_policy:index')
+        try:
+            classifier = client.policyclassifier_create(request, **context)
+            messages.success(request, _('Policy Classifier successfully created.'))
+            return classifier
+        except Exception as e:
+            exceptions.handle(request, _("Unable to create policy classifier."), redirect=url) 
 
 class UpdatePolicyClassifierForm(forms.SelfHandlingForm):
     name = forms.CharField(max_length=80, label=_("Name"), required=False)

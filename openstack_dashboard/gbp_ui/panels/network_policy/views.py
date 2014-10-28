@@ -122,4 +122,4 @@ class L2PolicyUpdateView(forms.ModalFormView):
 
 class L2PolicyDetailsView(tabs.TabView):
     tab_group_class = (np_tabs.L2PolicyDetailsTabs)
-    template_name = 'project/endpoint_groups/details_tabs.html'
+    template_name = 'project/network_policy/details_tabs.html'

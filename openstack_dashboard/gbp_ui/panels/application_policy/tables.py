@@ -27,7 +27,7 @@ class AddAppPolicyLink(tables.LinkAction):
 
 class UpdateAppPolicyLink(tables.LinkAction):
     name = "updatecontract"
-    verbose_name = _("Edit Policy Rule Set")
+    verbose_name = _("Edit")
     classes = ("ajax-modal",'edit_contract')
 
     def get_link_url(self, contract):

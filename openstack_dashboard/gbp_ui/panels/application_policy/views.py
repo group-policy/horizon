@@ -37,7 +37,6 @@ PolicyActionDetailsTabs = contract_tabs.PolicyActionDetailsTabs
 AddContract = contract_workflows.AddContract
 AddPolicyRule = contract_workflows.AddPolicyRule
 AddPolicyClassifier = contract_workflows.AddPolicyClassifier
-AddPolicyAction = contract_workflows.AddPolicyAction
 
 
 class IndexView(tabs.TabView):
@@ -109,15 +108,30 @@ class AddPolicyRuleView(workflows.WorkflowView):
     workflow_class = AddPolicyRule
     template_name = "project/application_policy/addpolicyrule.html"
 
-
-class AddPolicyClassifierView(workflows.WorkflowView):
-    workflow_class = AddPolicyClassifier
-    template_name = "project/application_policy/addpolicyclassifier.html"
+    def get_object_id(self,rule):
+        return [rule.name]
 
 
-class AddPolicyActionView(workflows.WorkflowView):
-    workflow_class = AddPolicyAction
-    template_name = "project/application_policy/addpolicyaction.html"
+class AddPolicyClassifierView(forms.ModalFormView):
+    form_class = contract_forms.AddPolicyClassifierForm
+    template_name = "project/application_policy/add_policy_classifier.html"
+
+    def get_success_url(self):
+        return reverse('horizon:project:application_policy:index')
+    
+    def get_object_id(self, classifier):
+        return [classifier.id]
+ 
+class AddPolicyActionView(forms.ModalFormView):
+    form_class = contract_forms.AddPolicyActionForm
+    template_name = "project/application_policy/add_policy_action.html"
+
+    def get_success_url(self):
+        return reverse('horizon:project:application_policy:index')
+    
+    def get_object_id(self, policyaction):
+        return [policyaction.id]
+ 
 
 class UpdatePolicyActionView(forms.ModalFormView):
     form_class = contract_forms.UpdatePolicyActionForm

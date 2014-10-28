@@ -20,14 +20,12 @@
 	<div class='panel panel-default'>
 		<div class='panel-heading'>{% trans "L3 Policies" %}</div>
 		<div class='panel-body'>
-			<table class="table">
-				<thead><tr><th>Name</th><th>ID</th><tr></thead>
-				<tbody>
+			<ul class="unstyled">
 				{% for l3 in l3list %}
-				<tr><td>&nbsp;{{l3.name}}</td><td>{{l3.id}}</td></tr>
+				<li><a href="{% url 'horizon:project:network_policy:l3policy_details' l3.id %}">{{l3.name}}:{{l3.id}}</a></li>
+ 
 				{% endfor %}
-				</tbody>
-			</table>
+			</ul>
 		</div>
 	</div>
 	{% endif %}
@@ -35,14 +33,11 @@
 	<div class='panel panel-default'>
 		<div class='panel-heading'>{% trans "L2 Policies" %}</div>
 		<div class='panel-body'>
-			<table class="table">
-				<thead><tr><th>Name</th><th>ID</th><tr></thead>
-				<tbody>
+			<ul class="unstyled">
 				{% for l2 in l2list %}
-				<tr><td>&nbsp;{{l2.name}}</td><td>{{l2.id}}</td></tr>
+				<li><a href="{% url 'horizon:project:network_policy:l2policy_details' l2.id %}">{{l2.name}}:{{l2.id}}</a></li>
 				{% endfor %}
-				</tbody>
-			</table>
+			</ul>
 		</div>
 	</div>
 	{% endif %}

@@ -22,6 +22,9 @@ from horizon import workflows
 
 from gbp_ui import client
 
+ADD_POLICY_ACTION_URL =  "horizon:project:application_policy:addpolicyaction"
+ADD_POLICY_CLASSIFIER_URL = "horizon:project:application_policy:addpolicyclassifier"
+ADD_POLICY_RULE_URL = "horizon:project:application_policy:addpolicyrule"
 
 class SelectPolicyRuleAction(workflows.Action):
     policy_rules = forms.MultipleChoiceField(
@@ -123,10 +126,11 @@ class AddContract(workflows.Workflow):
 
 
 class SelectPolicyClassifierAction(workflows.Action):
-    classifier = forms.ChoiceField(
+    classifier = forms.DynamicChoiceField(
         label=_("Policy Classifier"),
         required=False,
-        help_text=_("Create a policy with selected classifier."))
+        help_text=_("Create a policy with selected classifier."),
+        add_item_link=ADD_POLICY_CLASSIFIER_URL)
 
     class Meta:
         name = _("Classifiers")
@@ -154,9 +158,8 @@ class SelectPolicyActionAction(workflows.Action):
     actions = forms.DynamicChoiceField(
         label=_("Policy Action"),
         required=False,
-        widget=forms.Select(),
         help_text=_("Create a policy-rule with selected action."),
-        add_item_link="horizon:project:application_policy:addpolicyaction")
+        add_item_link=ADD_POLICY_RULE_URL)
 
     class Meta:
         name = _("actions")
@@ -249,20 +252,14 @@ class AddPolicyRule(workflows.Workflow):
     def format_status_message(self, message):
         return message % self.context.get('name')
 
-    def _create_policyrule(self, request, context):
+    def handle(self, request, context):
         try:
-            client.policyrule_create(request, **context)
-            return True
+            rule = client.policyrule_create(request, **context)
+            return rule
         except Exception as e:
             msg = self.format_status_message(self.failure_message) + str(e)
             exceptions.handle(request, msg)
             return False
-
-    def handle(self, request, context):
-        policy_rule = self._create_policyrule(request, context)
-        if not policy_rule:
-            return False
-        return True
 
 
 class AddClassifierAction(workflows.Action):
@@ -326,62 +323,3 @@ class AddPolicyClassifier(workflows.Workflow):
 		if not classifier:
 			return False
 		return True
-
-
-class AddPolicyActionAction(workflows.Action):
-    name = forms.CharField(max_length=80,
-                           label=_("Name"),
-                           required=False)
-    action_type = forms.ChoiceField(
-        label=_("Action"),
-        choices=[('allow', _('ALLOW')), ('redirect', _('REDIRECT'))],)
-    action_value = forms.CharField(max_length=36,
-                           label=_("Action value"),
-                           required=False)
-
-    def __init__(self, request, *args, **kwargs):
-        super(AddPolicyActionAction, self).__init__(request, *args, **kwargs)
-
-    class Meta:
-        name = _("Create Action")
-        help_text = _("Create a new Action")
-
-
-class AddPolicyActionStep(workflows.Step):
-    action_class = AddPolicyActionAction
-    contributes = ("name", "action_type", "action_value")
-
-    def contribute(self, data, context):
-        context = super(AddPolicyActionStep, self).contribute(data, context)
-        if data:
-            if not context['action_value']:
-                del context['action_value']
-            return context
-
-
-class AddPolicyAction(workflows.Workflow):
-    slug = "addpolicyaction"
-    name = _("Create Action")
-    finalize_button_name = _("Create")
-    success_message = _('Created Action "%s".')
-    failure_message = _('Unable to create Action "%s".')
-    success_url = "horizon:project:application_policy:index"
-    default_steps = (AddPolicyActionStep,)
-
-    def format_status_message(self, message):
-        return message % self.context.get('name')
-
-    def _create_action(self, request, context):
-        try:
-            client.policyaction_create(request, **context)
-            return True
-        except Exception as e:
-            msg = self.format_status_message(self.failure_message) + str(e)
-            exceptions.handle(request, msg)
-            return False
-
-    def handle(self, request, context):
-        action = self._create_action(request, context)
-        if not action:
-            return False
-        return True

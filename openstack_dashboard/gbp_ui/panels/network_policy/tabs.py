@@ -57,10 +57,6 @@ class L3PolicyTab(tabs.TableTab):
 							_('Unable to retrieve l3 policy list.'))
 		return policies 
 
-class L3PolicyTabs(tabs.TabGroup):
-    slug = "l3policy_tab"
-    tabs = (L3PolicyTab,)
-    sticky = True
 
 class L2PolicyTab(tabs.TableTab):
 	table_classes = (tables.L2PolicyTable,)
@@ -79,10 +75,24 @@ class L2PolicyTab(tabs.TableTab):
 							_('Unable to retrieve l2 policy list.'))
 		return policies
 
+class ServicePolicyTab(tabs.TableTab):
+    table_classes = (tables.ServicePolicyTable,)
+    name = _("Service Policy")
+    slug = "service_policy"
+    template_name = "horizon/common/_detail_table.html"
+
+    def get_service_policy_table_data(self):
+        return []
+
+class L3PolicyTabs(tabs.TabGroup):
+    slug = "l3policy_tab"
+    tabs = (L3PolicyTab,ServicePolicyTab,)
+    sticky = True
+ 
 class L2PolicyDetailsTab(tabs.Tab):
 	name = _("L2 Policy Details")
 	slug = "l2_policy_details"
-	template_name = "project/endpoint_groups/_l2_policy_details.html"
+	template_name = "project/network_policy/_l2_policy_details.html"
 	failure_url = reverse_lazy('horizon:project:endpoint_group:index')
 
 	def get_context_data(self,request):

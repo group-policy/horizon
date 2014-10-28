@@ -23,10 +23,10 @@ from openstack_dashboard.dashboards.project.instances.tables import *
 import pdb
 
 class CreateL2PolicyLink(tables.LinkAction):
-	name = "create_l2policy"
-	verbose_name = _("Create L2 Policy")
-	url = "horizon:project:network_policy:addl2policy"
-	classes = ("ajax-modal","btn-addl2policy")
+    name = "create_l2policy"
+    verbose_name = _("Create L2 Policy")
+    url = "horizon:project:network_policy:addl2policy"
+    classes = ("ajax-modal","btn-addl2policy")
 
 
 class EditL2PolicyLink(tables.LinkAction):
@@ -47,19 +47,19 @@ class DeleteL2PolicyLink(tables.DeleteAction):
  
 
 class L2PolicyTable(tables.DataTable):
-	name = tables.Column("name",
-						verbose_name=_("Name"),
-						link="horizon:project:network_policy:l2policy_details")
-	description = tables.Column("description", verbose_name=_("Description"))
-	id = tables.Column("id", verbose_name=_("ID"))
-	l3_policy_id = tables.Column("l3_policy_id", verbose_name=_("L3 Policy ID"))
+    name = tables.Column("name",
+                         verbose_name=_("Name"),
+                         link="horizon:project:network_policy:l2policy_details")
+    description = tables.Column("description", verbose_name=_("Description"))
+    id = tables.Column("id", verbose_name=_("ID"))
+    l3_policy_id = tables.Column("l3_policy_id", verbose_name=_("L3 Policy ID"))
 
-	class Meta:
-		name = "l2policy_table"
-		verbose_name = _("L2 Policies")
-		table_actions = (CreateL2PolicyLink,DeleteL2PolicyLink)
-		row_actions = (EditL2PolicyLink,DeleteL2PolicyLink) 
- 
+    class Meta:
+        name = "l2policy_table"
+        verbose_name = _("L2 Policies")
+        table_actions = (CreateL2PolicyLink,DeleteL2PolicyLink)
+        row_actions = (EditL2PolicyLink,DeleteL2PolicyLink) 
+
 class CreateL3PolicyLink(tables.LinkAction):
 	name = "create_l3policy"
 	verbose_name = _("Create L3 Policy")
@@ -83,17 +83,26 @@ class DeleteL3PolicyLink(tables.DeleteAction):
     data_type_plural = _("L3Policies")
  
 class L3PolicyTable(tables.DataTable):
-	name = tables.Column("name",
-						verbose_name=_("Name"),
-						link="horizon:project:network_policy:l3policy_details")
-	description = tables.Column("description", verbose_name=_("Description"))
-	id = tables.Column("id", verbose_name=_("ID"))
-	ip_version = tables.Column("ip_version",verbose_name=_("IP Version"))
-	ip_pool = tables.Column("ip_pool",verbose_name=_("IP Pool"))
-	subnet_prefix_length = tables.Column("subnet_prefix_length",verbose_name=_("Subnet Prefix Length"))
+    name = tables.Column("name",
+                         verbose_name=_("Name"),
+                         link="horizon:project:network_policy:l3policy_details")
+    description = tables.Column("description", verbose_name=_("Description"))
+    id = tables.Column("id", verbose_name=_("ID"))
+    ip_version = tables.Column("ip_version",verbose_name=_("IP Version"))
+    ip_pool = tables.Column("ip_pool",verbose_name=_("IP Pool"))
+    subnet_prefix_length = tables.Column("subnet_prefix_length",verbose_name=_("Subnet Prefix Length"))
 
-	class Meta:
-		name = "l3policy_table"
-		verbose_name = _("L3 Policy")
-		table_actions = (CreateL3PolicyLink,DeleteL3PolicyLink,)
-		row_actions = (EditL3PolicyLink,DeleteL3PolicyLink,)
+    class Meta:
+        name = "l3policy_table"
+        verbose_name = _("L3 Policy")
+        table_actions = (CreateL3PolicyLink,DeleteL3PolicyLink,)
+        row_actions = (EditL3PolicyLink,DeleteL3PolicyLink,)
+
+class ServicePolicyTable(tables.DataTable):
+    name = tables.Column("name", verbose_name=_("Name"))
+    description = tables.Column("description", verbose_name=_("Description"))
+
+
+    class Meta:
+        name = "service_policy_table"
+        verbose_name = _("Service Policies")

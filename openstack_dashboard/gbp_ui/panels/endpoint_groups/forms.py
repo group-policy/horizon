@@ -65,18 +65,18 @@ class UpdateEPGForm(forms.SelfHandlingForm):
             context['provided_contracts'] = dict([(i,'string') for i in context['provided_contracts']])
             context['consumed_contracts'] = dict([(i,'string') for i in context['consumed_contracts']])
             epg = client.epg_update(request, epg_id, **context)
-            msg = _('EPG %s was successfully updated.') % name_or_id
+            msg = _('Group %s was successfully updated.') % name_or_id
             LOG.debug(msg)
             messages.success(request, msg)
             return epg
         except Exception as e:
-            msg = _('Failed to update EPG %(name)s: %(reason)s' % {'name': name_or_id, 'reason': e})
+            msg = _('Failed to update Group %(name)s: %(reason)s' % {'name': name_or_id, 'reason': e})
             LOG.error(msg)
             redirect = reverse(self.failure_url)
             exceptions.handle(request, msg, redirect=redirect)
 
 class CreateContractForm(forms.SelfHandlingForm):
-    #This function does Add Provided contracts to EPG
+    #This function does Add Provided contracts to Group
     contract = forms.MultipleChoiceField(label=_("Provided Contracts"),)
     
     def __init__(self, request, *args, **kwargs):

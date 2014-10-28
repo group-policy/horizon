@@ -125,7 +125,7 @@ class InstancesTable(tables.DataTable):
 
 class AddContractLink(tables.LinkAction):
      name = "add_contract"
-     verbose_name = _("Add Contract")
+     verbose_name = _("Add Policy Rule Set")
      classes = ("ajax-modal", "btn-addvm",)
      
      def get_link_url(self):
@@ -133,14 +133,14 @@ class AddContractLink(tables.LinkAction):
 
 class RemoveContractLink(tables.LinkAction):
      name = "remove_contract"
-     verbose_name = _("Remove Contract")
+     verbose_name = _("Remove Policy Rule Set")
      classes = ("ajax-modal", "btn-addvm",)
      
      def get_link_url(self):
         return reverse("horizon:project:endpoint_groups:remove_contract", kwargs={'epg_id': self.table.kwargs['epg_id']}) 
  
 class ProvidedContractsTable(tables.DataTable):
-    name = tables.Column("name", link="horizon:project:contracts:contractdetails", verbose_name=_("Contract Name"))
+    name = tables.Column("name", link="horizon:project:application_policy:policy_rule_set_details", verbose_name=_("Name"))
     
     class Meta:
         name = 'provided_contracts'
@@ -166,7 +166,7 @@ class RemoveConsumedLink(tables.LinkAction):
 
 class ConsumedContractsTable(tables.DataTable):
     name = tables.Column("name",
-            link="horizon:project:contracts:contractdetails", verbose_name=_("Contract Name"))
+            link="horizon:project:application_policy:policy_rule_set_details", verbose_name=_("Name"))
     description = tables.Column("description",verbose_name=_("Description"))
 
     class Meta:

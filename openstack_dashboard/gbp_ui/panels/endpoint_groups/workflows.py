@@ -30,87 +30,87 @@ from openstack_dashboard.dashboards.project.images import utils as imageutils
 
 LOG = logging.getLogger(__name__)
 
-class SelectProvidedContractAction(workflows.Action):
+class SelectPolicyRuleSetAction(workflows.Action):
     provided_contract = forms.MultipleChoiceField(
         label=_("Provided Policy Rule Set"),
         required=False,
         widget=forms.CheckboxSelectMultiple(),
-        help_text=_("Choose a policy rule set for an EPG."))
-
-    class Meta:
-        name = _("Provided Policy Rule Set")
-        help_text = _("Select provided Policy Rule Set for EPG.")
-
-    def populate_provided_contract_choices(self, request, context):
-        try:
-            tenant_id = self.request.user.tenant_id
-            contracts = client.contract_list(request,
-                tenant_id=tenant_id)
-            for c in contracts:
-                c.set_id_as_name_if_empty()
-            contracts = sorted(contracts,
-                           key=lambda rule: rule.name)
-            contract_list = [(c.id, c.name) for c in contracts]
-        except Exception as e:
-            contract_list = []
-            exceptions.handle(request,
-                              _('Unable to retrieve policy rule set (%(error)s).')
-                              % {'error': str(e)})
-        return contract_list
-
-
-class SelectConsumedContractAction(workflows.Action):
+        help_text=_("Choose a policy rule set for an Group.")) 
     consumed_contract = forms.MultipleChoiceField(
         label=_("Consumed Policy Rule Set"),
         required=False,
         widget=forms.CheckboxSelectMultiple(),
-        help_text=_("Select consumed policy rule set for EPG."))
+        help_text=_("Select consumed policy rule set for Group."))
+ 
 
     class Meta:
-        name = _("Consumed Policy Rule Set")
-        help_text = _("Select consumed policy rule set for EPG.")
+        name = _("Policy Rule Set")
+        help_text = _("Select Policy Rule Set for Group.")
 
-    def populate_consumed_contract_choices(self, request, context):
+    def _contract_list(self,request,tenant_id):
+        contracts = client.contract_list(request,
+                tenant_id=tenant_id)
+        for c in contracts:
+                c.set_id_as_name_if_empty()
+        contracts = sorted(contracts,
+                           key=lambda rule: rule.name)
+        return [(c.id, c.name) for c in contracts]
+
+    def populate_provided_contract_choices(self, request, context):
         try:
             tenant_id = self.request.user.tenant_id
-            contracts = client.contract_list(request,
-                tenant_id=tenant_id)
-            for c in contracts:
-                c.set_id_as_name_if_empty()
-            contracts = sorted(contracts,
-                           key=lambda rule: rule.name)
-            contract_list = [(c.id, c.name) for c in contracts]
+            contract_list = self._contract_list(request,tenant_id)
         except Exception as e:
             contract_list = []
             exceptions.handle(request,
                               _('Unable to retrieve policy rule set (%(error)s).')
                               % {'error': str(e)})
         return contract_list
+    
+    def populate_consumed_contract_choices(self, request, context):
+        try:
+            tenant_id = self.request.user.tenant_id
+            contract_list = self._contract_list(request,tenant_id)
+        except Exception as e:
+            contract_list = []
+            exceptions.handle(request,
+                              _('Unable to retrieve policy rule set (%(error)s).')
+                              % {'error': str(e)})
+        return contract_list 
+
 
 class SelectL2policyAction(workflows.Action):
-	l2policy_id = forms.ChoiceField(
-			label=_("Network Policy"),
-			required=False,
-			help_text=_("Select network policy for EPG."),)
+    l2policy_id = forms.ChoiceField(
+        label=_("Network Policy"),
+        required=False,
+        help_text=_("Select network policy for Group."))
+    network_services_policy_id = forms.ChoiceField(
+        label=_("Network Services Policy"),
+        required=False,
+        help_text=_("Select network services policy for Group.")) 
 
-	class Meta:
-		name = _("Network Policy")
-		help_text = _("Select network policy for EPG. Selecting default will create an Network Policy implicitly.")
 
-	def populate_l2policy_id_choices(self,request,context):
-		policies = []
-		try:
-			policies = client.l2policy_list(request)
-			for p in policies:
-				p.set_id_as_name_if_empty()
-			policies = sorted(policies, key=lambda rule: rule.name)
-			policies = [(p.id, p.name+":"+p.id) for p in policies] 
-			policies.insert(0,('default','default'))
-		except Exception as e:
-			exceptions.handle(request,
-					_("Unable to retrieve policies (%(error)s).")
-					% {'error': str(e)})
-		return policies
+    class Meta:
+        name = _("Network Policy")
+        help_text = _("Select network policy for Group. Selecting default will create an Network Policy implicitly.")
+
+    def populate_l2policy_id_choices(self,request,context):
+        policies = []
+        try:
+            policies = client.l2policy_list(request)
+            for p in policies:
+                p.set_id_as_name_if_empty()
+            policies = sorted(policies, key=lambda rule: rule.name)
+            policies = [(p.id, p.name+":"+p.id) for p in policies] 
+            policies.insert(0,('default','default'))
+        except Exception as e:
+            exceptions.handle(request,
+                              _("Unable to retrieve policies (%(error)s).")
+                              % {'error': str(e)})
+        return policies
+    
+    def populate_network_services_policy_id_choices(self,request,context):
+        return []
 
 class SelectL2policyStep(workflows.Step):
     action_class = SelectL2policyAction
@@ -124,10 +124,10 @@ class SelectL2policyStep(workflows.Step):
 
 
 
-class SelectProvidedContractStep(workflows.Step):
-    action_class = SelectProvidedContractAction
+class SelectPolicyRuleSetStep(workflows.Step):
+    action_class = SelectPolicyRuleSetAction
     name = _("Provided Policy Rule Set")
-    contributes = ("provided_contracts",)
+    contributes = ("provided_contracts","consumed_contracts",)
 
     def contribute(self, data, context):
         if data:
@@ -141,23 +141,6 @@ class SelectProvidedContractStep(workflows.Step):
                 context['provided_contracts'] = contract_dict
             return context
 
-
-class SelectConsumedContractStep(workflows.Step):
-    action_class = SelectConsumedContractAction
-    name = _("Consumed Policy Rule Set")
-    contributes = ("consumed_contracts",)
-
-    def contribute(self, data, context):
-        if data:
-            contracts = self.workflow.request.POST.getlist(
-                "consumed_contract")
-            if contracts:
-                contract_dict = {}
-                for contract in contracts:
-                    if contract != '':
-                        contract_dict[contract] = None
-                context['consumed_contracts'] = contract_dict
-            return context
 
 
 class AddEPGAction(workflows.Action):
@@ -193,8 +176,7 @@ class AddEPG(workflows.Workflow):
     failure_message = _('Unable to create Group "%s".')
     success_url = "horizon:project:endpoint_groups:index"
     default_steps = (AddEPGStep,
-                     SelectProvidedContractStep,
-                     SelectConsumedContractStep,
+                     SelectPolicyRuleSetStep,
 					 SelectL2policyStep,)
 
     def format_status_message(self, message):
@@ -202,10 +184,8 @@ class AddEPG(workflows.Workflow):
 
     def handle(self, request, context):
 		try:
-			print "EPG creation context"
-			print context
-			client.epg_create(request, **context)
-			return True
+			group = client.epg_create(request, **context)
+			return group
 		except Exception as e:
 			msg = self.format_status_message(self.failure_message) + str(e)
 			exceptions.handle(request, msg)
@@ -278,7 +258,7 @@ class LaunchInstance(workflows.Action):
             LOG.debug(msg)
             messages.success(request, msg)
         except Exception as e:
-            #msg = _('Failed to update EPG %(name)s: %(reason)s' % {'name': name_or_id, 'reason': e})
+            #msg = _('Failed to update Group %(name)s: %(reason)s' % {'name': name_or_id, 'reason': e})
             msg = _('Failed to launch VM')
             LOG.error(msg)
             redirect = reverse("horizon:project:endpoint_groups:epgdetails", kwargs={'epg_id': epg_id})
