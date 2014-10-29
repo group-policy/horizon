@@ -51,6 +51,14 @@ class EPGsTable(tables.DataTable):
     name = tables.Column("name",
                          verbose_name=_("Name"),
                          link="horizon:project:endpoint_groups:epgdetails")
+    description = tables.Column("description",verbose_name=_("Description"))
+    provided_contracts = tables.Column("provided_contracts",
+                                      verbose_name=_("Provided Rule Sets"))
+    consumed_contracts = tables.Column("consumed_contracts",
+                                      verbose_name=_("Consumed Rule Sets")) 
+    l2_policy_id = tables.Column("l2_policy_id",
+                                 verbose_name=_("L2 Policy"))
+
 
     class Meta:
         name = "epgstable"

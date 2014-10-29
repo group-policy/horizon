@@ -30,21 +30,21 @@ from openstack_dashboard.dashboards.project.images import utils as imageutils
 
 LOG = logging.getLogger(__name__)
 
+CREATE_POLICY_RULE_SET_URL = "horizon:project:application_policy:addcontract"
+
 class SelectPolicyRuleSetAction(workflows.Action):
-    provided_contract = forms.MultipleChoiceField(
+    provided_contract = forms.DynamicChoiceField(
         label=_("Provided Policy Rule Set"),
-        required=False,
-        widget=forms.CheckboxSelectMultiple(),
-        help_text=_("Choose a policy rule set for an Group.")) 
-    consumed_contract = forms.MultipleChoiceField(
+        help_text=_("Choose a policy rule set for an Group."),
+        add_item_link=CREATE_POLICY_RULE_SET_URL) 
+    consumed_contract = forms.DynamicChoiceField(
         label=_("Consumed Policy Rule Set"),
-        required=False,
-        widget=forms.CheckboxSelectMultiple(),
-        help_text=_("Select consumed policy rule set for Group."))
+        help_text=_("Select consumed policy rule set for Group."),
+        add_item_link=CREATE_POLICY_RULE_SET_URL)
  
 
     class Meta:
-        name = _("Policy Rule Set")
+        name = _("Application Policy")
         help_text = _("Select Policy Rule Set for Group.")
 
     def _contract_list(self,request,tenant_id):
@@ -82,12 +82,11 @@ class SelectPolicyRuleSetAction(workflows.Action):
 class SelectL2policyAction(workflows.Action):
     l2policy_id = forms.ChoiceField(
         label=_("Network Policy"),
-        required=False,
         help_text=_("Select network policy for Group."))
     network_services_policy_id = forms.ChoiceField(
         label=_("Network Services Policy"),
-        required=False,
-        help_text=_("Select network services policy for Group.")) 
+        help_text=_("Select network services policy for Group."),
+        choices=[('None','None')]) 
 
 
     class Meta:
@@ -145,8 +144,7 @@ class SelectPolicyRuleSetStep(workflows.Step):
 
 class AddEPGAction(workflows.Action):
     name = forms.CharField(max_length=80,
-                           label=_("Name"),
-                           required=False)
+                           label=_("Name"))
     description = forms.CharField(max_length=80,
                                   label=_("Description"),
                                   required=False)
@@ -178,6 +176,7 @@ class AddEPG(workflows.Workflow):
     default_steps = (AddEPGStep,
                      SelectPolicyRuleSetStep,
 					 SelectL2policyStep,)
+    wizard = True
 
     def format_status_message(self, message):
         return message % self.context.get('name')

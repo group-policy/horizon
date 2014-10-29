@@ -213,11 +213,11 @@ def policyrule_get(request, pr_id):
 
 
 def policyrule_delete(request, pr_id):
-	gbpclient(request).delete_policy_rule(pr_id)
+	return gbpclient(request).delete_policy_rule(pr_id)
 
 
 def policyrule_update(request, pr_id, **kwargs):
-	gbpclient(request).update_policy_rule(pr_id,kwargs)
+	return gbpclient(request).update_policy_rule(pr_id,kwargs)
 
 
 def policyclassifier_get(request, pc_id):
@@ -248,11 +248,17 @@ def l3policy_get(request,pc_id,**kwargs):
 	return gbpclient(request).show_l3_policy(pc_id).get('l3_policy')
 
 def l2policy_get(request,pc_id,**kwargs):
-	return gbpclient(request).show_l2_policy(pc_id).get('l2_policy')
+	return L2Policy(gbpclient(request).show_l2_policy(pc_id).get('l2_policy'))
 
 def l2policy_create(request,**kwargs):
- 	body = {'l2_policy': kwargs}
-	return gbpclient(request).create_l2_policy(body).get('l2_policy')
+    body = {'l2_policy': kwargs}
+    policy = gbpclient(request).create_l2_policy(body).get('l2_policy')
+    return L2Policy(policy)
+
+def l2policy_update(request,pc_id,**kwargs):
+    body = {'l2_policy': kwargs}
+    policy = gbpclient(request).update_l2_policy(pc_id,body).get('l2_policy')
+    return L2Policy(policy)
 
 def l3policy_create(request,**kwargs):
 	body = {'l3_policy':kwargs}

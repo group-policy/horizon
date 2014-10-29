@@ -18,6 +18,6 @@ from django.utils.translation import ugettext_lazy as _
 import horizon
 
 
-class NetworkPolicy(horizon.Panel):
-    name = _("Network and Services' Policy")
-    slug = "network_policy"  
+class NetworkServices(horizon.Panel):
+    name = _("Network Services")
+    slug = "network_services"   

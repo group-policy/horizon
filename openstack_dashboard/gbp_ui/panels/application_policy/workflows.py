@@ -27,10 +27,10 @@ ADD_POLICY_CLASSIFIER_URL = "horizon:project:application_policy:addpolicyclassif
 ADD_POLICY_RULE_URL = "horizon:project:application_policy:addpolicyrule"
 
 class SelectPolicyRuleAction(workflows.Action):
-    policy_rules = forms.MultipleChoiceField(
+    policy_rules = forms.DynamicChoiceField(
         label=_("Policy Rules"),
         required=False,
-        widget=forms.CheckboxSelectMultiple(),
+        add_item_link=ADD_POLICY_RULE_URL,
         help_text=_("Create a policy rule set with selected rules."))
 
     class Meta:
@@ -111,8 +111,7 @@ class AddContract(workflows.Workflow):
 
     def _create_contract(self, request, context):
         try:
-            client.contract_create(request, **context)
-            return True
+            return client.contract_create(request, **context)
         except Exception as e:
             msg = self.format_status_message(self.failure_message) + str(e)
             exceptions.handle(request, msg)
@@ -120,9 +119,8 @@ class AddContract(workflows.Workflow):
 
     def handle(self, request, context):
         contract = self._create_contract(request, context)
-        if not contract:
-            return False
-        return True
+        self.object = contract
+        return contract
 
 
 class SelectPolicyClassifierAction(workflows.Action):
@@ -159,7 +157,7 @@ class SelectPolicyActionAction(workflows.Action):
         label=_("Policy Action"),
         required=False,
         help_text=_("Create a policy-rule with selected action."),
-        add_item_link=ADD_POLICY_RULE_URL)
+        add_item_link=ADD_POLICY_ACTION_URL)
 
     class Meta:
         name = _("actions")
@@ -212,8 +210,7 @@ class SelectPolicyClassifierStep(workflows.Step):
 
 class AddPolicyRuleAction(workflows.Action):
     name = forms.CharField(max_length=80,
-                           label=_("Name"),
-                           required=False)
+                           label=_("Name"))
     description = forms.CharField(max_length=80,
                                   label=_("Description"),
                                   required=False)
@@ -255,6 +252,7 @@ class AddPolicyRule(workflows.Workflow):
     def handle(self, request, context):
         try:
             rule = client.policyrule_create(request, **context)
+            self.object = rule
             return rule
         except Exception as e:
             msg = self.format_status_message(self.failure_message) + str(e)
@@ -298,28 +296,28 @@ class AddClassifierStep(workflows.Step):
 
 
 class AddPolicyClassifier(workflows.Workflow):
-	slug = "addpolicyclassifier"
-	name = _("Create Classifier")
-	finalize_button_name = _("Create")
-	success_message = _('Created Classifier "%s".')
-	failure_message = _('Unable to create Classifier "%s".')
-	success_url = "horizon:project:application_policy:index"
-	default_steps = (AddClassifierStep,)
+    slug = "addpolicyclassifier"
+    name = _("Create Classifier")
+    finalize_button_name = _("Create")
+    success_message = _('Created Classifier "%s".')
+    failure_message = _('Unable to create Classifier "%s".')
+    success_url = "horizon:project:application_policy:index"
+    default_steps = (AddClassifierStep,)
 
-	def format_status_message(self, message):
-		return message % self.context.get('name')
+    def format_status_message(self, message):
+        return message % self.context.get('name')
 
-	def _create_classifer(self, request, context):
-		try:
-			client.policyclassifier_create(request, **context)
-			return True
-		except Exception as e:
-			msg = self.format_status_message(self.failure_message) + str(e)
-			exceptions.handle(request, msg)
-			return False
+    def _create_classifer(self, request, context):
+        try:
+            client.policyclassifier_create(request, **context)
+            return True
+        except Exception as e:
+            msg = self.format_status_message(self.failure_message) + str(e)
+            exceptions.handle(request, msg)
+            return False
 
-	def handle(self, request, context):
-		classifier = self._create_classifer(request, context)
-		if not classifier:
-			return False
-		return True
+    def handle(self, request, context):
+        classifier = self._create_classifer(request, context)
+        if not classifier:
+            return False
+        return classifier

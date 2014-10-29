@@ -33,6 +33,15 @@ class UpdateEPGForm(forms.SelfHandlingForm):
     description = forms.CharField(max_length=80, label=_("Description"), required=False)
     provided_contracts = forms.MultipleChoiceField(label=_("Provided Policy Rule Set"),required=False)
     consumed_contracts = forms.MultipleChoiceField(label=_("Consumed Policy Rule Set"),required=False)
+    l2policy_id = forms.ChoiceField(
+        label=_("Network Policy"),
+        required=False,
+        help_text=_("Select network policy for Group."))
+    network_services_policy_id = forms.ChoiceField(
+        label=_("Network Services Policy"),
+        required=False,
+        help_text=_("Select network services policy for Group.")) 
+ 
     failure_url = 'horizon:project:endpoint_groups:index'
 
     def __init__(self, request, *args, **kwargs):

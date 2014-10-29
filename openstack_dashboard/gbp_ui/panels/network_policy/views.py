@@ -109,7 +109,7 @@ class AddL2policyView(forms.ModalFormView):
 
 class L2PolicyUpdateView(forms.ModalFormView):
  	form_class = np_forms.UpdateL2PolicyForm
-	template_name = "project/endpoint_groups/update_l2policy.html"
+	template_name = "project/network_policy/update_l2policy.html"
 
 	def get_context_data(self, **kwargs):
 		context = super(L2PolicyUpdateView,self).get_context_data(**kwargs)

@@ -90,6 +90,9 @@ class AddContractView(workflows.WorkflowView):
     workflow_class = AddContract
     template_name = "project/application_policy/addcontract.html"
 
+    def get_object_id(self,contract):
+        return [contract.id]
+
 class UpdateContractView(forms.ModalFormView):
     form_class = contract_forms.UpdateContractForm
     template_name = 'project/application_policy/update_contract.html'
@@ -109,7 +112,7 @@ class AddPolicyRuleView(workflows.WorkflowView):
     template_name = "project/application_policy/addpolicyrule.html"
 
     def get_object_id(self,rule):
-        return [rule.name]
+        return [rule.id]
 
 
 class AddPolicyClassifierView(forms.ModalFormView):
