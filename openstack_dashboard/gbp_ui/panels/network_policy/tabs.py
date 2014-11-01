@@ -82,7 +82,15 @@ class ServicePolicyTab(tabs.TableTab):
     template_name = "horizon/common/_detail_table.html"
 
     def get_service_policy_table_data(self):
-        return []
+        policies = []
+	try:
+		tenant_id = self.request.user.tenant_id
+		policies = client.networkservicepolicy_list(self.request,tenant_id=tenant_id)
+	except Exception:
+		policies = []
+		exceptions.handle(self.tab_group.request,
+                          _('Unable to retrieve network service policy list.'))
+	return policies
 
 class L3PolicyTabs(tabs.TabGroup):
     slug = "l3policy_tab"

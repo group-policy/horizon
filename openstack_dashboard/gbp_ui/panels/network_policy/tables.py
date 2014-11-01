@@ -101,7 +101,8 @@ class L3PolicyTable(tables.DataTable):
 class ServicePolicyTable(tables.DataTable):
     name = tables.Column("name", verbose_name=_("Name"))
     description = tables.Column("description", verbose_name=_("Description"))
-
+    network_service_params = tables.Column("network_service_params", 
+				verbose_name=_("Network Service Parameters"))
 
     class Meta:
         name = "service_policy_table"

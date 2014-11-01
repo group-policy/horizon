@@ -36,11 +36,13 @@ class SelectPolicyRuleSetAction(workflows.Action):
     provided_contract = forms.DynamicChoiceField(
         label=_("Provided Policy Rule Set"),
         help_text=_("Choose a policy rule set for an Group."),
-        add_item_link=CREATE_POLICY_RULE_SET_URL) 
+        add_item_link=CREATE_POLICY_RULE_SET_URL,
+        required=False) 
     consumed_contract = forms.DynamicChoiceField(
         label=_("Consumed Policy Rule Set"),
         help_text=_("Select consumed policy rule set for Group."),
-        add_item_link=CREATE_POLICY_RULE_SET_URL)
+        add_item_link=CREATE_POLICY_RULE_SET_URL,
+	required=False)
  
 
     class Meta:
@@ -82,11 +84,12 @@ class SelectPolicyRuleSetAction(workflows.Action):
 class SelectL2policyAction(workflows.Action):
     l2policy_id = forms.ChoiceField(
         label=_("Network Policy"),
-        help_text=_("Select network policy for Group."))
+        help_text=_("Select network policy for Group."),
+        required=False)
     network_services_policy_id = forms.ChoiceField(
         label=_("Network Services Policy"),
         help_text=_("Select network services policy for Group."),
-        choices=[('None','None')]) 
+        choices=[('None','None')], required=False) 
 
 
     class Meta:
@@ -109,7 +112,18 @@ class SelectL2policyAction(workflows.Action):
         return policies
     
     def populate_network_services_policy_id_choices(self,request,context):
-        return []
+        policies = []
+        try:
+            policies = client.networkservicepolicy_list(request, 
+				tenant_id=request.user.tenant_id)
+            for p in policies:
+                p.set_id_as_name_if_empty()
+            policies = [(p.id, p.name+":"+p.id) for p in policies]
+        except Exception as e:
+            exceptions.handle(request,
+                       _("Unable to retrieve service policies (%(error)s).")
+                       % {'error': str(e)})
+        return policies
 
 class SelectL2policyStep(workflows.Step):
     action_class = SelectL2policyAction
