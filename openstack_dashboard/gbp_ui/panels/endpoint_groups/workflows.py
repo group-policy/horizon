@@ -56,7 +56,7 @@ class SelectPolicyRuleSetAction(workflows.Action):
                 c.set_id_as_name_if_empty()
         contracts = sorted(contracts,
                            key=lambda rule: rule.name)
-        return [(c.id, c.name) for c in contracts]
+        return [('select','select')] + [(c.id, c.name) for c in contracts]
 
     def populate_provided_contract_choices(self, request, context):
         try:
@@ -89,7 +89,7 @@ class SelectL2policyAction(workflows.Action):
     network_services_policy_id = forms.ChoiceField(
         label=_("Network Services Policy"),
         help_text=_("Select network services policy for Group."),
-        choices=[('None','None')], required=False) 
+        required=False) 
 
 
     class Meta:
@@ -119,6 +119,7 @@ class SelectL2policyAction(workflows.Action):
             for p in policies:
                 p.set_id_as_name_if_empty()
             policies = [(p.id, p.name+":"+p.id) for p in policies]
+            policies.insert(0,('select','select'))
         except Exception as e:
             exceptions.handle(request,
                        _("Unable to retrieve service policies (%(error)s).")
@@ -128,11 +129,14 @@ class SelectL2policyAction(workflows.Action):
 class SelectL2policyStep(workflows.Step):
     action_class = SelectL2policyAction
     name = _("L2 Policy")
-    contributes = ("l2policy_id",)
+    contributes = ("l2policy_id","network_services_policy_id",)
 
     def contribute(self,data,context):
         if data['l2policy_id'] != 'default':
             context['l2_policy_id'] = data['l2policy_id']
+        if data['network_services_policy_id'] != 'select':
+	    context['network_services_policy_id'] = \
+		data['network_services_policy_id']
         return context
 
 
@@ -149,9 +153,17 @@ class SelectPolicyRuleSetStep(workflows.Step):
             if contracts:
                 contract_dict = {}
                 for contract in contracts:
-                    if contract != '':
+                    if contract != '' and contract != "select":
                         contract_dict[contract] = None
                 context['provided_contracts'] = contract_dict
+	    contracts = self.workflow.request.POST.getlist(
+                "consumed_contract")
+            if contracts:
+                contract_dict = {}
+                for contract in contracts:
+                    if contract != '' and contract != "select":
+                        contract_dict[contract] = None
+                context['consumed_contracts'] = contract_dict
             return context
 
 
