@@ -60,6 +60,7 @@ class PolicyClassifiersTab(tabs.TableTab):
             classifiers = client.policyclassifier_list(
                 self.tab_group.request,
                 tenant_id=tenant_id)
+            print classifiers
         except Exception:
             classifiers = []
             exceptions.handle(self.tab_group.request,

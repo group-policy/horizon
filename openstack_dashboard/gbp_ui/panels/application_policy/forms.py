@@ -79,15 +79,15 @@ class AddPolicyActionForm(forms.SelfHandlingForm):
 
     def __init__(self, request, *args, **kwargs):
         super(AddPolicyActionForm, self).__init__(request, *args, **kwargs)
-	try:
+        url = reverse('horizon:project:application_policy:index')
+        try:
             sc_specs = client.servicechainspec_list(request,
                         tenant_id=request.user.tenant_id)
             self.fields['action_value'].choices = \
                 [(spec.id, (spec.name if spec.name is not None else "" )+ ":" + spec.id) \
                         for spec in sc_specs]
-	except Exception as e:
-            exceptions.handle(request, _("Unable to retrieve action values."), 
-			redirect=url)
+        except Exception as e:
+            exceptions.handle(request, _("Unable to retrieve action values."),redirect=url)
 	    
     def handle(self,request,context):
         url = reverse('horizon:project:application_policy:index')

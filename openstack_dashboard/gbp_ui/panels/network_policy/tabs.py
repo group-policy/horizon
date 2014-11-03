@@ -85,7 +85,7 @@ class ServicePolicyTab(tabs.TableTab):
         policies = []
 	try:
 		tenant_id = self.request.user.tenant_id
-		policies = client.networkservicepolicy_list(self.request,tenant_id=tenant_id)
+		#policies = client.networkservicepolicy_list(self.request,tenant_id=tenant_id)
 	except Exception:
 		policies = []
 		exceptions.handle(self.tab_group.request,

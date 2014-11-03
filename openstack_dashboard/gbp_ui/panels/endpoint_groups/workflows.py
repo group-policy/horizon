@@ -84,8 +84,7 @@ class SelectPolicyRuleSetAction(workflows.Action):
 class SelectL2policyAction(workflows.Action):
     l2policy_id = forms.ChoiceField(
         label=_("Network Policy"),
-        help_text=_("Select network policy for Group."),
-        required=False)
+        help_text=_("Select network policy for Group."))
     network_services_policy_id = forms.ChoiceField(
         label=_("Network Services Policy"),
         help_text=_("Select network services policy for Group."),
@@ -114,8 +113,7 @@ class SelectL2policyAction(workflows.Action):
     def populate_network_services_policy_id_choices(self,request,context):
         policies = []
         try:
-            policies = client.networkservicepolicy_list(request, 
-				tenant_id=request.user.tenant_id)
+            policies = client.networkservicepolicy_list(request, tenant_id=request.user.tenant_id)
             for p in policies:
                 p.set_id_as_name_if_empty()
             policies = [(p.id, p.name+":"+p.id) for p in policies]

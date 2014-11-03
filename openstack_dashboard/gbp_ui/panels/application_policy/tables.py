@@ -14,9 +14,11 @@
 
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
+from django.template import defaultfilters as dfilters
 
 from horizon import tables
 
+from gbp_ui import column_filters
 
 class AddAppPolicyLink(tables.LinkAction):
     name = "addcontract"
@@ -78,7 +80,7 @@ class AddPolicyClassifierLink(tables.LinkAction):
 
 class UpdatePolicyClassifierLink(tables.LinkAction):
     name = "updatepolicyclassifier"
-    verbose_name = _("Edit PolicyClassifier")
+    verbose_name = _("Edit")
     classes = ("ajax-modal", "btn-update",)
 
     def get_link_url(self, policy_classifier):
@@ -123,51 +125,61 @@ class DeletePolicyActionLink(tables.DeleteAction):
 
 
 class ApplicationPoliciesTable(tables.DataTable):
-	name = tables.Column("name", verbose_name=_("Name"),
-			link="horizon:project:application_policy:policy_rule_set_details")
-	description = tables.Column("description",
-			verbose_name=_("Description"))
+    name = tables.Column("name", verbose_name=_("Name"),
+                         link="horizon:project:application_policy:policy_rule_set_details")
+    description = tables.Column("description",
+                                verbose_name=_("Description"))
+    policy_rules = tables.Column("policy_rules",
+                                 sortable=False,
+                                 filters=(column_filters.list_column_filter,dfilters.unordered_list,),
+                                 verbose_name=_("Policy Rules"))
 
-	class Meta:
-		name = "application_policies_table"
-		verbose_name = _("Policy Rule Set")
-		table_actions = (AddAppPolicyLink, DeleteAppPolicyLink)
-		row_actions = (UpdateAppPolicyLink, DeleteAppPolicyLink)
+
+    class Meta:
+        name = "application_policies_table"
+        verbose_name = _("Policy Rule Set")
+        table_actions = (AddAppPolicyLink, DeleteAppPolicyLink)
+        row_actions = (UpdateAppPolicyLink, DeleteAppPolicyLink)
 
 
 class PolicyRulesTable(tables.DataTable):
-	name = tables.Column("name",
-			verbose_name=_("Name"),
-			link="horizon:project:application_policy:policyruledetails")
-	description = tables.Column("description",
-			verbose_name=_("Description"))
-	enabled = tables.Column("enabled",
-			verbose_name=_("Enabled"))
+    name = tables.Column("name",
+                         verbose_name=_("Name"),
+                         link="horizon:project:application_policy:policyruledetails")
+    description = tables.Column("description",
+                                verbose_name=_("Description"))
+    enabled = tables.Column("enabled",
+                            verbose_name=_("Enabled"))
+    policy_classifier = tables.Column("policy_classifier_id",
+                                      verbose_name=_("Policy Classifier"))
 
 
-	class Meta:
-		name = "policyrulestable"
-		verbose_name = _("Policy Rules")
-		table_actions = (AddPolicyRuleLink, DeletePolicyRuleLink)
-		row_actions = (UpdatePolicyRuleLink, DeletePolicyRuleLink)
+
+    class Meta:
+        name = "policyrulestable"
+        verbose_name = _("Policy Rules")
+        table_actions = (AddPolicyRuleLink, DeletePolicyRuleLink)
+        row_actions = (UpdatePolicyRuleLink, DeletePolicyRuleLink)
 
 
 class PolicyClassifiersTable(tables.DataTable):
-	name = tables.Column("name",
-			verbose_name=_("Name"),
-			link="horizon:project:application_policy:policyclassifierdetails")
-	description = tables.Column("description",
-			verbose_name=_("Description"))
-	direction = tables.Column("direction",
-			verbose_name=_("Direction"))
-	protocol = tables.Column("protocol",
-			verbose_name=_("Protocol"))
+    name = tables.Column("name",
+                         verbose_name=_("Name"),
+                         link="horizon:project:application_policy:policyclassifierdetails")
+    description = tables.Column("description",
+                                verbose_name=_("Description"))
+    protocol = tables.Column("protocol",
+                             verbose_name=_("Protocol"))
+    port_range = tables.Column("port_range",
+                               verbose_name=_("Port Range")) 
+    direction = tables.Column("direction",
+                              verbose_name=_("Direction"))
 
-	class Meta:
-		name = "policyclassifierstable"
-		verbose_name = _("Policy Classifiers")
-		table_actions = (AddPolicyClassifierLink, DeletePolicyClassifierLink)
-		row_actions = (UpdatePolicyClassifierLink, DeletePolicyClassifierLink)
+    class Meta:
+        name = "policyclassifierstable"
+        verbose_name = _("Policy Classifiers")
+        table_actions = (AddPolicyClassifierLink, DeletePolicyClassifierLink)
+        row_actions = (UpdatePolicyClassifierLink, DeletePolicyClassifierLink)
 
 
 class PolicyActionsTable(tables.DataTable):
@@ -175,10 +187,10 @@ class PolicyActionsTable(tables.DataTable):
 			link="horizon:project:application_policy:policyactiondetails")
 	description = tables.Column("description",
 			verbose_name=_("Description"))
+ 	action_type = tables.Column("action_type",
+			verbose_name=_("Type"))
 	action_value = tables.Column("action_value",
-			verbose_name=_("Action Value"))
-	action_type = tables.Column("action_type",
-			verbose_name=_("Action Type"))
+			verbose_name=_("Value"))
 
 
 	class Meta:

@@ -15,10 +15,12 @@
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
 from django import http
+from django.template import defaultfilters as dfilters
 
 from horizon import tables
 from horizon.utils import filters
 
+from gbp_ui import column_filters
 from openstack_dashboard.dashboards.project.instances.tables import *
 import pdb
 
@@ -53,8 +55,12 @@ class EPGsTable(tables.DataTable):
                          link="horizon:project:endpoint_groups:epgdetails")
     description = tables.Column("description",verbose_name=_("Description"))
     provided_contracts = tables.Column("provided_contracts",
+                                       sortable=False,
+                                       filters=(column_filters.list_column_filter,dfilters.unordered_list,),
                                       verbose_name=_("Provided Rule Sets"))
     consumed_contracts = tables.Column("consumed_contracts",
+                                       sortable=False,
+                                       filters=(column_filters.list_column_filter,dfilters.unordered_list,),
                                       verbose_name=_("Consumed Rule Sets")) 
     l2_policy_id = tables.Column("l2_policy_id",
                                  verbose_name=_("L2 Policy"))
@@ -72,7 +78,8 @@ class LaunchVMLink(tables.LinkAction):
     classes = ("ajax-modal", "btn-addvm",)
     
     def get_link_url(self):
-        return reverse("horizon:project:endpoint_groups:addvm", kwargs={'epg_id': self.table.kwargs['epg_id']})
+        return reverse("horizon:project:endpoint_groups:addvm",
+                       kwargs={'epg_id': self.table.kwargs['epg_id']})
 
 class RemoveVMLink(tables.DeleteAction):
     data_type_singular = _("Instance")
@@ -80,7 +87,8 @@ class RemoveVMLink(tables.DeleteAction):
  
     
     def delete(self, request, instance_id):
-        url = reverse("horizon:project:endpoint_groups:epgdetails", kwargs={'epg_id': self.table.kwargs['epg_id']}) 
+        url = reverse("horizon:project:endpoint_groups:epgdetails",
+                      kwargs={'epg_id': self.table.kwargs['epg_id']}) 
         try:
             api.nova.server_delete(request, instance_id)
             LOG.debug('Deleted instance %s successfully' % instance_id)
@@ -119,10 +127,15 @@ class ConsoleLink(tables.LinkAction):
 
 
 class InstancesTable(tables.DataTable):
-    name = tables.Column("name", link="horizon:project:instances:detail", verbose_name=_("Instance Name"))
+    name = tables.Column("name", 
+                         link="horizon:project:instances:detail",
+                         verbose_name=_("Instance Name"))
     image_name = tables.Column("image_name", verbose_name=_("Image Name"))
     status = tables.Column("status", verbose_name=_("Status"))
     ip = tables.Column(get_ips, verbose_name=_("IP Address"), attrs={'data-type': "ip"})
+
+    def get_empty_message(self,*args,**kwargs):
+        return "No members in this group, create one"
 
 
     class Meta:
@@ -137,7 +150,8 @@ class AddContractLink(tables.LinkAction):
      classes = ("ajax-modal", "btn-addvm",)
      
      def get_link_url(self):
-        return reverse("horizon:project:endpoint_groups:add_contract", kwargs={'epg_id': self.table.kwargs['epg_id']}) 
+        return reverse("horizon:project:endpoint_groups:add_contract",
+                       kwargs={'epg_id': self.table.kwargs['epg_id']}) 
 
 class RemoveContractLink(tables.LinkAction):
      name = "remove_contract"
@@ -145,10 +159,18 @@ class RemoveContractLink(tables.LinkAction):
      classes = ("ajax-modal", "btn-addvm",)
      
      def get_link_url(self):
-        return reverse("horizon:project:endpoint_groups:remove_contract", kwargs={'epg_id': self.table.kwargs['epg_id']}) 
+        return reverse("horizon:project:endpoint_groups:remove_contract",
+                       kwargs={'epg_id': self.table.kwargs['epg_id']}) 
  
 class ProvidedContractsTable(tables.DataTable):
-    name = tables.Column("name", link="horizon:project:application_policy:policy_rule_set_details", verbose_name=_("Name"))
+    name = tables.Column("name", 
+                         link="horizon:project:application_policy:policy_rule_set_details",
+                         verbose_name=_("Name"))
+    description = tables.Column("description",verbose_name=_("Description"))
+    policy_rules = tables.Column("policy_rules",
+                                 sortable=False,
+                                 filters=(column_filters.list_column_filter,dfilters.unordered_list,),
+                                 verbose_name=_("Policy Rules"))
     
     class Meta:
         name = 'provided_contracts'
@@ -162,7 +184,8 @@ class AddConsumedLink(tables.LinkAction):
      classes = ("ajax-modal", "btn-addvm",)
      
      def get_link_url(self):
-        return reverse("horizon:project:endpoint_groups:add_consumed", kwargs={'epg_id': self.table.kwargs['epg_id']})
+        return reverse("horizon:project:endpoint_groups:add_consumed",
+                       kwargs={'epg_id': self.table.kwargs['epg_id']})
 
 class RemoveConsumedLink(tables.LinkAction):
      name = "remove_consumed"
@@ -170,12 +193,19 @@ class RemoveConsumedLink(tables.LinkAction):
      classes = ("ajax-modal", "btn-addvm",)
      
      def get_link_url(self):
-        return reverse("horizon:project:endpoint_groups:remove_consumed", kwargs={'epg_id': self.table.kwargs['epg_id']})
+        return reverse("horizon:project:endpoint_groups:remove_consumed",
+                       kwargs={'epg_id': self.table.kwargs['epg_id']})
 
 class ConsumedContractsTable(tables.DataTable):
     name = tables.Column("name",
-            link="horizon:project:application_policy:policy_rule_set_details", verbose_name=_("Name"))
-    description = tables.Column("description",verbose_name=_("Description"))
+                         link="horizon:project:application_policy:policy_rule_set_details",
+                         verbose_name=_("Name"))
+    description = tables.Column("description",
+                                verbose_name=_("Description"))
+    policy_rules = tables.Column("policy_rules",
+                                 sortable=False,
+                                 filters=(column_filters.list_column_filter,dfilters.unordered_list,),
+                                 verbose_name=_("Policy Rules"))
 
     class Meta:
         name = 'consumed_contracts'

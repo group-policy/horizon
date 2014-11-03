@@ -117,13 +117,18 @@ class ConsumedTab(tabs.TableTab):
     template_name = ("horizon/common/_detail_table.html")
 
     def get_consumed_contracts_data(self):
-        epgid = self.tab_group.kwargs['epg_id']
-        epg = client.epg_get(self.request, epgid)
-        consumed_contract_ids = epg.get('consumed_contracts')
-        consumed_contracts = []
-        for _id in consumed_contract_ids:
-            consumed_contracts.append(client.contract_get(self.request, _id))
-        return consumed_contracts
+        try:
+            epgid = self.tab_group.kwargs['epg_id']
+            epg = client.epg_get(self.request, epgid)
+            consumed_contract_ids = epg.get('consumed_contracts')
+            consumed_contracts = []
+            for _id in consumed_contract_ids:
+                consumed_contracts.append(client.contract_get(self.request, _id))
+            return consumed_contracts
+        except Exception as e:
+            error_message = _('Unable to get consumed rule sets')
+            exceptions.handle(self.request, error_message) 
+            return []
 
 class ProvidedTab(tabs.TableTab):
     name = _('Provided Policy Rule Set')
@@ -132,13 +137,18 @@ class ProvidedTab(tabs.TableTab):
     template_name = ("horizon/common/_detail_table.html")
     
     def get_provided_contracts_data(self):
-        epgid = self.tab_group.kwargs['epg_id']
-        epg = client.epg_get(self.request, epgid)
-        provided_contract_ids = epg.get('provided_contracts')
-        provided_contracts = []
-        for _id in provided_contract_ids:
-            provided_contracts.append(client.contract_get(self.request, _id))
-        return provided_contracts
+        try:
+            epgid = self.tab_group.kwargs['epg_id']
+            epg = client.epg_get(self.request, epgid)
+            provided_contract_ids = epg.get('provided_contracts')
+            provided_contracts = []
+            for _id in provided_contract_ids:
+                provided_contracts.append(client.contract_get(self.request, _id))
+            return provided_contracts
+        except Exception as e:
+            error_message = _('Unable to get provided rule sets')
+            exceptions.handle(self.request, error_message)  
+            return []
 
 class EPGMemberTabs(tabs.TabGroup):
     slug = 'member_tabs'
