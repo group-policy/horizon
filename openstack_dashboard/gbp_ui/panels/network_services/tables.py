@@ -19,12 +19,60 @@ from django import http
 from horizon import tables
 from horizon.utils import filters
 
+class CreateServiceChainSpecLink(tables.LinkAction):
+    name = "create_scspec_link"
+    verbose_name = _("Create Service Chain Spec")
+    url = "horizon:project:network_services:create_sc_spec"
+    classes = ("ajax-modal","btn-create_scspec")
+ 
 class ServiceChainSpecTable(tables.DataTable):
     name = tables.Column("name",
-                         verbose_name=_("Name"))
+            verbose_name=_("Name"))
     description = tables.Column("description", 
-                                verbose_name=_("Description"))
+            verbose_name=_("Description"))
+    nodes = tables.Column("nodes",
+            verbose_name=_("Nodes"))
 
     class Meta:
         name = "service_chain_spec_table"
         verbose_name = _("Service Chain Specs")
+        table_actions = (CreateServiceChainSpecLink,)
+
+
+class CreateServiceChainNodeLink(tables.LinkAction):
+    name = "create_scnode_link"
+    verbose_name = _("Create Service Chain Node")
+    url = "horizon:project:network_services:create_sc_node"
+    classes = ("ajax-modal","btn-create_scnode")
+ 
+class ServiceChainNodeTable(tables.DataTable):
+    name = tables.Column("name",
+            verbose_name=_("Name"))
+    description = tables.Column("description", 
+            verbose_name=_("Description"))
+    service_type = tables.Column("service_type",
+            verbose_name=_("Service Type"))
+    config = tables.Column("config",
+            verbose_name=_("Config"))
+
+    class Meta:
+        name = "service_chain_node_table"
+        verbose_name = _("Service Chain Node") 
+        table_actions = (CreateServiceChainNodeLink,)
+
+class CreateServiceChainInstanceLink(tables.LinkAction):
+    name = "create_scinstance_link"
+    verbose_name = _("Create Service Chain Instance")
+    url = "horizon:project:network_services:create_sc_instance"
+    classes = ("ajax-modal","btn-create_scinstance") 
+
+class ServiceChainInstanceTable(tables.DataTable):
+    name = tables.Column("name",
+            verbose_name=_("Name"))
+    description = tables.Column("description", 
+            verbose_name=_("Description"))
+
+    class Meta:
+        name = "service_chain_instance_table"
+        verbose_name = _("Service Chain Instance")  
+        table_actions = (CreateServiceChainInstanceLink,)

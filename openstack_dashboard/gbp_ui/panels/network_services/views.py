@@ -34,5 +34,30 @@ import tables as ns_tables
 
 
 class IndexView(tabs.TabView):
-    tab_group_class = (ns_tabs.ServiceChainSpecTabs)
+    tab_group_class = (ns_tabs.ServiceChainTabs)
     template_name = 'project/network_services/details_tabs.html'
+
+class CreateServiceChainNodeView(forms.ModalFormView):
+ 	form_class = ns_forms.CreateServiceChainNodeForm
+	template_name = "project/network_services/create_service_chain_node.html"
+
+	def get_context_data(self, **kwargs):
+		context = super(CreateServiceChainNodeView,self).get_context_data(**kwargs)
+		return context
+
+
+class CreateServiceChainSpecView(forms.ModalFormView):
+  	form_class = ns_forms.CreateServiceChainSpecForm
+	template_name = "project/network_services/create_service_chain_node.html"
+
+	def get_context_data(self, **kwargs):
+		context = super(CreateServiceChainSpecView,self).get_context_data(**kwargs)
+		return context
+
+class CreateServiceChainInstanceView(forms.ModalFormView):
+   	form_class = ns_forms.CreateServiceChainInstanceForm
+	template_name = "project/network_services/create_service_chain_instance.html"
+
+	def get_context_data(self, **kwargs):
+		context = super(CreateServiceChainInstanceView,self).get_context_data(**kwargs)
+		return context

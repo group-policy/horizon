@@ -87,19 +87,19 @@ class L2Policy(neutron.NeutronAPIDictWrapper):
 		return policy_dict
  
 class NetworkServicePolicy(neutron.NeutronAPIDictWrapper):
-        """Wrapper for neutron network service policy."""
+	"""Wrapper for neutron network service policy."""
 
-        def get_dict(self):
-                policy_dict = self._apidict
-                return policy_dict
+	def get_dict(self):
+		policy_dict = self._apidict
+		return policy_dict
 
 class ServiceChainSpec(neutron.NeutronAPIDictWrapper):
-        """Wrapper for neutron service chain spec."""
+	"""Wrapper for neutron service chain spec."""
 
-        def get_dict(self):
-                sc_spec_dict = self._apidict
-                return sc_spec_dict
- 
+	def get_dict(self):
+		sc_spec_dict = self._apidict
+		return sc_spec_dict
+
 def epg_create(request, **kwargs):
     body = {'endpoint_group': kwargs}
     epg = gbpclient(request).create_endpoint_group( body).get('endpoint_group')
@@ -258,9 +258,9 @@ def l2policy_list(request,**kwargs):
 	return [L2Policy(item) for item in policies]
 
 def networkservicepolicy_list(request,**kwargs):
-        policies =  gbpclient(request).list_network_service_policies(
-		**kwargs).get('network_service_policies')
-        return [NetworkServicePolicy(item) for item in policies]
+	policies =  gbpclient(request).list_network_service_policies(
+	**kwargs).get('network_service_policies')
+	return [NetworkServicePolicy(item) for item in policies]
 
 def l3policy_get(request,pc_id,**kwargs):
 	return gbpclient(request).show_l3_policy(pc_id).get('l3_policy')
@@ -283,6 +283,6 @@ def l3policy_create(request,**kwargs):
 	return gbpclient(request).create_l3_policy(body).get('l3_policy')
 
 def servicechainspec_list(request,**kwargs):
-        sc_specs =  gbpclient(request).list_servicechain_specs(
-                **kwargs).get('servicechain_specs')
-        return [ServiceChainSpec(item) for item in sc_specs]  
+	sc_specs =  gbpclient(request).list_servicechain_specs(
+			**kwargs).get('servicechain_specs')
+	return [ServiceChainSpec(item) for item in sc_specs]  

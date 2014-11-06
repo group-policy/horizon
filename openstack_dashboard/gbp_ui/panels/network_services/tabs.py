@@ -32,7 +32,27 @@ class ServiceChainSpecTab(tabs.TableTab):
     def get_service_chain_spec_table_data(self):
         return []
 
-class ServiceChainSpecTabs(tabs.TabGroup):
+class ServiceChainNodeTab(tabs.TableTab):
+	name = _("Service Chain Nodes")
+	table_classes = (ns_tables.ServiceChainNodeTable,)
+	slug = "service_chain_node"
+	template_name = "horizon/common/_detail_table.html"
+
+	def get_service_chain_node_table_data(self):
+		return []
+
+class ServiceChainInstanceTab(tabs.TableTab):
+	name = _("Service Chain Instances")
+	table_classes = (ns_tables.ServiceChainInstanceTable,)
+	slug = "service_chain_instance"
+	template_name = "horizon/common/_detail_table.html"
+
+	def get_service_chain_instance_table_data(self):
+		return []
+
+class ServiceChainTabs(tabs.TabGroup):
     slug = "service_chain_spec_tabs"
-    tabs = (ServiceChainSpecTab,)
+    tabs = (ServiceChainSpecTab,
+			ServiceChainNodeTab,
+			ServiceChainInstanceTab,)
     sticky = True
