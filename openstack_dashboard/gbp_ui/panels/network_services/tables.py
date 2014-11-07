@@ -15,9 +15,12 @@
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
 from django import http
+from django.template import defaultfilters as dfilters
 
 from horizon import tables
 from horizon.utils import filters
+
+from gbp_ui import column_filters
 
 class CreateServiceChainSpecLink(tables.LinkAction):
     name = "create_scspec_link"
@@ -31,7 +34,8 @@ class ServiceChainSpecTable(tables.DataTable):
     description = tables.Column("description", 
             verbose_name=_("Description"))
     nodes = tables.Column("nodes",
-            verbose_name=_("Nodes"))
+            verbose_name=_("Nodes"),
+			filters=(column_filters.list_column_filter,dfilters.unordered_list,))
 
     class Meta:
         name = "service_chain_spec_table"
@@ -42,7 +46,7 @@ class ServiceChainSpecTable(tables.DataTable):
 class CreateServiceChainNodeLink(tables.LinkAction):
     name = "create_scnode_link"
     verbose_name = _("Create Service Chain Node")
-    url = "horizon:project:network_services:create_sc_node"
+    url = "horizon:project:network_services:create_sc_spec"
     classes = ("ajax-modal","btn-create_scnode")
  
 class ServiceChainNodeTable(tables.DataTable):
@@ -52,8 +56,6 @@ class ServiceChainNodeTable(tables.DataTable):
             verbose_name=_("Description"))
     service_type = tables.Column("service_type",
             verbose_name=_("Service Type"))
-    config = tables.Column("config",
-            verbose_name=_("Config"))
 
     class Meta:
         name = "service_chain_node_table"

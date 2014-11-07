@@ -48,7 +48,7 @@ class CreateServiceChainNodeView(forms.ModalFormView):
 
 class CreateServiceChainSpecView(forms.ModalFormView):
   	form_class = ns_forms.CreateServiceChainSpecForm
-	template_name = "project/network_services/create_service_chain_node.html"
+	template_name = "project/network_services/create_service_chain_spec.html"
 
 	def get_context_data(self, **kwargs):
 		context = super(CreateServiceChainSpecView,self).get_context_data(**kwargs)

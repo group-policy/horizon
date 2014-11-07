@@ -24,13 +24,18 @@ import tables
 import tables as ns_tables
 
 class ServiceChainSpecTab(tabs.TableTab):
-    name = _("Service Chain Specs")
-    table_classes = (ns_tables.ServiceChainSpecTable,)
-    slug = "service_chain_specs"
-    template_name = "horizon/common/_detail_table.html"
+	name = _("Service Chain Specs")
+	table_classes = (ns_tables.ServiceChainSpecTable,)
+	slug = "service_chain_specs"
+	template_name = "horizon/common/_detail_table.html"
 
-    def get_service_chain_spec_table_data(self):
-        return []
+	def get_service_chain_spec_table_data(self):
+		specs = []
+		try:
+			specs = client.servicechainspec_list(self.request)
+		except Exception as e:
+			pass
+		return specs
 
 class ServiceChainNodeTab(tabs.TableTab):
 	name = _("Service Chain Nodes")
@@ -39,7 +44,12 @@ class ServiceChainNodeTab(tabs.TableTab):
 	template_name = "horizon/common/_detail_table.html"
 
 	def get_service_chain_node_table_data(self):
-		return []
+		nodes = []
+		try:
+			nodes = client.servicechainnode_list(self.request)
+		except Exception as e:
+			pass
+		return nodes
 
 class ServiceChainInstanceTab(tabs.TableTab):
 	name = _("Service Chain Instances")

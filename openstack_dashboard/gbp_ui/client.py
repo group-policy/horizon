@@ -100,6 +100,13 @@ class ServiceChainSpec(neutron.NeutronAPIDictWrapper):
 		sc_spec_dict = self._apidict
 		return sc_spec_dict
 
+class ServiceChainNode(neutron.NeutronAPIDictWrapper):
+	"""Wrapper for neutron service chain spec."""
+
+	def get_dict(self):
+		sc_node_dict = self._apidict
+		return sc_node_dict 
+
 def epg_create(request, **kwargs):
     body = {'endpoint_group': kwargs}
     epg = gbpclient(request).create_endpoint_group( body).get('endpoint_group')
@@ -286,3 +293,17 @@ def servicechainspec_list(request,**kwargs):
 	sc_specs =  gbpclient(request).list_servicechain_specs(
 			**kwargs).get('servicechain_specs')
 	return [ServiceChainSpec(item) for item in sc_specs]  
+
+def create_servicechain_spec(request,**kwargs):
+	body = {'servicechain_spec':kwargs}
+	sc_spec = gbpclient(request).create_servicechain_spec(body).get('servicechain_spec')
+	return ServiceChainSpec(sc_spec)
+
+def servicechainnode_list(request,**kwargs):
+	sc_nodes = gbpclient(request).list_servicechain_nodes(**kwargs).get('servicechain_nodes')
+	return [ServiceChainNode(item) for item in sc_nodes]
+
+def create_servicechain_node(request,**kwargs):
+	body = {'servicechain_node':kwargs}
+	sc_node = gbpclient(request).create_servicechain_node(body).get('servicechain_node')
+	return ServiceChainNode(sc_node)
