@@ -27,20 +27,31 @@ class CreateServiceChainSpecLink(tables.LinkAction):
     verbose_name = _("Create Service Chain Spec")
     url = "horizon:project:network_services:create_sc_spec"
     classes = ("ajax-modal","btn-create_scspec")
+
+class EditServiceChainSpecLink(tables.LinkAction):
+    name = "edit_sc_spec"
+    verbose_name = _("Edit")
+    classes = ("ajax-modal", "btn-update",)
+
+    def get_link_url(self, scspec):
+        base_url = reverse("horizon:project:network_services:update_sc_spec", kwargs={'scspec_id': scspec.id})
+        return base_url
+ 
  
 class ServiceChainSpecTable(tables.DataTable):
-    name = tables.Column("name",
-            verbose_name=_("Name"))
-    description = tables.Column("description", 
-            verbose_name=_("Description"))
-    nodes = tables.Column("nodes",
-            verbose_name=_("Nodes"),
+	name = tables.Column("name",
+			verbose_name=_("Name"))
+	description = tables.Column("description", 
+			verbose_name=_("Description"))
+	nodes = tables.Column("nodes",
+			verbose_name=_("Nodes"),
 			filters=(column_filters.list_column_filter,dfilters.unordered_list,))
 
-    class Meta:
-        name = "service_chain_spec_table"
-        verbose_name = _("Service Chain Specs")
-        table_actions = (CreateServiceChainSpecLink,)
+	class Meta:
+		name = "service_chain_spec_table"
+		verbose_name = _("Service Chain Specs")
+		table_actions = (CreateServiceChainSpecLink,)
+		row_actions = (EditServiceChainSpecLink,)
 
 
 class CreateServiceChainNodeLink(tables.LinkAction):
@@ -48,19 +59,30 @@ class CreateServiceChainNodeLink(tables.LinkAction):
     verbose_name = _("Create Service Chain Node")
     url = "horizon:project:network_services:create_sc_spec"
     classes = ("ajax-modal","btn-create_scnode")
+
+class EditServiceChainNodeLink(tables.LinkAction):
+    name = "edit_sc_node"
+    verbose_name = _("Edit")
+    classes = ("ajax-modal", "btn-update",)
+
+    def get_link_url(self, scnode):
+        base_url = reverse("horizon:project:network_services:update_sc_node", kwargs={'scnode_id': scnode.id})
+        return base_url
  
 class ServiceChainNodeTable(tables.DataTable):
-    name = tables.Column("name",
-            verbose_name=_("Name"))
-    description = tables.Column("description", 
-            verbose_name=_("Description"))
-    service_type = tables.Column("service_type",
-            verbose_name=_("Service Type"))
+	name = tables.Column("name",
+			verbose_name=_("Name"))
+	description = tables.Column("description", 
+			verbose_name=_("Description"))
+	service_type = tables.Column("service_type",
+			verbose_name=_("Service Type"))
 
-    class Meta:
-        name = "service_chain_node_table"
-        verbose_name = _("Service Chain Node") 
-        table_actions = (CreateServiceChainNodeLink,)
+	class Meta:
+		name = "service_chain_node_table"
+		verbose_name = _("Service Chain Node") 
+		table_actions = (CreateServiceChainNodeLink,)
+		row_actions = (EditServiceChainNodeLink,)
+
 
 class CreateServiceChainInstanceLink(tables.LinkAction):
     name = "create_scinstance_link"
@@ -68,13 +90,23 @@ class CreateServiceChainInstanceLink(tables.LinkAction):
     url = "horizon:project:network_services:create_sc_instance"
     classes = ("ajax-modal","btn-create_scinstance") 
 
-class ServiceChainInstanceTable(tables.DataTable):
-    name = tables.Column("name",
-            verbose_name=_("Name"))
-    description = tables.Column("description", 
-            verbose_name=_("Description"))
+class EditServiceChainInstanceLink(tables.LinkAction):
+    name = "edit_sc_instance"
+    verbose_name = _("Edit")
+    classes = ("ajax-modal", "btn-update",)
 
-    class Meta:
-        name = "service_chain_instance_table"
-        verbose_name = _("Service Chain Instance")  
-        table_actions = (CreateServiceChainInstanceLink,)
+    def get_link_url(self, scinstance):
+        base_url = reverse("horizon:project:network_services:update_sc_instance", kwargs={'scinstance_id': scinstance.id})
+        return base_url
+ 
+class ServiceChainInstanceTable(tables.DataTable):
+	name = tables.Column("name",
+			verbose_name=_("Name"))
+	description = tables.Column("description", 
+			verbose_name=_("Description"))
+
+	class Meta:
+		name = "service_chain_instance_table"
+		verbose_name = _("Service Chain Instance")  
+		table_actions = (CreateServiceChainInstanceLink,)
+		row_actions = (EditServiceChainInstanceLink,)

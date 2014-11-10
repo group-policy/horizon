@@ -45,7 +45,15 @@ class CreateServiceChainNodeView(forms.ModalFormView):
 		context = super(CreateServiceChainNodeView,self).get_context_data(**kwargs)
 		return context
 
+class UpdateServiceChainNodeView(forms.ModalFormView):
+ 	form_class = ns_forms.CreateServiceChainNodeForm
+	template_name = "project/network_services/update_service_chain_node.html"
 
+	def get_context_data(self, **kwargs):
+		context = super(UpdateServiceChainNodeView,self).get_context_data(**kwargs)
+		context['scnode_id'] = self.kwargs['scnode_id']
+		return context
+ 
 class CreateServiceChainSpecView(forms.ModalFormView):
   	form_class = ns_forms.CreateServiceChainSpecForm
 	template_name = "project/network_services/create_service_chain_spec.html"
@@ -54,6 +62,15 @@ class CreateServiceChainSpecView(forms.ModalFormView):
 		context = super(CreateServiceChainSpecView,self).get_context_data(**kwargs)
 		return context
 
+class UpdateServiceChainSpecView(forms.ModalFormView):
+  	form_class = ns_forms.CreateServiceChainSpecForm
+	template_name = "project/network_services/update_service_chain_spec.html"
+
+	def get_context_data(self, **kwargs):
+		context = super(UpdateServiceChainSpecView,self).get_context_data(**kwargs)
+		context['scspec_id'] = self.kwargs['scspec_id']
+		return context
+ 
 class CreateServiceChainInstanceView(forms.ModalFormView):
    	form_class = ns_forms.CreateServiceChainInstanceForm
 	template_name = "project/network_services/create_service_chain_instance.html"
@@ -61,3 +78,12 @@ class CreateServiceChainInstanceView(forms.ModalFormView):
 	def get_context_data(self, **kwargs):
 		context = super(CreateServiceChainInstanceView,self).get_context_data(**kwargs)
 		return context
+
+class UpdateServiceChainInstanceView(forms.ModalFormView):
+   	form_class = ns_forms.CreateServiceChainInstanceForm
+	template_name = "project/network_services/update_service_chain_instance.html"
+
+	def get_context_data(self, **kwargs):
+		context = super(UpdateServiceChainInstanceView,self).get_context_data(**kwargs)
+		context['scinstance_id'] = self.kwargs['scinstance_id']
+		return context 

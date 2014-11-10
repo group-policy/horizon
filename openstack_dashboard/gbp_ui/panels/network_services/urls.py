@@ -21,6 +21,9 @@ import views
 urlpatterns = patterns( '',
     url(r'^$', views.IndexView.as_view(), name='index'),
     url(r'^create_sc_node$', views.CreateServiceChainNodeView.as_view(), name='create_sc_node'),
+    url(r'^update_sc_node/(?P<scnode_id>[^/]+)/$', views.UpdateServiceChainNodeView.as_view(), name='update_sc_node'),
     url(r'^create_sc_spec$', views.CreateServiceChainSpecView.as_view(), name='create_sc_spec'),
+    url(r'^update_sc_spec/(?P<scspec_id>[^/]+)/$', views.UpdateServiceChainSpecView.as_view(), name='update_sc_spec'),
     url(r'^create_sc_instance$', views.CreateServiceChainInstanceView.as_view(), name='create_sc_instance'),
+    url(r'^update_sc_instance/(?P<scinstance_id>[^/]+)/$', views.UpdateServiceChainInstanceView.as_view(), name='update_sc_instance'),
 )
