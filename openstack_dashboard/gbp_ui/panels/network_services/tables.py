@@ -37,6 +37,12 @@ class EditServiceChainSpecLink(tables.LinkAction):
         base_url = reverse("horizon:project:network_services:update_sc_spec", kwargs={'scspec_id': scspec.id})
         return base_url
  
+class DeleteServiceChainSpecLink(tables.DeleteAction):
+	name = "delete_servicechain_spec"
+	action_present = _("Delete")
+	action_past = _("Scheduled deletion of %(data_type)s")
+	data_type_singular = _("ServiceChainSpec")
+	data_type_plural = _("ServiceChainSpecs")
  
 class ServiceChainSpecTable(tables.DataTable):
 	name = tables.Column("name",
@@ -51,7 +57,7 @@ class ServiceChainSpecTable(tables.DataTable):
 		name = "service_chain_spec_table"
 		verbose_name = _("Service Chain Specs")
 		table_actions = (CreateServiceChainSpecLink,)
-		row_actions = (EditServiceChainSpecLink,)
+		row_actions = (EditServiceChainSpecLink,DeleteServiceChainSpecLink,)
 
 
 class CreateServiceChainNodeLink(tables.LinkAction):
@@ -59,6 +65,7 @@ class CreateServiceChainNodeLink(tables.LinkAction):
     verbose_name = _("Create Service Chain Node")
     url = "horizon:project:network_services:create_sc_spec"
     classes = ("ajax-modal","btn-create_scnode")
+
 
 class EditServiceChainNodeLink(tables.LinkAction):
     name = "edit_sc_node"
@@ -68,6 +75,13 @@ class EditServiceChainNodeLink(tables.LinkAction):
     def get_link_url(self, scnode):
         base_url = reverse("horizon:project:network_services:update_sc_node", kwargs={'scnode_id': scnode.id})
         return base_url
+
+class DeleteServiceChainNodeLink(tables.DeleteAction):
+	name = "delete_servicechain_node"
+	action_present = _("Delete")
+	action_past = _("Scheduled deletion of %(data_type)s")
+	data_type_singular = _("ServiceChainNode")
+	data_type_plural = _("ServiceChainNodes")
  
 class ServiceChainNodeTable(tables.DataTable):
 	name = tables.Column("name",
@@ -81,7 +95,7 @@ class ServiceChainNodeTable(tables.DataTable):
 		name = "service_chain_node_table"
 		verbose_name = _("Service Chain Node") 
 		table_actions = (CreateServiceChainNodeLink,)
-		row_actions = (EditServiceChainNodeLink,)
+		row_actions = (EditServiceChainNodeLink,DeleteServiceChainNodeLink,)
 
 
 class CreateServiceChainInstanceLink(tables.LinkAction):
@@ -98,6 +112,13 @@ class EditServiceChainInstanceLink(tables.LinkAction):
     def get_link_url(self, scinstance):
         base_url = reverse("horizon:project:network_services:update_sc_instance", kwargs={'scinstance_id': scinstance.id})
         return base_url
+  
+class DeleteServiceChainInstanceLink(tables.DeleteAction):
+	name = "delete_servicechain_instance"
+	action_present = _("Delete")
+	action_past = _("Scheduled deletion of %(data_type)s")
+	data_type_singular = _("ServiceChainInstance")
+	data_type_plural = _("ServiceChainInstances")
  
 class ServiceChainInstanceTable(tables.DataTable):
 	name = tables.Column("name",
@@ -109,4 +130,4 @@ class ServiceChainInstanceTable(tables.DataTable):
 		name = "service_chain_instance_table"
 		verbose_name = _("Service Chain Instance")  
 		table_actions = (CreateServiceChainInstanceLink,)
-		row_actions = (EditServiceChainInstanceLink,)
+		row_actions = (EditServiceChainInstanceLink,DeleteServiceChainInstanceLink,)

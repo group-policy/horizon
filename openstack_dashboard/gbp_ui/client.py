@@ -107,6 +107,13 @@ class ServiceChainNode(neutron.NeutronAPIDictWrapper):
 		sc_node_dict = self._apidict
 		return sc_node_dict 
 
+class ServiceChainInstance(neutron.NeutronAPIDictWrapper):
+	"""Wrapper for neutron service chain spec."""
+
+	def get_dict(self):
+		sc_instance_dict = self._apidict
+		return sc_instance_dict 
+ 
 def epg_create(request, **kwargs):
     body = {'endpoint_group': kwargs}
     epg = gbpclient(request).create_endpoint_group( body).get('endpoint_group')
@@ -289,21 +296,58 @@ def l3policy_create(request,**kwargs):
 	body = {'l3_policy':kwargs}
 	return gbpclient(request).create_l3_policy(body).get('l3_policy')
 
+def servicechainnode_list(request,**kwargs):
+	sc_nodes = gbpclient(request).list_servicechain_nodes(**kwargs).get('servicechain_nodes')
+	return [ServiceChainNode(item) for item in sc_nodes]
+ 
 def servicechainspec_list(request,**kwargs):
 	sc_specs =  gbpclient(request).list_servicechain_specs(
 			**kwargs).get('servicechain_specs')
 	return [ServiceChainSpec(item) for item in sc_specs]  
 
+def servicechaininstance_list(request,**kwargs):
+	sc_instances = gbpclient(request).list_servicechain_instances(
+			**kwargs).get('servicechain_instances')
+	return [ServiceChainInstance(item) for item in sc_instances]
+
+def get_servicechain_node(request,scnode_id):
+	scnode = gbpclient(request).show_servicechain_node(scnode_id).get('servicechain_node')
+	return ServiceChainNode(scnode)
+
+def create_servicechain_node(request,**kwargs):
+	body = {'servicechain_node':kwargs}
+	sc_node = gbpclient(request).create_servicechain_node(body).get('servicechain_node')
+	return ServiceChainNode(sc_node) 
+
+def update_servicechain_node(request,scnode_id,**kwargs):
+	body = {'servicechain_node':kwargs}
+	sc_node = gbpclient(request).update_servicechain_node(scnode_id,body).get('servicechain_node')
+	return ServiceChainNode(sc_node) 
+
+def get_servicechain_spec(request,scspec_id):
+	sc_spec = gbpclient(request).show_servicechain_spec(scspec_id).get('servicechain_spec')
+	return ServiceChainSpec(sc_spec)
+ 
 def create_servicechain_spec(request,**kwargs):
 	body = {'servicechain_spec':kwargs}
 	sc_spec = gbpclient(request).create_servicechain_spec(body).get('servicechain_spec')
 	return ServiceChainSpec(sc_spec)
 
-def servicechainnode_list(request,**kwargs):
-	sc_nodes = gbpclient(request).list_servicechain_nodes(**kwargs).get('servicechain_nodes')
-	return [ServiceChainNode(item) for item in sc_nodes]
+def update_servicechain_spec(request,scspec_id,**kwargs):
+	body = {'servicechain_spec':kwargs}
+	sc_spec = gbpclient(request).update_servicechain_spec(scspec_id,body).get('servicechain_spec')
+	return ServiceChainSpec(sc_spec)
+ 
+def get_servicechain_instance(request,scinstance_id):
+	sc_instance = gbpclient(request).show_servicechain_instance(scinstance_id).get('servicechain_instance')
+	return ServiceChainInstance(sc_instance)
 
-def create_servicechain_node(request,**kwargs):
-	body = {'servicechain_node':kwargs}
-	sc_node = gbpclient(request).create_servicechain_node(body).get('servicechain_node')
-	return ServiceChainNode(sc_node)
+def create_servicechain_instance(request,**kwargs):
+	body = {'servicechain_instance':kwargs}
+	sc_instance = gbpclient(request).create_servicechain_instance(body).get('servicechain_instance')
+	return ServiceChainInstance(sc_instance)
+
+def update_servicechain_instance(request,scinstance_id,**kwargs):
+	body = {'servicechain_instance':kwargs}
+	sc_instance = gbpclient(request).update_servicechain_instance(scinstance_id,body).get('servicechain_instance')
+	return ServiceChainInstance(sc_instance) 

@@ -58,7 +58,14 @@ class ServiceChainInstanceTab(tabs.TableTab):
 	template_name = "horizon/common/_detail_table.html"
 
 	def get_service_chain_instance_table_data(self):
-		return []
+		instances = []
+		try:
+			instances = client.servicechaininstance_list(self.request)
+			print instances
+		except Exception as e:
+			print e
+			pass
+		return instances
 
 class ServiceChainTabs(tabs.TabGroup):
     slug = "service_chain_spec_tabs"

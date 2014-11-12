@@ -46,13 +46,16 @@ class CreateServiceChainNodeView(forms.ModalFormView):
 		return context
 
 class UpdateServiceChainNodeView(forms.ModalFormView):
- 	form_class = ns_forms.CreateServiceChainNodeForm
+ 	form_class = ns_forms.UpdateServiceChainNodeForm
 	template_name = "project/network_services/update_service_chain_node.html"
 
 	def get_context_data(self, **kwargs):
 		context = super(UpdateServiceChainNodeView,self).get_context_data(**kwargs)
 		context['scnode_id'] = self.kwargs['scnode_id']
 		return context
+
+	def get_initial(self):
+		return self.kwargs
  
 class CreateServiceChainSpecView(forms.ModalFormView):
   	form_class = ns_forms.CreateServiceChainSpecForm
@@ -63,13 +66,16 @@ class CreateServiceChainSpecView(forms.ModalFormView):
 		return context
 
 class UpdateServiceChainSpecView(forms.ModalFormView):
-  	form_class = ns_forms.CreateServiceChainSpecForm
+  	form_class = ns_forms.UpdateServiceChainSpecForm
 	template_name = "project/network_services/update_service_chain_spec.html"
 
 	def get_context_data(self, **kwargs):
 		context = super(UpdateServiceChainSpecView,self).get_context_data(**kwargs)
 		context['scspec_id'] = self.kwargs['scspec_id']
 		return context
+ 	
+	def get_initial(self):
+		return self.kwargs
  
 class CreateServiceChainInstanceView(forms.ModalFormView):
    	form_class = ns_forms.CreateServiceChainInstanceForm
@@ -80,10 +86,14 @@ class CreateServiceChainInstanceView(forms.ModalFormView):
 		return context
 
 class UpdateServiceChainInstanceView(forms.ModalFormView):
-   	form_class = ns_forms.CreateServiceChainInstanceForm
+   	form_class = ns_forms.UpdateServiceChainInstanceForm
 	template_name = "project/network_services/update_service_chain_instance.html"
 
 	def get_context_data(self, **kwargs):
 		context = super(UpdateServiceChainInstanceView,self).get_context_data(**kwargs)
 		context['scinstance_id'] = self.kwargs['scinstance_id']
 		return context 
+ 	
+	def get_initial(self):
+		return self.kwargs
+ 
