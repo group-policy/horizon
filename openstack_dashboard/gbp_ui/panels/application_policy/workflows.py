@@ -21,13 +21,14 @@ from horizon import forms
 from horizon import workflows
 
 from gbp_ui import client
+from gbp_ui import fields
 
 ADD_POLICY_ACTION_URL =  "horizon:project:application_policy:addpolicyaction"
 ADD_POLICY_CLASSIFIER_URL = "horizon:project:application_policy:addpolicyclassifier"
 ADD_POLICY_RULE_URL = "horizon:project:application_policy:addpolicyrule"
 
 class SelectPolicyRuleAction(workflows.Action):
-    policy_rules = forms.DynamicChoiceField(
+    policy_rules = fields.DynamicMultiChoiceField(
         label=_("Policy Rules"),
         required=False,
         add_item_link=ADD_POLICY_RULE_URL,
