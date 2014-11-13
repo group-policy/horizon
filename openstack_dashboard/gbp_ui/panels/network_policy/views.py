@@ -123,3 +123,23 @@ class L2PolicyUpdateView(forms.ModalFormView):
 class L2PolicyDetailsView(tabs.TabView):
     tab_group_class = (np_tabs.L2PolicyDetailsTabs)
     template_name = 'project/network_policy/details_tabs.html'
+
+class CreateServicePolicyView(forms.ModalFormView):
+ 	form_class = np_forms.CreateServicePolicyForm
+	template_name = "project/network_policy/create_service_policy.html"
+
+	def get_context_data(self, **kwargs):
+		context = super(CreateServicePolicyView,self).get_context_data(**kwargs)
+		return context
+
+class UpdateServicePolicyView(forms.ModalFormView):
+ 	form_class = np_forms.UpdateServicePolicyForm
+	template_name = "project/network_policy/update_service_policy.html"
+
+	def get_context_data(self, **kwargs):
+		context = super(CreateServicePolicyView,self).get_context_data(**kwargs)
+		context['service_policy_id'] = self.kwargs['service_policy_id']
+		return context 
+
+	def get_initial(self):
+		return self.kwargs

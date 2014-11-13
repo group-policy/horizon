@@ -21,6 +21,8 @@ import views
 urlpatterns = patterns( '',
     url(r'^$', views.IndexView.as_view(), name='index'),
     url(r'^addl3policy$', views.AddL3policyView.as_view(), name='addl3policy'),
+    url(r'^addserviceolicy$', views.CreateServicePolicyView.as_view(), name='create_servicepolicy'),
+    url(r'^update_servicepolicy/(?P<service_policy_id>[^/]+)/$', views.UpdateServicePolicyView.as_view(), name='update_service_policy'),
     url(r'^addl2policy$', views.AddL2policyView.as_view(), name='addl2policy'),
     url(r'^l3policy_details/(?P<l3policy_id>[^/]+)/$', views.L3PolicyDetailsView.as_view(), name='l3policy_details'),
     url(r'^l3policy_update/(?P<l3policy_id>[^/]+)/$', views.L3PolicyUpdateView.as_view(), name='update_l3policy'),

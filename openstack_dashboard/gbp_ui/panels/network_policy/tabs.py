@@ -76,21 +76,20 @@ class L2PolicyTab(tabs.TableTab):
 		return policies
 
 class ServicePolicyTab(tabs.TableTab):
-    table_classes = (tables.ServicePolicyTable,)
-    name = _("Service Policy")
-    slug = "service_policy"
-    template_name = "horizon/common/_detail_table.html"
+	table_classes = (tables.ServicePolicyTable,)
+	name = _("Service Policy")
+	slug = "service_policy"
+	template_name = "horizon/common/_detail_table.html"
 
-    def get_service_policy_table_data(self):
-        policies = []
-	try:
-		tenant_id = self.request.user.tenant_id
-		#policies = client.networkservicepolicy_list(self.request,tenant_id=tenant_id)
-	except Exception:
+	def get_service_policy_table_data(self):
 		policies = []
-		exceptions.handle(self.tab_group.request,
-                          _('Unable to retrieve network service policy list.'))
-	return policies
+		try:
+			policies = client.networkservicepolicy_list(self.request)
+		except Exception:
+			policies = []
+			exceptions.handle(self.tab_group.request,
+					_('Unable to retrieve network service policy list.'))
+		return policies
 
 class L3PolicyTabs(tabs.TabGroup):
     slug = "l3policy_tab"

@@ -276,6 +276,16 @@ def networkservicepolicy_list(request,**kwargs):
 	**kwargs).get('network_service_policies')
 	return [NetworkServicePolicy(item) for item in policies]
 
+def create_networkservice_policy(request,**kwargs):
+	body = {'network_service_policy': kwargs}
+	spolicy = gbpclient(request).create_network_service_policy(body).get('network_service_policy')
+	return NetworkServicePolicy(spolicy)
+
+def update_networkservice_policy(request,policy_id,**kwargs):
+	body = {'network_service_policy': kwargs}
+	spolicy = gbpclient.update_network_service_policy(policy_id,body).get('network_service_policy')
+	return NetworkServicePolicy(spolicy)
+
 def l3policy_get(request,pc_id,**kwargs):
 	return gbpclient(request).show_l3_policy(pc_id).get('l3_policy')
 

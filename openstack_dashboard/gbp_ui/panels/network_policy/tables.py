@@ -98,12 +98,34 @@ class L3PolicyTable(tables.DataTable):
         table_actions = (CreateL3PolicyLink,DeleteL3PolicyLink,)
         row_actions = (EditL3PolicyLink,DeleteL3PolicyLink,)
 
-class ServicePolicyTable(tables.DataTable):
-    name = tables.Column("name", verbose_name=_("Name"))
-    description = tables.Column("description", verbose_name=_("Description"))
-    network_service_params = tables.Column("network_service_params", 
-				verbose_name=_("Network Service Parameters"))
+class CreateServicePolicyLink(tables.LinkAction):
+	name = "create_service_policy"
+	verbose_name = _("Create Service Policy")
+	url = "horizon:project:network_policy:create_servicepolicy"
+	classes = ("ajax-modal","btn-addservicepolicy")
 
-    class Meta:
-        name = "service_policy_table"
-        verbose_name = _("Service Policies")
+class EditServicePolicyLink(tables.LinkAction):
+    name = "update_service_policy"
+    verbose_name = _("Edit")
+    classes = ("ajax-modal", "btn-update",)
+
+    def get_link_url(self, policy):
+        base_url = reverse("horizon:project:network_policy:update_service_policy", kwargs={'service_policy_id': policy.id})
+        return base_url
+
+class DeleteServicePolicyLink(tables.DeleteAction):
+    name = "delete_service_policy"
+    action_present = _("Delete")
+    action_past = _("Scheduled deletion of %(data_type)s")
+    data_type_singular = _("ServicePolicy")
+    data_type_plural = _("ServicePolicies")
+ 
+class ServicePolicyTable(tables.DataTable):
+	name = tables.Column("name", verbose_name=_("Name"))
+	description = tables.Column("description", verbose_name=_("Description"))
+
+	class Meta:
+		name = "service_policy_table"
+		verbose_name = _("Service Policies")
+		table_actions = (CreateServicePolicyLink,DeleteServicePolicyLink,)
+		row_actions = (EditServicePolicyLink,DeleteServicePolicyLink,)
