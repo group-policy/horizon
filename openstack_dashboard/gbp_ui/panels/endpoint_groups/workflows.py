@@ -25,6 +25,7 @@ from horizon import workflows
 
 from openstack_dashboard import api
 from gbp_ui import client
+from gbp_ui import fields
 from openstack_dashboard.dashboards.project.instances import utils
 from openstack_dashboard.dashboards.project.images import utils as imageutils
 
@@ -33,12 +34,12 @@ LOG = logging.getLogger(__name__)
 CREATE_POLICY_RULE_SET_URL = "horizon:project:application_policy:addcontract"
 
 class SelectPolicyRuleSetAction(workflows.Action):
-    provided_contract = forms.DynamicChoiceField(
+    provided_contract = fields.DynamicMultiChoiceField(
         label=_("Provided Policy Rule Set"),
         help_text=_("Choose a policy rule set for an Group."),
         add_item_link=CREATE_POLICY_RULE_SET_URL,
         required=False) 
-    consumed_contract = forms.DynamicChoiceField(
+    consumed_contract = fields.DynamicMultiChoiceField(
         label=_("Consumed Policy Rule Set"),
         help_text=_("Select consumed policy rule set for Group."),
         add_item_link=CREATE_POLICY_RULE_SET_URL,
@@ -56,7 +57,7 @@ class SelectPolicyRuleSetAction(workflows.Action):
                 c.set_id_as_name_if_empty()
         contracts = sorted(contracts,
                            key=lambda rule: rule.name)
-        return [('select','select')] + [(c.id, c.name) for c in contracts]
+        return [('None','None')] + [(c.id, c.name) for c in contracts]
 
     def populate_provided_contract_choices(self, request, context):
         try:
@@ -132,7 +133,7 @@ class SelectL2policyStep(workflows.Step):
     def contribute(self,data,context):
         if data['l2policy_id'] != 'default':
             context['l2_policy_id'] = data['l2policy_id']
-        if data['network_services_policy_id'] != 'select':
+        if data['network_services_policy_id'] != 'None':
 	    context['network_services_policy_id'] = \
 		data['network_services_policy_id']
         return context
