@@ -154,7 +154,7 @@ class SelectPolicyClassifierAction(workflows.Action):
 
 
 class SelectPolicyActionAction(workflows.Action):
-    actions = forms.DynamicChoiceField(
+    actions = fields.DynamicMultiChoiceField(
         label=_("Policy Action"),
         required=False,
         help_text=_("Create a policy-rule with selected action."),

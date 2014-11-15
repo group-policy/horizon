@@ -57,12 +57,12 @@ class SelectPolicyRuleSetAction(workflows.Action):
                 c.set_id_as_name_if_empty()
         contracts = sorted(contracts,
                            key=lambda rule: rule.name)
-        return [('None','None')] + [(c.id, c.name) for c in contracts]
+        return [(c.id, c.name) for c in contracts]
 
     def populate_provided_contract_choices(self, request, context):
         try:
             tenant_id = self.request.user.tenant_id
-            contract_list = self._contract_list(request,tenant_id)
+            contract_list =  [('None','No Provided Policy Rule Sets')] + self._contract_list(request,tenant_id)
         except Exception as e:
             contract_list = []
             exceptions.handle(request,
@@ -73,7 +73,7 @@ class SelectPolicyRuleSetAction(workflows.Action):
     def populate_consumed_contract_choices(self, request, context):
         try:
             tenant_id = self.request.user.tenant_id
-            contract_list = self._contract_list(request,tenant_id)
+            contract_list =  [('None','No Consumed Policy Rule Sets')] + self._contract_list(request,tenant_id)
         except Exception as e:
             contract_list = []
             exceptions.handle(request,
@@ -86,7 +86,7 @@ class SelectL2policyAction(workflows.Action):
     l2policy_id = forms.ChoiceField(
         label=_("Network Policy"),
         help_text=_("Select network policy for Group."))
-    network_services_policy_id = forms.ChoiceField(
+    network_service_policy_id = forms.ChoiceField(
         label=_("Network Services Policy"),
         help_text=_("Select network services policy for Group."),
         required=False) 
@@ -104,21 +104,21 @@ class SelectL2policyAction(workflows.Action):
                 p.set_id_as_name_if_empty()
             policies = sorted(policies, key=lambda rule: rule.name)
             policies = [(p.id, p.name+":"+p.id) for p in policies] 
-            policies.insert(0,('default','default'))
+            policies.insert(0,('default','Default'))
         except Exception as e:
             exceptions.handle(request,
                               _("Unable to retrieve policies (%(error)s).")
                               % {'error': str(e)})
         return policies
     
-    def populate_network_services_policy_id_choices(self,request,context):
+    def populate_network_service_policy_id_choices(self,request,context):
         policies = []
         try:
             policies = client.networkservicepolicy_list(request, tenant_id=request.user.tenant_id)
             for p in policies:
                 p.set_id_as_name_if_empty()
             policies = [(p.id, p.name+":"+p.id) for p in policies]
-            policies.insert(0,('select','select'))
+            policies.insert(0,('select','No Network Service Policy'))
         except Exception as e:
             exceptions.handle(request,
                        _("Unable to retrieve service policies (%(error)s).")
@@ -133,9 +133,9 @@ class SelectL2policyStep(workflows.Step):
     def contribute(self,data,context):
         if data['l2policy_id'] != 'default':
             context['l2_policy_id'] = data['l2policy_id']
-        if data['network_services_policy_id'] != 'None':
-	    context['network_services_policy_id'] = \
-		data['network_services_policy_id']
+        if data['network_service_policy_id'] != 'None':
+	    context['network_service_policy_id'] = \
+		data['network_service_policy_id']
         return context
 
 
