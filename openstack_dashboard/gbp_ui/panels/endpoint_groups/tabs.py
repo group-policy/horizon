@@ -13,7 +13,9 @@
 # @author: Ronak Shah
 
 from django.core.urlresolvers import reverse_lazy
+from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext_lazy as _
+from django.utils.safestring import mark_safe
 from horizon import exceptions
 from horizon import tabs
 
@@ -21,30 +23,32 @@ from openstack_dashboard.dashboards.project.instances.tables import is_deleting
 from openstack_dashboard import api
 
 from gbp_ui import client
+from gbp_ui import column_filters as gfilters
 import tables
 
 EPGsTable = tables.EPGsTable
 
+
 class EPGsTab(tabs.TableTab):
-    table_classes = (EPGsTable,)
-    name = _("Groups")
-    slug = "endpoint_groups"
-    template_name = "horizon/common/_detail_table.html"
+	table_classes = (EPGsTable,)
+	name = _("Groups")
+	slug = "endpoint_groups"
+	template_name = "horizon/common/_detail_table.html"
 
-    def get_epgstable_data(self):
-        try:
-            tenant_id = self.request.user.tenant_id
-            epgs = client.epg_list(self.tab_group.request,
-                                            tenant_id=tenant_id)
-        except Exception:
-            epgs = []
-            exceptions.handle(self.tab_group.request,
-                              _('Unable to retrieve epg list.'))
+	def get_epgstable_data(self):
+		try:
+			tenant_id = self.request.user.tenant_id
+			epgs = client.epg_list(self.tab_group.request,
+					tenant_id=tenant_id)
+			epgs = [gfilters.update_epg_attributes(self.request,item) for item in epgs]
+		except Exception:
+			epgs = []
+			exceptions.handle(self.tab_group.request,
+					_('Unable to retrieve epg list.'))
 
-        for epg in epgs:
-            epg.set_id_as_name_if_empty()
-
-        return epgs
+			for epg in epgs:
+				epg.set_id_as_name_if_empty()
+		return epgs
 
 
 
@@ -69,8 +73,6 @@ class EPGDetailsTab(tabs.Tab):
         except Exception:
             exceptions.handle(request, _('Unable to retrieve group details.'), redirect=self.failure_url)
         return {'epg': epg, 'l3list':l3list,'l2list':l2list}
-
-
 
 
 class EPGDetailsTabs(tabs.TabGroup):
@@ -111,44 +113,46 @@ class InstancesTab(tabs.TableTab):
 
 
 class ConsumedTab(tabs.TableTab):
-    name = _('Consumed Policy Rule Set')
-    slug = 'consumed_contracts_tab'
-    table_classes = (tables.ConsumedContractsTable,)
-    template_name = ("horizon/common/_detail_table.html")
+	name = _('Consumed Policy Rule Set')
+	slug = 'consumed_contracts_tab'
+	table_classes = (tables.ConsumedContractsTable,)
+	template_name = ("horizon/common/_detail_table.html")
 
-    def get_consumed_contracts_data(self):
-        try:
-            epgid = self.tab_group.kwargs['epg_id']
-            epg = client.epg_get(self.request, epgid)
-            consumed_contract_ids = epg.get('consumed_contracts')
-            consumed_contracts = []
-            for _id in consumed_contract_ids:
-                consumed_contracts.append(client.contract_get(self.request, _id))
-            return consumed_contracts
-        except Exception as e:
-            error_message = _('Unable to get consumed rule sets')
-            exceptions.handle(self.request, error_message) 
-            return []
+	def get_consumed_contracts_data(self):
+		try:
+			epgid = self.tab_group.kwargs['epg_id']
+			epg = client.epg_get(self.request, epgid)
+			consumed_contract_ids = epg.get('consumed_contracts')
+			consumed_contracts = []
+			for _id in consumed_contract_ids:
+				consumed_contracts.append(client.contract_get(self.request, _id))
+			consumed_contracts = [gfilters.update_pruleset_attributes(self.request,item) for item in consumed_contracts]
+			return consumed_contracts
+		except Exception as e:
+			error_message = _('Unable to get consumed rule sets')
+			exceptions.handle(self.request, error_message) 
+			return []
 
 class ProvidedTab(tabs.TableTab):
-    name = _('Provided Policy Rule Set')
-    slug = 'provided_contracts_tab'
-    table_classes = (tables.ProvidedContractsTable,)
-    template_name = ("horizon/common/_detail_table.html")
-    
-    def get_provided_contracts_data(self):
-        try:
-            epgid = self.tab_group.kwargs['epg_id']
-            epg = client.epg_get(self.request, epgid)
-            provided_contract_ids = epg.get('provided_contracts')
-            provided_contracts = []
-            for _id in provided_contract_ids:
-                provided_contracts.append(client.contract_get(self.request, _id))
-            return provided_contracts
-        except Exception as e:
-            error_message = _('Unable to get provided rule sets')
-            exceptions.handle(self.request, error_message)  
-            return []
+	name = _('Provided Policy Rule Set')
+	slug = 'provided_contracts_tab'
+	table_classes = (tables.ProvidedContractsTable,)
+	template_name = ("horizon/common/_detail_table.html")
+
+	def get_provided_contracts_data(self):
+		try:
+			epgid = self.tab_group.kwargs['epg_id']
+			epg = client.epg_get(self.request, epgid)
+			provided_contract_ids = epg.get('provided_contracts')
+			provided_contracts = []
+			for _id in provided_contract_ids:
+				provided_contracts.append(client.contract_get(self.request, _id))
+			provided_contracts = [gfilters.update_pruleset_attributes(self.request,item) for item in provided_contracts]
+			return provided_contracts
+		except Exception as e:
+			error_message = _('Unable to get provided rule sets')
+			exceptions.handle(self.request, error_message)  
+			return []
 
 class EPGMemberTabs(tabs.TabGroup):
     slug = 'member_tabs'

@@ -18,6 +18,8 @@ from horizon import exceptions
 from horizon import tabs
 
 from gbp_ui import client
+from gbp_ui import column_filters as gfilters
+
 import tables
 
 PolicyRulesTable = tables.PolicyRulesTable
@@ -73,46 +75,47 @@ class PolicyClassifiersTab(tabs.TableTab):
 
 
 class PolicyRulesTab(tabs.TableTab):
-    table_classes = (PolicyRulesTable,)
-    name = _("Policy-Rules")
-    slug = "policyrules"
-    template_name = "horizon/common/_detail_table.html"
+	table_classes = (PolicyRulesTable,)
+	name = _("Policy-Rules")
+	slug = "policyrules"
+	template_name = "horizon/common/_detail_table.html"
 
-    def get_policyrulestable_data(self):
-        try:
-            tenant_id = self.request.user.tenant_id
-            policy_rules = client.policyrule_list(
-                self.tab_group.request,
-                tenant_id=tenant_id)
-        except Exception:
-            policy_rules = []
-            exceptions.handle(self.tab_group.request,
-                              _('Unable to retrieve policy-rule list.'))
+	def get_policyrulestable_data(self):
+		try:
+			tenant_id = self.request.user.tenant_id
+			policy_rules = client.policyrule_list(
+					self.tab_group.request,
+					tenant_id=tenant_id)
+			policy_rules = [gfilters.update_policyrule_attributes(self.request,item) for item in policy_rules]
+		except Exception:
+			policy_rules = []
+			exceptions.handle(self.tab_group.request,
+					_('Unable to retrieve policy-rule list.'))
 
-        for rule in policy_rules:
-            rule.set_id_as_name_if_empty()
+			for rule in policy_rules:
+				rule.set_id_as_name_if_empty()
 
-        return policy_rules
+		return policy_rules
 
 
 class ApplicationPoliciesTab(tabs.TableTab):
-    table_classes = (tables.ApplicationPoliciesTable,)
-    name = _("Policy Rule Set")
-    slug = "application_policies"
-    template_name = "horizon/common/_detail_table.html"
+	table_classes = (tables.ApplicationPoliciesTable,)
+	name = _("Policy Rule Set")
+	slug = "application_policies"
+	template_name = "horizon/common/_detail_table.html"
 
-    def get_application_policies_table_data(self):
-        try:
-            tenant_id = self.request.user.tenant_id
-            contracts = client.contract_list(self.tab_group.request, tenant_id=tenant_id)
-        except Exception:
-            contracts = []
-            exceptions.handle(self.tab_group.request, _('Unable to retrieve policy rule set list.'))
+	def get_application_policies_table_data(self):
+		contracts = []
+		try:
+			tenant_id = self.request.user.tenant_id
+			contracts = client.contract_list(self.tab_group.request, tenant_id=tenant_id)
+			contracts = [gfilters.update_pruleset_attributes(self.request,item) for item in contracts]
+		except Exception:
+			exceptions.handle(self.tab_group.request, _('Unable to retrieve policy rule set list.'))
 
-        for contract in contracts:
-            contract.set_id_as_name_if_empty()
-
-        return contracts
+		for contract in contracts:
+			contract.set_id_as_name_if_empty()
+		return contracts
 
 
 class ApplicationPoliciesTabs(tabs.TabGroup):

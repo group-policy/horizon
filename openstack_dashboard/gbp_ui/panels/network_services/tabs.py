@@ -20,6 +20,8 @@ from horizon import tabs
 from openstack_dashboard import api
 
 from gbp_ui import client
+from gbp_ui import column_filters as gfilters
+
 import tables
 import tables as ns_tables
 
@@ -33,6 +35,7 @@ class ServiceChainSpecTab(tabs.TableTab):
 		specs = []
 		try:
 			specs = client.servicechainspec_list(self.request)
+			specs = [gfilters.update_sc_spec_attributes(self.request,item) for item in specs]
 		except Exception as e:
 			pass
 		return specs

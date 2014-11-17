@@ -56,11 +56,9 @@ class EPGsTable(tables.DataTable):
     description = tables.Column("description",verbose_name=_("Description"))
     provided_contracts = tables.Column("provided_contracts",
                                        sortable=False,
-                                       filters=(column_filters.list_column_filter,dfilters.unordered_list,),
                                       verbose_name=_("Provided Rule Sets"))
     consumed_contracts = tables.Column("consumed_contracts",
                                        sortable=False,
-                                       filters=(column_filters.list_column_filter,dfilters.unordered_list,),
                                       verbose_name=_("Consumed Rule Sets")) 
     l2_policy_id = tables.Column("l2_policy_id",
                                  verbose_name=_("L2 Policy"))
@@ -169,7 +167,6 @@ class ProvidedContractsTable(tables.DataTable):
     description = tables.Column("description",verbose_name=_("Description"))
     policy_rules = tables.Column("policy_rules",
                                  sortable=False,
-                                 filters=(column_filters.list_column_filter,dfilters.unordered_list,),
                                  verbose_name=_("Policy Rules"))
     
     class Meta:
@@ -204,7 +201,6 @@ class ConsumedContractsTable(tables.DataTable):
                                 verbose_name=_("Description"))
     policy_rules = tables.Column("policy_rules",
                                  sortable=False,
-                                 filters=(column_filters.list_column_filter,dfilters.unordered_list,),
                                  verbose_name=_("Policy Rules"))
 
     class Meta:

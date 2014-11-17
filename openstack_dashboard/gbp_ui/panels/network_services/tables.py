@@ -49,9 +49,7 @@ class ServiceChainSpecTable(tables.DataTable):
 			verbose_name=_("Name"))
 	description = tables.Column("description", 
 			verbose_name=_("Description"))
-	nodes = tables.Column("nodes",
-			verbose_name=_("Nodes"),
-			filters=(column_filters.list_column_filter,dfilters.unordered_list,))
+	nodes = tables.Column("nodes", verbose_name=_("Nodes"))
 
 	class Meta:
 		name = "service_chain_spec_table"

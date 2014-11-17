@@ -131,7 +131,6 @@ class ApplicationPoliciesTable(tables.DataTable):
                                 verbose_name=_("Description"))
     policy_rules = tables.Column("policy_rules",
                                  sortable=False,
-                                 filters=(column_filters.list_column_filter,dfilters.unordered_list,),
                                  verbose_name=_("Policy Rules"))
 
 
