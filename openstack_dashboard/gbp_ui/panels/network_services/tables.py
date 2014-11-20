@@ -46,7 +46,8 @@ class DeleteServiceChainSpecLink(tables.DeleteAction):
  
 class ServiceChainSpecTable(tables.DataTable):
 	name = tables.Column("name",
-			verbose_name=_("Name"))
+			verbose_name=_("Name"),
+ 			link="horizon:project:network_services:sc_spec_details")
 	description = tables.Column("description", 
 			verbose_name=_("Description"))
 	nodes = tables.Column("nodes", verbose_name=_("Nodes"))
@@ -61,7 +62,7 @@ class ServiceChainSpecTable(tables.DataTable):
 class CreateServiceChainNodeLink(tables.LinkAction):
     name = "create_scnode_link"
     verbose_name = _("Create Service Chain Node")
-    url = "horizon:project:network_services:create_sc_spec"
+    url = "horizon:project:network_services:create_sc_node"
     classes = ("ajax-modal","btn-create_scnode")
 
 
@@ -83,7 +84,8 @@ class DeleteServiceChainNodeLink(tables.DeleteAction):
  
 class ServiceChainNodeTable(tables.DataTable):
 	name = tables.Column("name",
-			verbose_name=_("Name"))
+			verbose_name=_("Name"),
+ 			link="horizon:project:network_services:sc_node_details")
 	description = tables.Column("description", 
 			verbose_name=_("Description"))
 	service_type = tables.Column("service_type",
@@ -120,9 +122,15 @@ class DeleteServiceChainInstanceLink(tables.DeleteAction):
  
 class ServiceChainInstanceTable(tables.DataTable):
 	name = tables.Column("name",
-			verbose_name=_("Name"))
+			verbose_name=_("Name"),
+ 			link="horizon:project:network_services:sc_instance_details")
 	description = tables.Column("description", 
 			verbose_name=_("Description"))
+	provider_ptg = tables.Column("provider_ptg", verbose_name=_("Provider PTG"))
+   	consumer_ptg = tables.Column("consumer_ptg", verbose_name=_("Consumer PTG")) 
+	servicechain_spec = tables.Column("servicechain_spec", verbose_name=_("Service Chain Spec"))
+	classifier = tables.Column("classifier",verbose_name=_("Classifier"))
+
 
 	class Meta:
 		name = "service_chain_instance_table"

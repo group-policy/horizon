@@ -31,15 +31,15 @@ from openstack_dashboard.dashboards.project.images import utils as imageutils
 
 LOG = logging.getLogger(__name__)
 
-CREATE_POLICY_RULE_SET_URL = "horizon:project:application_policy:addcontract"
+CREATE_POLICY_RULE_SET_URL = "horizon:project:application_policy:addpolicy_rule_set"
 
 class SelectPolicyRuleSetAction(workflows.Action):
-    provided_contract = fields.DynamicMultiChoiceField(
+    provided_policy_rule_set = fields.DynamicMultiChoiceField(
         label=_("Provided Policy Rule Set"),
         help_text=_("Choose a policy rule set for an Group."),
         add_item_link=CREATE_POLICY_RULE_SET_URL,
         required=False) 
-    consumed_contract = fields.DynamicMultiChoiceField(
+    consumed_policy_rule_set = fields.DynamicMultiChoiceField(
         label=_("Consumed Policy Rule Set"),
         help_text=_("Select consumed policy rule set for Group."),
         add_item_link=CREATE_POLICY_RULE_SET_URL,
@@ -50,36 +50,36 @@ class SelectPolicyRuleSetAction(workflows.Action):
         name = _("Application Policy")
         help_text = _("Select Policy Rule Set for Group.")
 
-    def _contract_list(self,request,tenant_id):
-        contracts = client.contract_list(request,
+    def _policy_rule_set_list(self,request,tenant_id):
+        policy_rule_sets = client.policy_rule_set_list(request,
                 tenant_id=tenant_id)
-        for c in contracts:
+        for c in policy_rule_sets:
                 c.set_id_as_name_if_empty()
-        contracts = sorted(contracts,
+        policy_rule_sets = sorted(policy_rule_sets,
                            key=lambda rule: rule.name)
-        return [(c.id, c.name) for c in contracts]
+        return [(c.id, c.name) for c in policy_rule_sets]
 
-    def populate_provided_contract_choices(self, request, context):
+    def populate_provided_policy_rule_set_choices(self, request, context):
         try:
             tenant_id = self.request.user.tenant_id
-            contract_list =  [('None','No Provided Policy Rule Sets')] + self._contract_list(request,tenant_id)
+            policy_rule_set_list =  [('None','No Provided Policy Rule Sets')] + self._policy_rule_set_list(request,tenant_id)
         except Exception as e:
-            contract_list = []
+            policy_rule_set_list = []
             exceptions.handle(request,
                               _('Unable to retrieve policy rule set (%(error)s).')
                               % {'error': str(e)})
-        return contract_list
+        return policy_rule_set_list
     
-    def populate_consumed_contract_choices(self, request, context):
+    def populate_consumed_policy_rule_set_choices(self, request, context):
         try:
             tenant_id = self.request.user.tenant_id
-            contract_list =  [('None','No Consumed Policy Rule Sets')] + self._contract_list(request,tenant_id)
+            policy_rule_set_list =  [('None','No Consumed Policy Rule Sets')] + self._policy_rule_set_list(request,tenant_id)
         except Exception as e:
-            contract_list = []
+            policy_rule_set_list = []
             exceptions.handle(request,
                               _('Unable to retrieve policy rule set (%(error)s).')
                               % {'error': str(e)})
-        return contract_list 
+        return policy_rule_set_list 
 
 
 class SelectL2policyAction(workflows.Action):
@@ -118,7 +118,7 @@ class SelectL2policyAction(workflows.Action):
             for p in policies:
                 p.set_id_as_name_if_empty()
             policies = [(p.id, p.name+":"+p.id) for p in policies]
-            policies.insert(0,('select','No Network Service Policy'))
+            policies.insert(0,('None','No Network Service Policy'))
         except Exception as e:
             exceptions.handle(request,
                        _("Unable to retrieve service policies (%(error)s).")
@@ -143,31 +143,31 @@ class SelectL2policyStep(workflows.Step):
 class SelectPolicyRuleSetStep(workflows.Step):
     action_class = SelectPolicyRuleSetAction
     name = _("Provided Policy Rule Set")
-    contributes = ("provided_contracts","consumed_contracts",)
+    contributes = ("provided_policy_rule_sets","consumed_policy_rule_sets",)
 
     def contribute(self, data, context):
         if data:
-            contracts = self.workflow.request.POST.getlist(
-                "provided_contract")
-            if contracts:
-                contract_dict = {}
-                for contract in contracts:
-                    if contract != '' and contract != "select":
-                        contract_dict[contract] = None
-                context['provided_contracts'] = contract_dict
-	    contracts = self.workflow.request.POST.getlist(
-                "consumed_contract")
-            if contracts:
-                contract_dict = {}
-                for contract in contracts:
-                    if contract != '' and contract != "select":
-                        contract_dict[contract] = None
-                context['consumed_contracts'] = contract_dict
+            policy_rule_sets = self.workflow.request.POST.getlist(
+                "provided_policy_rule_set")
+            if policy_rule_sets:
+                policy_rule_set_dict = {}
+                for policy_rule_set in policy_rule_sets:
+                    if policy_rule_set != '' and policy_rule_set != "select":
+                        policy_rule_set_dict[policy_rule_set] = None
+                context['provided_policy_rule_sets'] = policy_rule_set_dict
+	    policy_rule_sets = self.workflow.request.POST.getlist(
+                "consumed_policy_rule_set")
+            if policy_rule_sets:
+                policy_rule_set_dict = {}
+                for policy_rule_set in policy_rule_sets:
+                    if policy_rule_set != '' and policy_rule_set != "select":
+                        policy_rule_set_dict[policy_rule_set] = None
+                context['consumed_policy_rule_sets'] = policy_rule_set_dict
             return context
 
 
 
-class AddEPGAction(workflows.Action):
+class AddPTGAction(workflows.Action):
     name = forms.CharField(max_length=80,
                            label=_("Name"))
     description = forms.CharField(max_length=80,
@@ -175,30 +175,30 @@ class AddEPGAction(workflows.Action):
                                   required=False)
 
     def __init__(self, request, *args, **kwargs):
-        super(AddEPGAction, self).__init__(request, *args, **kwargs)
+        super(AddPTGAction, self).__init__(request, *args, **kwargs)
 
     class Meta:
         name = _("Create Group")
         help_text = _("Create a new Group")
 
 
-class AddEPGStep(workflows.Step):
-    action_class = AddEPGAction
+class AddPTGStep(workflows.Step):
+    action_class = AddPTGAction
     contributes = ("name", "description")
 
     def contribute(self, data, context):
-        context = super(AddEPGStep, self).contribute(data, context)
+        context = super(AddPTGStep, self).contribute(data, context)
         return context
 
 
-class AddEPG(workflows.Workflow):
-    slug = "addepg"
+class AddPTG(workflows.Workflow):
+    slug = "addpolicy_target"
     name = _("Create Group")
     finalize_button_name = _("Create")
     success_message = _('Create Group "%s".')
     failure_message = _('Unable to create Group "%s".')
-    success_url = "horizon:project:endpoint_groups:index"
-    default_steps = (AddEPGStep,
+    success_url = "horizon:project:policytargets:index"
+    default_steps = (AddPTGStep,
                      SelectPolicyRuleSetStep,
 					 SelectL2policyStep,)
     wizard = True
@@ -208,7 +208,7 @@ class AddEPG(workflows.Workflow):
 
     def handle(self, request, context):
 		try:
-			group = client.epg_create(request, **context)
+			group = client.policy_target_create(request, **context)
 			return group
 		except Exception as e:
 			msg = self.format_status_message(self.failure_message) + str(e)
@@ -266,10 +266,10 @@ class LaunchInstance(workflows.Action):
         return zone_list
     
     def handle(self, request, context):
-        epg_id = self.request.path.split("/")[-2]
+        policy_target_id = self.request.path.split("/")[-2]
         try:
             msg = _('Member was successfully created.')
-            ep = client.ep_create(request,endpoint_group_id=epg_id)
+            ep = client.pt_create(request,policy_target_group_id=policy_target_id)
             api.nova.server_create(request, 
                     context['name'], 
                     context['image'],
@@ -282,10 +282,9 @@ class LaunchInstance(workflows.Action):
             LOG.debug(msg)
             messages.success(request, msg)
         except Exception as e:
-            #msg = _('Failed to update Group %(name)s: %(reason)s' % {'name': name_or_id, 'reason': e})
             msg = _('Failed to launch VM')
             LOG.error(msg)
-            redirect = reverse("horizon:project:endpoint_groups:epgdetails", kwargs={'epg_id': epg_id})
+            redirect = reverse("horizon:project:policytargets:policy_targetdetails", kwargs={'policy_target_id': policy_target_id})
             exceptions.handle(request, msg, redirect=redirect) 
 
 
@@ -312,6 +311,6 @@ class CreateVM(workflows.Workflow):
         return message % self.context.get('name')
     
     def get_success_url(self):
-        epgid = self.request.path.split("/")[-2] #TODO need to find a better way of doing this.
-        success_url = reverse("horizon:project:endpoint_groups:epgdetails",kwargs={'epg_id':epgid})
+        policy_targetid = self.request.path.split("/")[-2] #TODO need to find a better way of doing this.
+        success_url = reverse("horizon:project:policytargets:policy_targetdetails",kwargs={'policy_target_id':policy_targetid})
         return success_url

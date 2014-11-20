@@ -21,24 +21,24 @@ from horizon import tables
 from gbp_ui import column_filters
 
 class AddAppPolicyLink(tables.LinkAction):
-    name = "addcontract"
+    name = "addpolicy_rule_set"
     verbose_name = _("Create Policy Rule Set")
-    url = "horizon:project:application_policy:addcontract"
-    classes = ("ajax-modal", "btn-addcontract",)
+    url = "horizon:project:application_policy:addpolicy_rule_set"
+    classes = ("ajax-modal", "btn-addpolicy_rule_set",)
 
 
 class UpdateAppPolicyLink(tables.LinkAction):
-    name = "updatecontract"
+    name = "updatepolicy_rule_set"
     verbose_name = _("Edit")
-    classes = ("ajax-modal",'edit_contract')
+    classes = ("ajax-modal",'edit_policy_rule_set')
 
-    def get_link_url(self, contract):
-        base_url = reverse("horizon:project:application_policy:updatecontract", kwargs={'contract_id': contract.id})
+    def get_link_url(self, policy_rule_set):
+        base_url = reverse("horizon:project:application_policy:updatepolicy_rule_set", kwargs={'policy_rule_set_id': policy_rule_set.id})
         return base_url
 
 
 class DeleteAppPolicyLink(tables.DeleteAction):
-    name = "deletecontract"
+    name = "deletepolicy_rule_set"
     action_present = _("Delete")
     action_past = _("Scheduled deletion of %(data_type)s")
     data_type_singular = _("Policy Rule Set")

@@ -2,10 +2,10 @@
 {% load i18n %}
 {% load url from future %}
 
-{% block form_id %}update_contract_form{% endblock %}
-{% block form_action %}{% url "horizon:project:application_policy:updatecontract" contract_id %}{% endblock %}
+{% block form_id %}update_policy_rule_set_form{% endblock %}
+{% block form_action %}{% url "horizon:project:application_policy:updatepolicy_rule_set" policy_rule_set_id %}{% endblock %}
 
-{% block modal_id %}update_contract_modal{% endblock %}
+{% block modal_id %}update_policy_rule_set_modal{% endblock %}
 {% block modal-header %}{% trans "Edit Policy Rule Set" %}{% endblock %}
 
 {% block modal-body %}

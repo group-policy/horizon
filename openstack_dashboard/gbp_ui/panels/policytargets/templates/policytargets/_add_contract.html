@@ -2,10 +2,10 @@
 {% load i18n %}
 {% load url from future %}
 
-{% block form_id %}update_epg_form{% endblock %}
-{% block form_action %}{% url 'horizon:project:endpoint_groups:updateepg' epg_id %}{% endblock %}
+{% block form_id %}add_contract_form{% endblock %}
+{% block form_action %}{% url 'horizon:project:policytargets:add_contract' policy_target_id %}{% endblock %}
 
-{% block modal-header %}{% trans "Edit Endpoint Group" %}{% endblock %}
+{% block modal-header %}{% trans "Add Policy Rule Set" %}{% endblock %}
 
 {% block modal-body %}
 <div class="left">
@@ -15,11 +15,11 @@
 </div>
 <div class="right">
     <h3>{% trans "Description:" %}</h3>
-    <p>{% trans "You may update epg details here." %}</p>
+    <p>{% trans "Add Policy Rule Set.  Press Ctrl to select multiple items." %}</p>
 </div>
 {% endblock %}
 
 {% block modal-footer %}
   <input class="btn btn-primary pull-right" type="submit" value="{% trans "Save Changes" %}" />
-  <a href="{% url 'horizon:project:endpoint_groups:index' %}" class="btn secondary cancel close">{% trans "Cancel" %}</a>
+  <a href="{% url 'horizon:project:policytargets:index' %}" class="btn secondary cancel close">{% trans "Cancel" %}</a>
 {% endblock %}

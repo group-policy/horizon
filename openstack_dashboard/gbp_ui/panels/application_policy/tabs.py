@@ -105,17 +105,17 @@ class ApplicationPoliciesTab(tabs.TableTab):
 	template_name = "horizon/common/_detail_table.html"
 
 	def get_application_policies_table_data(self):
-		contracts = []
+		policy_rule_sets = []
 		try:
 			tenant_id = self.request.user.tenant_id
-			contracts = client.contract_list(self.tab_group.request, tenant_id=tenant_id)
-			contracts = [gfilters.update_pruleset_attributes(self.request,item) for item in contracts]
+			policy_rule_sets = client.policy_rule_set_list(self.tab_group.request, tenant_id=tenant_id)
+			policy_rule_sets = [gfilters.update_pruleset_attributes(self.request,item) for item in policy_rule_sets]
 		except Exception:
 			exceptions.handle(self.tab_group.request, _('Unable to retrieve policy rule set list.'))
 
-		for contract in contracts:
-			contract.set_id_as_name_if_empty()
-		return contracts
+		for policy_rule_set in policy_rule_sets:
+			policy_rule_set.set_id_as_name_if_empty()
+		return policy_rule_sets
 
 
 class ApplicationPoliciesTabs(tabs.TabGroup):
@@ -129,16 +129,16 @@ class ApplicationPoliciesTabs(tabs.TabGroup):
 
 class ContractDetailsTab(tabs.Tab):
     name = _("Policy Rule Set Details")
-    slug = "contractdetails"
-    template_name = "project/application_policy/_contract_details.html"
-    failure_url = reverse_lazy('horizon:project:contract:index')
+    slug = "policy_rule_setdetails"
+    template_name = "project/application_policy/_policy_rule_set_details.html"
+    failure_url = reverse_lazy('horizon:project:policy_rule_set:index')
 
     def get_context_data(self, request):
-        cid = self.tab_group.kwargs['contract_id']
+        cid = self.tab_group.kwargs['policy_rule_set_id']
         try:
-            contract = client.contract_get(request, cid)
-            rules = client.policyrule_list(request, contract_id=contract.id)
-            rules = [item for item in rules if item.id in contract.policy_rules]
+            policy_rule_set = client.policy_rule_set_get(request, cid)
+            rules = client.policyrule_list(request, policy_rule_set_id=policy_rule_set.id)
+            rules = [item for item in rules if item.id in policy_rule_set.policy_rules]
             rules_with_details = []
             for rule in rules:
                 r = {}
@@ -156,13 +156,13 @@ class ContractDetailsTab(tabs.Tab):
                 rules_with_details.append(r)
         except Exception:
             exceptions.handle(request,
-                              _('Unable to retrieve contract details.'),
+                              _('Unable to retrieve policy_rule_set details.'),
                               redirect=self.failure_url)
-        return {'contract': contract,'rules_with_details':rules_with_details}
+        return {'policy_rule_set': policy_rule_set,'rules_with_details':rules_with_details}
 
 
 class ContractDetailsTabs(tabs.TabGroup):
-    slug = "contracttabs"
+    slug = "policy_rule_settabs"
     tabs = (ContractDetailsTab,)
 
 
@@ -198,7 +198,7 @@ class PolicyClassifierDetailsTab(tabs.Tab):
     name = _("Policyclassifier Details")
     slug = "policyclassifierdetails"
     template_name = "project/application_policy/_policyclassifier_details.html"
-    failure_url = reverse_lazy('horizon:project:contract:index')
+    failure_url = reverse_lazy('horizon:project:policy_rule_set:index')
 
     def get_context_data(self, request):
         pcid = self.tab_group.kwargs['policyclassifier_id']
@@ -206,7 +206,7 @@ class PolicyClassifierDetailsTab(tabs.Tab):
             policyclassifier = client.policyclassifier_get(request, pcid)
         except Exception:
             exceptions.handle(request,
-                              _('Unable to retrieve contract details.'),
+                              _('Unable to retrieve policy_rule_set details.'),
                               redirect=self.failure_url)
         return {'policyclassifier': policyclassifier}
 
@@ -220,7 +220,7 @@ class PolicyActionDetailsTab(tabs.Tab):
     name = _("PolicyAction Details")
     slug = "policyactiondetails"
     template_name = "project/application_policy/_policyaction_details.html"
-    failure_url = reverse_lazy('horizon:project:contract:index')
+    failure_url = reverse_lazy('horizon:project:policy_rule_set:index')
 
     def get_context_data(self, request):
         paid = self.tab_group.kwargs['policyaction_id']

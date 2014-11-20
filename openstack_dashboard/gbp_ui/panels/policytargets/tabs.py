@@ -26,58 +26,58 @@ from gbp_ui import client
 from gbp_ui import column_filters as gfilters
 import tables
 
-EPGsTable = tables.EPGsTable
+PTGsTable = tables.PTGsTable
 
 
-class EPGsTab(tabs.TableTab):
-	table_classes = (EPGsTable,)
+class PTGsTab(tabs.TableTab):
+	table_classes = (PTGsTable,)
 	name = _("Groups")
-	slug = "endpoint_groups"
+	slug = "policytargets"
 	template_name = "horizon/common/_detail_table.html"
 
-	def get_epgstable_data(self):
+	def get_policy_targetstable_data(self):
 		try:
 			tenant_id = self.request.user.tenant_id
-			epgs = client.epg_list(self.tab_group.request,
+			policy_targets = client.policy_target_list(self.tab_group.request,
 					tenant_id=tenant_id)
-			epgs = [gfilters.update_epg_attributes(self.request,item) for item in epgs]
+			policy_targets = [gfilters.update_policy_target_attributes(self.request,item) for item in policy_targets]
 		except Exception:
-			epgs = []
+			policy_targets = []
 			exceptions.handle(self.tab_group.request,
-					_('Unable to retrieve epg list.'))
+					_('Unable to retrieve policy_target list.'))
 
-			for epg in epgs:
-				epg.set_id_as_name_if_empty()
-		return epgs
+			for policy_target in policy_targets:
+				policy_target.set_id_as_name_if_empty()
+		return policy_targets
 
 
 
-class EPGTabs(tabs.TabGroup):
-    slug = "epgtabs"
-    tabs = (EPGsTab,)
+class PTGTabs(tabs.TabGroup):
+    slug = "policy_targettabs"
+    tabs = (PTGsTab,)
     sticky = True
 
-class EPGDetailsTab(tabs.Tab):
+class PTGDetailsTab(tabs.Tab):
     name = _("Group Details")
-    slug = "epgdetails"
-    template_name = "project/endpoint_groups/_epg_details.html"
-    failure_url = reverse_lazy('horizon:project:endpoint_group:index')
+    slug = "policy_targetdetails"
+    template_name = "project/policytargets/_policy_target_details.html"
+    failure_url = reverse_lazy('horizon:project:policy_target_group:index')
 
     def get_context_data(self, request):
-        epgid = self.tab_group.kwargs['epg_id']
+        policy_targetid = self.tab_group.kwargs['policy_target_id']
         try:
-            epg = client.epg_get(request, epgid)
+            policy_target = client.policy_target_get(request, policy_targetid)
             l3list = client.l3policy_list(request)
             l2list = client.l2policy_list(request)
-            l2list = [item for item in l2list if item.id == epg.l2_policy_id]
+            l2list = [item for item in l2list if item.id == policy_target.l2_policy_id]
         except Exception:
             exceptions.handle(request, _('Unable to retrieve group details.'), redirect=self.failure_url)
-        return {'epg': epg, 'l3list':l3list,'l2list':l2list}
+        return {'policy_target': policy_target, 'l3list':l3list,'l2list':l2list}
 
 
-class EPGDetailsTabs(tabs.TabGroup):
-    slug = "epgtabs"
-    tabs = (EPGDetailsTab,)
+class PTGDetailsTabs(tabs.TabGroup):
+    slug = "policy_targettabs"
+    tabs = (PTGDetailsTab,)
 
 class InstancesTab(tabs.TableTab):
     name = _("Members")
@@ -87,12 +87,12 @@ class InstancesTab(tabs.TableTab):
     preload = True
 
     def get_instances_data(self):
-        epgid = self.tab_group.kwargs['epg_id']
+        policy_targetid = self.tab_group.kwargs['policy_target_id']
         filtered_instances = []
         try:
-            eps = client.ep_list(self.request,
-                                           endpoint_group_id=epgid)
-            epg_ports = [x.port_id for x in eps]
+            policytargets = client.pt_list(self.request,
+                                           policy_target_group_id=policy_targetid)
+            policy_target_ports = [x.port_id for x in policytargets]
             marker = self.request.GET.get(
                 tables.InstancesTable._meta.pagination_param, None)
             instances, self._has_more = api.nova.server_list(
@@ -101,7 +101,7 @@ class InstancesTab(tabs.TableTab):
             for item in instances:
                 for port in api.neutron.port_list(self.request,
                                                   device_id=item.id):
-                    if port.id in epg_ports:
+                    if port.id in policy_target_ports:
                         filtered_instances.append(item)
                         break
         except Exception as e:
@@ -114,20 +114,20 @@ class InstancesTab(tabs.TableTab):
 
 class ConsumedTab(tabs.TableTab):
 	name = _('Consumed Policy Rule Set')
-	slug = 'consumed_contracts_tab'
+	slug = 'consumed_policy_rule_sets_tab'
 	table_classes = (tables.ConsumedContractsTable,)
 	template_name = ("horizon/common/_detail_table.html")
 
-	def get_consumed_contracts_data(self):
+	def get_consumed_policy_rule_sets_data(self):
 		try:
-			epgid = self.tab_group.kwargs['epg_id']
-			epg = client.epg_get(self.request, epgid)
-			consumed_contract_ids = epg.get('consumed_contracts')
-			consumed_contracts = []
-			for _id in consumed_contract_ids:
-				consumed_contracts.append(client.contract_get(self.request, _id))
-			consumed_contracts = [gfilters.update_pruleset_attributes(self.request,item) for item in consumed_contracts]
-			return consumed_contracts
+			policy_targetid = self.tab_group.kwargs['policy_target_id']
+			policy_target = client.policy_target_get(self.request, policy_targetid)
+			consumed_policy_rule_set_ids = policy_target.get('consumed_policy_rule_sets')
+			consumed_policy_rule_sets = []
+			for _id in consumed_policy_rule_set_ids:
+				consumed_policy_rule_sets.append(client.policy_rule_set_get(self.request, _id))
+			consumed_policy_rule_sets = [gfilters.update_pruleset_attributes(self.request,item) for item in consumed_policy_rule_sets]
+			return consumed_policy_rule_sets
 		except Exception as e:
 			error_message = _('Unable to get consumed rule sets')
 			exceptions.handle(self.request, error_message) 
@@ -135,26 +135,26 @@ class ConsumedTab(tabs.TableTab):
 
 class ProvidedTab(tabs.TableTab):
 	name = _('Provided Policy Rule Set')
-	slug = 'provided_contracts_tab'
+	slug = 'provided_policy_rule_sets_tab'
 	table_classes = (tables.ProvidedContractsTable,)
 	template_name = ("horizon/common/_detail_table.html")
 
-	def get_provided_contracts_data(self):
+	def get_provided_policy_rule_sets_data(self):
 		try:
-			epgid = self.tab_group.kwargs['epg_id']
-			epg = client.epg_get(self.request, epgid)
-			provided_contract_ids = epg.get('provided_contracts')
-			provided_contracts = []
-			for _id in provided_contract_ids:
-				provided_contracts.append(client.contract_get(self.request, _id))
-			provided_contracts = [gfilters.update_pruleset_attributes(self.request,item) for item in provided_contracts]
-			return provided_contracts
+			policy_targetid = self.tab_group.kwargs['policy_target_id']
+			policy_target = client.policy_target_get(self.request, policy_targetid)
+			provided_policy_rule_set_ids = policy_target.get('provided_policy_rule_sets')
+			provided_policy_rule_sets = []
+			for _id in provided_policy_rule_set_ids:
+				provided_policy_rule_sets.append(client.policy_rule_set_get(self.request, _id))
+			provided_policy_rule_sets = [gfilters.update_pruleset_attributes(self.request,item) for item in provided_policy_rule_sets]
+			return provided_policy_rule_sets
 		except Exception as e:
 			error_message = _('Unable to get provided rule sets')
 			exceptions.handle(self.request, error_message)  
 			return []
 
-class EPGMemberTabs(tabs.TabGroup):
+class PTGMemberTabs(tabs.TabGroup):
     slug = 'member_tabs'
-    tabs = (InstancesTab, ProvidedTab, ConsumedTab, EPGDetailsTab,)
+    tabs = (InstancesTab, ProvidedTab, ConsumedTab, PTGDetailsTab,)
     stiky = True

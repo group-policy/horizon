@@ -18,6 +18,6 @@ from django.utils.translation import ugettext_lazy as _
 import horizon
 
 
-class EPG(horizon.Panel):
+class PolicyTargetGroup(horizon.Panel):
     name = _("Groups")
-    slug = "endpoint_groups"
+    slug = "policytargets"

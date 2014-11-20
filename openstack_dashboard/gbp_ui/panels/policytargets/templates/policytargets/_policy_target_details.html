@@ -5,16 +5,16 @@
 	<hr class="header_rule">
 	<dl>
 		<dt>{% trans "Name" %}</dt>
-		<dd>{{ epg.name|default:_("-") }}</dd>
+		<dd>{{ policy_target.name|default:_("-") }}</dd>
 
 		<dt>{% trans "Description" %}</dt>
-		<dd>{{ epg.description|default:_("-") }}</dd>
+		<dd>{{ policy_target.description|default:_("-") }}</dd>
 
 		<dt>{% trans "ID" %}</dt>
-		<dd>{{ epg.id }} </dd>
+		<dd>{{ policy_target.id }} </dd>
 
 		<dt>{% trans "Project ID" %}</dt>
-		<dd>{{ epg.tenant_id }}</dd>
+		<dd>{{ policy_target.tenant_id }}</dd>
 	</dl>
 	{% if l3list %}
 	<div class='panel panel-default'>

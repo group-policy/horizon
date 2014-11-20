@@ -157,24 +157,25 @@ class CreateServiceChainInstanceForm(forms.SelfHandlingForm):
   	name = forms.CharField(max_length=80, label=_("Name"))
 	description = forms.CharField(max_length=80, label=_("Description"), required=False)
 	servicechain_spec = forms.ChoiceField(label=_("ServiceChain Spec"))
-	provider_epg = forms.ChoiceField(label=_("Provider EPG"))
-	consumer_epg = forms.ChoiceField(label=_("Consumer EPG"))
+	provider_ptg = forms.ChoiceField(label=_("Provider PTG"))
+	consumer_ptg = forms.ChoiceField(label=_("Consumer PTG"))
 	classifier = forms.ChoiceField(label=_("Classifier"))
 
 	def __init__(self,request,*args,**kwargs):
 		super(CreateServiceChainInstanceForm,self).__init__(request,*args,**kwargs)
 		try:
 			sc_specs = client.servicechainspec_list(request)
-			epgs = client.epg_list(request)
- 			epgs = [(item.id,item.name) for item in epgs]
-			print epgs
+			ptgs = client.policy_target_list(request)
+ 			ptgs = [(item.id,item.name) for item in ptgs]
 			classifiers = client.policyclassifier_list(request)
 			self.fields['servicechain_spec'].choices = [(item.id,item.name) for item in sc_specs]
-			self.fields['provider_epg'].choices = epgs
-			self.fields['consumer_epg'].choices = epgs
+			self.fields['provider_ptg'].choices = ptgs
+			self.fields['consumer_ptg'].choices = ptgs
 			self.fields['classifier'].choices = [(item.id,item.name) for item in classifiers] 
 		except Exception as e:
-			pass
+			print e
+			msg = _("Failed to retrive policy targets")
+			LOG.error(msg)
 
 	def handle(self,request,context):
 		url = reverse("horizon:project:network_services:index")

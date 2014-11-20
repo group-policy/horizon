@@ -56,7 +56,11 @@ class UpdateServiceChainNodeView(forms.ModalFormView):
 
 	def get_initial(self):
 		return self.kwargs
- 
+
+class ServiceChainNodeDetailsView(tabs.TabView):
+	tab_group_class = (ns_tabs.SCNodeDetailsTabGroup)
+	template_name = 'project/network_services/details_tabs.html' 
+
 class CreateServiceChainSpecView(forms.ModalFormView):
   	form_class = ns_forms.CreateServiceChainSpecForm
 	template_name = "project/network_services/create_service_chain_spec.html"
@@ -76,6 +80,10 @@ class UpdateServiceChainSpecView(forms.ModalFormView):
  	
 	def get_initial(self):
 		return self.kwargs
+
+class ServiceChainSpecDetailsView(tabs.TabView):
+	tab_group_class = (ns_tabs.SCSpecDetailsTabGroup)
+	template_name = 'project/network_services/details_tabs.html' 
  
 class CreateServiceChainInstanceView(forms.ModalFormView):
    	form_class = ns_forms.CreateServiceChainInstanceForm
@@ -96,4 +104,7 @@ class UpdateServiceChainInstanceView(forms.ModalFormView):
  	
 	def get_initial(self):
 		return self.kwargs
- 
+
+class ServiceChainInstanceDetailsView(tabs.TabView):
+	tab_group_class = (ns_tabs.SCInstanceDetailsTabGroup)
+	template_name = 'project/network_services/details_tabs.html' 

@@ -3,7 +3,7 @@
 {% load url from future %}
 
 {% block form_id %}add_vm_form{% endblock %}
-{% block form_action %}{% url 'horizon:project:endpoint_groups:addvm' epg_id %}{% endblock %}
+{% block form_action %}{% url 'horizon:project:policytargets:addvm' policy_target_id %}{% endblock %}
 
 {% block modal-header %}{% trans "Launch Instance" %}{% endblock %}
 
@@ -21,5 +21,5 @@
 
 {% block modal-footer %}
   <input class="btn btn-primary pull-right" type="submit" value="{% trans "Launch" %}" />
-  <a href="{% url 'horizon:project:endpoint_groups:index' %}" class="btn secondary cancel close">{% trans "Cancel" %}</a>
+  <a href="{% url 'horizon:project:policytargets:index' %}" class="btn secondary cancel close">{% trans "Cancel" %}</a>
 {% endblock %}

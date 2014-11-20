@@ -21,22 +21,22 @@ POLICY_ACTION_TYPES = [('allow', _('ALLOW')),
                        ('log', _('LOG')),
                        ('qos', _('QoS'))]
 
-class UpdateContractForm(forms.SelfHandlingForm):
+class UpdatePolicyRuleSetForm(forms.SelfHandlingForm):
     name = forms.CharField(label=_("Name"))
     description = forms.CharField(label=_("Description"),required=False)
     rules = forms.MultipleChoiceField(label=_("Policy Rules"),)
 
     def __init__(self, request, *args, **kwargs):
-        super(UpdateContractForm, self).__init__(request, *args, **kwargs)
+        super(UpdatePolicyRuleSetForm, self).__init__(request, *args, **kwargs)
         rules = []
         try:
             items = client.policyrule_list(request)
             rules = [(p.id,p.name) for p in items]
-            contract = client.contract_get(request, self.initial['contract_id'])
-            if contract:
-                self.fields['name'].initial = contract.name
-                self.fields['description'].initial = contract.description
-                existing = [item for item in contract.policy_rules]
+            policy_rule_set = client.policy_rule_set_get(request, self.initial['policy_rule_set_id'])
+            if policy_rule_set:
+                self.fields['name'].initial = policy_rule_set.name
+                self.fields['description'].initial = policy_rule_set.description
+                existing = [item for item in policy_rule_set.policy_rules]
                 self.fields['rules'].initial = existing
         except Exception as e:
             exceptions.handle(request, _('Unable to retrieve policy rules'))
@@ -44,19 +44,19 @@ class UpdateContractForm(forms.SelfHandlingForm):
     
     def handle(self,request,context):
         try:
-            contract_id = self.initial['contract_id']
-            con = client.contract_update(request, 
-                                                  contract_id,
+            policy_rule_set_id = self.initial['policy_rule_set_id']
+            con = client.policy_rule_set_update(request, 
+                                                  policy_rule_set_id,
                                                   name=context['name'],
                                                   description=context['description'],
                                                   policy_rules=context['rules'],
                                                   )
-            messages.success(request, _('Contract successfully updated.'))
+            messages.success(request, _('PolicyRuleSet successfully updated.'))
             url = reverse('horizon:project:application_policy:index')
             return http.HttpResponseRedirect(url)
         except Exception as e:
-            redirect = reverse('horizon:project:contracts:index')
-            exceptions.handle(request, _("Unable to update contract."), redirect=redirect)
+            redirect = reverse('horizon:project:policy_rule_sets:index')
+            exceptions.handle(request, _("Unable to update policy_rule_set."), redirect=redirect)
 
 class AddPolicyActionForm(forms.SelfHandlingForm):
     name = forms.CharField(label=_("Name"))

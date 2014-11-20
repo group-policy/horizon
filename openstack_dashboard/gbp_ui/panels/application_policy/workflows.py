@@ -95,7 +95,7 @@ class AddContractStep(workflows.Step):
 
 
 class AddContract(workflows.Workflow):
-    slug = "addcontract"
+    slug = "addpolicy_rule_set"
     name = _("Create Policy Rule Set")
     finalize_button_name = _("Create")
     success_message = _('Created Policy Rule Set "%s".')
@@ -110,18 +110,18 @@ class AddContract(workflows.Workflow):
     def format_status_message(self, message):
         return message % self.context.get('name')
 
-    def _create_contract(self, request, context):
+    def _create_policy_rule_set(self, request, context):
         try:
-            return client.contract_create(request, **context)
+            return client.policy_rule_set_create(request, **context)
         except Exception as e:
             msg = self.format_status_message(self.failure_message) + str(e)
             exceptions.handle(request, msg)
             return False
 
     def handle(self, request, context):
-        contract = self._create_contract(request, context)
-        self.object = contract
-        return contract
+        policy_rule_set = self._create_policy_rule_set(request, context)
+        self.object = policy_rule_set
+        return policy_rule_set
 
 
 class SelectPolicyClassifierAction(workflows.Action):

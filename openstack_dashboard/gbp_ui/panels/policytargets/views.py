@@ -26,21 +26,21 @@ from horizon import workflows
 
 from gbp_ui import client
 
-import forms as epg_forms
-import tabs as epg_tabs
-import workflows as epg_workflows
+import forms as policy_target_forms
+import tabs as policy_target_tabs
+import workflows as policy_target_workflows
 
-EPGTabs = epg_tabs.EPGTabs
-EPGDetailsTabs = epg_tabs.EPGDetailsTabs
+PTGTabs = policy_target_tabs.PTGTabs
+PTGDetailsTabs = policy_target_tabs.PTGDetailsTabs
 
-AddEPG = epg_workflows.AddEPG
-LaunchVM = epg_workflows.CreateVM
-CreateContractForm = epg_forms.CreateContractForm
+AddPTG = policy_target_workflows.AddPTG
+LaunchVM = policy_target_workflows.CreateVM
+CreateContractForm = policy_target_forms.CreateContractForm
 
 
 class IndexView(tabs.TabView):
-    tab_group_class = (EPGTabs)
-    template_name = 'project/endpoint_groups/details_tabs.html'
+    tab_group_class = (PTGTabs)
+    template_name = 'project/policytargets/details_tabs.html'
 
     def post(self, request, *args, **kwargs):
         obj_ids = request.POST.getlist('object_ids')
@@ -49,7 +49,7 @@ class IndexView(tabs.TabView):
             obj_ids.append(re.search('([0-9a-z-]+)$', action).group(1))
         for obj_id in obj_ids:
             try:
-                client.epg_delete(request, obj_id)
+                client.policy_target_delete(request, obj_id)
                 messages.success(request,
                                  _('Deleted Group %s') % obj_id)
             except Exception as e:
@@ -58,20 +58,20 @@ class IndexView(tabs.TabView):
         return self.get(request, *args, **kwargs)
 
 
-class AddEPGView(workflows.WorkflowView):
-    workflow_class = AddEPG
-    template_name = "project/endpoint_groups/addepg.html"
+class AddPTGView(workflows.WorkflowView):
+    workflow_class = AddPTG
+    template_name = "project/policytargets/addpolicy_target.html"
 
 
-class EPGDetailsView(tabs.TabbedTableView):
-    tab_group_class = (epg_tabs.EPGMemberTabs)
-    template_name = 'project/endpoint_groups/group_details.html'
+class PTGDetailsView(tabs.TabbedTableView):
+    tab_group_class = (policy_target_tabs.PTGMemberTabs)
+    template_name = 'project/policytargets/group_details.html'
 
     def get_context_data(self,**kwargs):
-        context = super(EPGDetailsView, self).get_context_data(**kwargs)
+        context = super(PTGDetailsView, self).get_context_data(**kwargs)
         try:
-            epg = client.epg_get(self.request,context['epg_id'])
-            context['epg'] = epg
+            policy_target = client.policy_target_get(self.request,context['policy_target_id'])
+            context['policy_target'] = policy_target
         except Exception as e:
             pass
         return context
@@ -79,21 +79,21 @@ class EPGDetailsView(tabs.TabbedTableView):
 
 class LaunchVMView(workflows.WorkflowView):
     workflow_class = LaunchVM
-    template_name = "project/endpoint_groups/add_vm.html"
+    template_name = "project/policytargets/add_vm.html"
     
     def get_initial(self):
         return self.kwargs
 
 
-class UpdateEPGView(forms.ModalFormView):
-    form_class = epg_forms.UpdateEPGForm
-    template_name = "project/endpoint_groups/updateepg.html"
-    context_object_name = 'epg'
-    success_url = reverse_lazy("horizon:project:endpoint_groups:index")
+class UpdatePTGView(forms.ModalFormView):
+    form_class = policy_target_forms.UpdatePolicyTargetForm
+    template_name = "project/policytargets/updatepolicy_target.html"
+    context_object_name = 'policy_target'
+    success_url = reverse_lazy("horizon:project:policytargets:index")
 
     def get_context_data(self, **kwargs):
-        context = super(UpdateEPGView, self).get_context_data(**kwargs)
-        context["epg_id"] = self.kwargs['epg_id']
+        context = super(UpdatePTGView, self).get_context_data(**kwargs)
+        context["policy_target_id"] = self.kwargs['policy_target_id']
         obj = self._get_object()
         if obj:
             context['name'] = obj.name
@@ -101,64 +101,64 @@ class UpdateEPGView(forms.ModalFormView):
 
     @memoized.memoized_method
     def _get_object(self, *args, **kwargs):
-        epg_id = self.kwargs['epg_id']
+        policy_target_id = self.kwargs['policy_target_id']
         try:
-            epg = client.epg_get(self.request, epg_id)
-            epg.set_id_as_name_if_empty()
-            return epg
+            policy_target = client.policy_target_get(self.request, policy_target_id)
+            policy_target.set_id_as_name_if_empty()
+            return policy_target
         except Exception:
             redirect = self.success_url
-            msg = _('Unable to retrieve epg details.')
+            msg = _('Unable to retrieve policy_target details.')
             exceptions.handle(self.request, msg, redirect=redirect)
 
     def get_initial(self):
-        epg = self._get_object()
-        initial = epg.get_dict()
+        policy_target = self._get_object()
+        initial = policy_target.get_dict()
         return initial
 
 class CreateContractView(forms.ModalFormView):
     form_class = CreateContractForm
-    template_name = "project/endpoint_groups/add_contract.html"
+    template_name = "project/policytargets/add_policy_rule_set.html"
 
     def get_context_data(self, **kwargs):
         context = super(CreateContractView, self).get_context_data(**kwargs)
-        context["epg_id"] = self.kwargs['epg_id']
+        context["policy_target_id"] = self.kwargs['policy_target_id']
         return context
     
     def get_initial(self):
         return self.kwargs
 
 class RemoveContractView(forms.ModalFormView):
-    form_class = epg_forms.RemoveContractForm
-    template_name = "project/endpoint_groups/remove_contract.html"
+    form_class = policy_target_forms.RemoveContractForm
+    template_name = "project/policytargets/remove_policy_rule_set.html"
 
     def get_context_data(self, **kwargs):
         context = super(RemoveContractView, self).get_context_data(**kwargs)
-        context["epg_id"] = self.kwargs['epg_id']
+        context["policy_target_id"] = self.kwargs['policy_target_id']
         return context
     
     def get_initial(self):
         return self.kwargs 
 
 class AddConsumedView(forms.ModalFormView):
-    form_class = epg_forms.AddConsumedForm
-    template_name = "project/endpoint_groups/add_consumed.html"
+    form_class = policy_target_forms.AddConsumedForm
+    template_name = "project/policytargets/add_consumed.html"
 
     def get_context_data(self, **kwargs):
         context = super(AddConsumedView, self).get_context_data(**kwargs)
-        context["epg_id"] = self.kwargs['epg_id']
+        context["policy_target_id"] = self.kwargs['policy_target_id']
         return context
     
     def get_initial(self):
         return self.kwargs
  
 class RemoveConsumedView(forms.ModalFormView):
-    form_class = epg_forms.RemoveConsumedForm
-    template_name = "project/endpoint_groups/remove_consumed.html"
+    form_class = policy_target_forms.RemoveConsumedForm
+    template_name = "project/policytargets/remove_consumed.html"
 
     def get_context_data(self, **kwargs):
         context = super(RemoveConsumedView, self).get_context_data(**kwargs)
-        context["epg_id"] = self.kwargs['epg_id']
+        context["policy_target_id"] = self.kwargs['policy_target_id']
         return context
     
     def get_initial(self):

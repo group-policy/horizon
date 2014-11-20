@@ -25,22 +25,22 @@ from horizon import forms
 
 from gbp_ui import client
 
-import tabs as contract_tabs
-import workflows as contract_workflows
-import forms as contract_forms
+import tabs as policy_rule_set_tabs
+import workflows as policy_rule_set_workflows
+import forms as policy_rule_set_forms
 
-ContractTabs = contract_tabs.ApplicationPoliciesTabs
-ContractDetailsTabs = contract_tabs.ContractDetailsTabs
-PolicyRuleDetailsTabs = contract_tabs.PolicyRuleDetailsTabs
-PolicyClassifierDetailsTabs = contract_tabs.PolicyClassifierDetailsTabs
-PolicyActionDetailsTabs = contract_tabs.PolicyActionDetailsTabs
-AddContract = contract_workflows.AddContract
-AddPolicyRule = contract_workflows.AddPolicyRule
-AddPolicyClassifier = contract_workflows.AddPolicyClassifier
+PolicyRuleSetTabs = policy_rule_set_tabs.ApplicationPoliciesTabs
+PolicyRuleSetDetailsTabs = policy_rule_set_tabs.ContractDetailsTabs
+PolicyRuleDetailsTabs = policy_rule_set_tabs.PolicyRuleDetailsTabs
+PolicyClassifierDetailsTabs = policy_rule_set_tabs.PolicyClassifierDetailsTabs
+PolicyActionDetailsTabs = policy_rule_set_tabs.PolicyActionDetailsTabs
+AddPolicyRuleSet = policy_rule_set_workflows.AddContract
+AddPolicyRule = policy_rule_set_workflows.AddPolicyRule
+AddPolicyClassifier = policy_rule_set_workflows.AddPolicyClassifier
 
 
 class IndexView(tabs.TabView):
-    tab_group_class = (ContractTabs)
+    tab_group_class = (PolicyRuleSetTabs)
     template_name = 'project/application_policy/details_tabs.html'
 
     def post(self, request, *args, **kwargs):
@@ -74,36 +74,36 @@ class IndexView(tabs.TabView):
                 except Exception as e:
                     exceptions.handle(request,
                                       _('Unable to delete rule. %s') % e)
-        if obj_type == 'contract':
+        if obj_type == 'policy_rule_set':
             for obj_id in obj_ids:
                 try:
-                    client.contract_delete(request, obj_id)
+                    client.policy_rule_set_delete(request, obj_id)
                     messages.success(request,
                                      _('Deleted rule %s') % obj_id)
                 except Exception as e:
                     exceptions.handle(request,
-                                      _('Unabled to delete contract. %s') % e)
+                                      _('Unabled to delete policy_rule_set. %s') % e)
 
         return self.get(request, *args, **kwargs)
 
-class AddContractView(workflows.WorkflowView):
-    workflow_class = AddContract
-    template_name = "project/application_policy/addcontract.html"
+class AddPolicyRuleSetView(workflows.WorkflowView):
+    workflow_class = AddPolicyRuleSet
+    template_name = "project/application_policy/addpolicy_rule_set.html"
 
-    def get_object_id(self,contract):
-        return [contract.id]
+    def get_object_id(self,policy_rule_set):
+        return [policy_rule_set.id]
 
-class UpdateContractView(forms.ModalFormView):
-    form_class = contract_forms.UpdateContractForm
-    template_name = 'project/application_policy/update_contract.html'
+class UpdatePolicyRuleSetView(forms.ModalFormView):
+    form_class = policy_rule_set_forms.UpdatePolicyRuleSetForm
+    template_name = 'project/application_policy/update_policy_rule_set.html'
 
     def get_context_data(self, **kwargs):
-        context = super(UpdateContractView, self).get_context_data(**kwargs)
-        context['contract_id'] = self.kwargs['contract_id']
+        context = super(UpdatePolicyRuleSetView, self).get_context_data(**kwargs)
+        context['policy_rule_set_id'] = self.kwargs['policy_rule_set_id']
         return context
 
     def get_initial(self):
-        return {'contract_id': self.kwargs['contract_id']}
+        return {'policy_rule_set_id': self.kwargs['policy_rule_set_id']}
  
 
 
@@ -116,7 +116,7 @@ class AddPolicyRuleView(workflows.WorkflowView):
 
 
 class AddPolicyClassifierView(forms.ModalFormView):
-    form_class = contract_forms.AddPolicyClassifierForm
+    form_class = policy_rule_set_forms.AddPolicyClassifierForm
     template_name = "project/application_policy/add_policy_classifier.html"
 
     def get_success_url(self):
@@ -126,7 +126,7 @@ class AddPolicyClassifierView(forms.ModalFormView):
         return [classifier.id]
  
 class AddPolicyActionView(forms.ModalFormView):
-    form_class = contract_forms.AddPolicyActionForm
+    form_class = policy_rule_set_forms.AddPolicyActionForm
     template_name = "project/application_policy/add_policy_action.html"
 
     def get_success_url(self):
@@ -137,7 +137,7 @@ class AddPolicyActionView(forms.ModalFormView):
  
 
 class UpdatePolicyActionView(forms.ModalFormView):
-    form_class = contract_forms.UpdatePolicyActionForm
+    form_class = policy_rule_set_forms.UpdatePolicyActionForm
     template_name = "project/application_policy/update_policy_action.html"
 
     def get_context_data(self, **kwargs):
@@ -149,8 +149,8 @@ class UpdatePolicyActionView(forms.ModalFormView):
         return {'policyaction_id': self.kwargs['policyaction_id']} 
 
 
-class ContractDetailsView(tabs.TabView):
-    tab_group_class = (ContractDetailsTabs)
+class PolicyRuleSetDetailsView(tabs.TabView):
+    tab_group_class = (PolicyRuleSetDetailsTabs)
     template_name = 'project/application_policy/details_tabs.html'
 
 
@@ -159,7 +159,7 @@ class PolicyRuleDetailsView(tabs.TabView):
     template_name = 'project/application_policy/details_tabs.html'
 
 class UpdatePolicyRuleView(forms.ModalFormView):
-    form_class = contract_forms.UpdatePolicyRuleForm
+    form_class = policy_rule_set_forms.UpdatePolicyRuleForm
     template_name = "project/application_policy/update_policy_rule.html"
 
     def get_context_data(self,**kwargs):
@@ -175,7 +175,7 @@ class PolicyClassifierDetailsView(tabs.TabView):
     template_name = 'project/application_policy/details_tabs.html'
 
 class UpdatePolicyClassifierView(forms.ModalFormView):
-    form_class = contract_forms.UpdatePolicyClassifierForm
+    form_class = policy_rule_set_forms.UpdatePolicyClassifierForm
     template_name = "project/application_policy/update_policy_classifier.html"
 
     def get_context_data(self,**kwargs):

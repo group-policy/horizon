@@ -25,16 +25,16 @@ def gbpclient(request):
     return c
 
 
-class EP(neutron.NeutronAPIDictWrapper):
+class PT(neutron.NeutronAPIDictWrapper):
     """Wrapper for neutron endpoint group."""
 
     def get_dict(self):
-        ep_dict = self._apidict
-        ep_dict['ep_id'] = ep_dict['id']
+        pt_dict = self._apidict
+        pt_dict['ep_id'] = pt_dict['id']
         return ep_dict
 
 
-class EPG(neutron.NeutronAPIDictWrapper):
+class PTG(neutron.NeutronAPIDictWrapper):
     """Wrapper for neutron endpoint group."""
 
     def get_dict(self):
@@ -44,12 +44,12 @@ class EPG(neutron.NeutronAPIDictWrapper):
 
 
 class Contract(neutron.NeutronAPIDictWrapper):
-    """Wrapper for neutron contract."""
+    """Wrapper for neutron policy_rule_set."""
 
     def get_dict(self):
-        contract_dict = self._apidict
-        contract_dict['contract_id'] = contract_dict['id']
-        return contract_dict
+        policy_rule_set_dict = self._apidict
+        policy_rule_set_dict['policy_rule_set_id'] = policy_rule_set_dict['id']
+        return policy_rule_set_dict
 
 
 class PolicyRule(neutron.NeutronAPIDictWrapper):
@@ -114,74 +114,74 @@ class ServiceChainInstance(neutron.NeutronAPIDictWrapper):
 		sc_instance_dict = self._apidict
 		return sc_instance_dict 
  
-def epg_create(request, **kwargs):
-    body = {'endpoint_group': kwargs}
-    epg = gbpclient(request).create_endpoint_group( body).get('endpoint_group')
-    return EPG(epg)
+def policy_target_create(request, **kwargs):
+    body = {'policy_target_group': kwargs}
+    policy_target = gbpclient(request).create_policy_target_group( body).get('endpoint_group')
+    return PTG(policy_target)
 
 
-def ep_create(request,**kwargs):
-	body = {'endpoint': kwargs}
-	ep = gbpclient(request).create_endpoint(body).get('endpoint')
-	return EPG(ep)
+def pt_create(request,**kwargs):
+	body = {'policy_target': kwargs}
+	pt = gbpclient(request).create_policy_target(body).get('policy_target')
+	return PTG(pt)
 
 
-def ep_list(request, **kwargs):
-	eps = gbpclient(request).list_endpoints(**kwargs).get('endpoints')
-	return [EP(ep) for ep in eps]
+def pt_list(request, **kwargs):
+	policy_targets = gbpclient(request).list_policy_targets(**kwargs).get('policy_targets')
+	return [PT(pt) for pt in policy_targets]
 
 
-def epg_list(request, **kwargs):
-	epgs = gbpclient(request).list_endpoint_groups(
-	 **kwargs).get('endpoint_groups')
-	return [EPG(epg) for epg in epgs]
+def policy_target_list(request, **kwargs):
+	policy_targets = gbpclient(request).list_policy_target_groups(
+	 **kwargs).get('policy_target_groups')
+	return [PTG(policy_target) for policy_target in policy_targets]
 
 
-def epg_get(request, epg_id):
-	epg = gbpclient(request).show_endpoint_group(
-	 epg_id).get('endpoint_group')
- 	return EPG(epg)
+def policy_target_get(request, policy_target_id):
+	policy_target = gbpclient(request).show_policy_target_group(
+	 policy_target_id).get('policy_target_group')
+ 	return PTG(policy_target)
 
 
-def epg_delete(request, epg_id):
-	gbpclient(request).delete_endpoint_group(epg_id)
+def policy_target_delete(request, policy_target_id):
+	gbpclient(request).delete_policy_target_group(policy_target_id)
 
 
-def epg_update(request, epg_id, **kwargs):
- 	body = {'endpoint_group': kwargs}
-	epg = gbpclient(request).update_endpoint_group(
-	 epg_id, body).get('endpoint_group')
-	return EPG(epg)
+def policy_target_update(request, policy_target_id, **kwargs):
+ 	body = {'policy_target_group': kwargs}
+	policy_target = gbpclient(request).update_policy_target_group(
+	 policy_target_id, body).get('policy_target_group')
+	return PTG(policy_target)
 
 
-def contract_create(request, **kwargs):
-	body = {'contract': kwargs}
-	contract = gbpclient(request).create_contract(
-	 body).get('contract')
-	return Contract(contract)
+def policy_rule_set_create(request, **kwargs):
+	body = {'policy_rule_set': kwargs}
+	policy_rule_set = gbpclient(request).create_policy_rule_set(
+	 body).get('policy_rule_set')
+	return Contract(policy_rule_set)
 
 
-def contract_list(request, **kwargs):
-	contracts = gbpclient(request).list_contracts(
-	 **kwargs).get('contracts')
- 	return [Contract(contract) for contract in contracts]
+def policy_rule_set_list(request, **kwargs):
+	policy_rule_sets = gbpclient(request).list_policy_rule_sets(
+	 **kwargs).get('policy_rule_sets')
+ 	return [Contract(policy_rule_set) for policy_rule_set in policy_rule_sets]
 
 
-def contract_get(request, contract_id):
-	contract = gbpclient(request).show_contract(
-	 contract_id).get('contract')
-	return Contract(contract)
+def policy_rule_set_get(request, policy_rule_set_id):
+	policy_rule_set = gbpclient(request).show_policy_rule_set(
+	 policy_rule_set_id).get('policy_rule_set')
+	return Contract(policy_rule_set)
 
 
-def contract_delete(request, contract_id):
-	gbpclient(request).delete_contract(contract_id)
+def policy_rule_set_delete(request, policy_rule_set_id):
+	gbpclient(request).delete_policy_rule_set(policy_rule_set_id)
 
 
-def contract_update(request, contract_id, **kwargs):
-	body = {'contract': kwargs}
-	contract = gbpclient(request).update_contract(
-	 contract_id, body).get('contract')
-	return Contract(contract)
+def policy_rule_set_update(request, policy_rule_set_id, **kwargs):
+	body = {'policy_rule_set': kwargs}
+	policy_rule_set = gbpclient(request).update_policy_rule_set(
+	 policy_rule_set_id, body).get('policy_rule_set')
+	return Contract(policy_rule_set)
 
 
 def policyrule_create(request, **kwargs):
